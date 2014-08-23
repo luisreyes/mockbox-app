@@ -1,0 +1,31 @@
+{
+  "name": "MockBox",
+  "version": "0.7.0",
+  "description": "Prorotype builder",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "gulp": "^3.8.7"
+  },
+  "devDependencies": {
+    "gulp-concat": "^2.3.4",
+    "gulp-cssmin": "^0.1.6",
+    "gulp-jade": "^0.7.0",
+    "gulp-minify-css": "^0.3.7",
+    "gulp-order": "^1.1.1",
+    "gulp-sass": "^0.7.3",
+    "gulp-uglify": "^0.3.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luisreyes/MockBox"
+  },
+  "author": "Luis Reyes <luis@luisreyes.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luisreyes/MockBox/issues"
+  },
+  "homepage": "https://github.com/luisreyes/MockBox"
+}

@@ -1,0 +1,17 @@
+// Section sizes
+$sidebar-width : 150px;
+$topbar-height : 40px;
+$topbar-height-frame : 30px;
+
+
+// Colors
+$theme-base-bg: #333;
+$theme-base-font-color:#CCC;
+$theme-color: #719fd4;
+$theme-color-dark : darken($theme-color, 25%);
+$theme-color-darker : darken($theme-color, 30%);
+
+
+$app-frame-width: 1px;
+$app-frame-type: solid;
+$app-frame-color:#333;

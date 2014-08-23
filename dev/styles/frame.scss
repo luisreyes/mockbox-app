@@ -1,0 +1,74 @@
+.window-bar{
+  height: 20px;
+  z-index: 100;
+  position: relative;
+  background: #222;
+
+  .window-drag{
+    -webkit-app-region: drag;
+    width:-webkit-calc(100% - 100px);
+    height: 100%;
+  }
+  .window-controls{ 
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    span{
+
+      width: 33.3%;
+      display: inline-block;
+      text-align: center;
+      line-height:20px;
+      font-size: large;
+      border-left: 1px solid #303030;
+    }
+    .window-min{
+      width:25px; 
+      &:hover { 
+        color:#333; 
+        background-color:$theme-color-dark;
+      }
+    }
+    .window-max{
+      width:25px; 
+      &:hover { 
+        color:#333; 
+        background-color:$theme-color-dark;
+      }
+    }
+    .window-close{ 
+      width:50px; 
+      background-color:darken(crimson,25%);
+      &:hover{ 
+        color:#333; 
+        background-color:crimson;
+      }
+    }
+
+  } 
+}
+
+.app-frame{
+  border-top: $app-frame-width $app-frame-type $app-frame-color;
+  border-right: $app-frame-width $app-frame-type $app-frame-color;
+  position: absolute;
+  z-index: 1000;
+  
+  &.frame-top{
+    top:0;
+    width: 100%;
+  }
+  &.frame-right{
+    height: 100%;
+    left:0;
+  }
+  &.frame-bottom{
+    bottom:0;
+    width: 100%;
+  }
+  &.frame-left{
+    height: 100%;
+    right:0;
+  }
+}

@@ -1,0 +1,34 @@
+{
+
+  "stylesheets":[
+    "lib/codemirror/theme/ambiance.css",
+    "lib/codemirror/theme/eclipse.css",
+    "lib/codemirror/theme/mbo.css",
+    "lib/codemirror/theme/solarized.css",
+    "lib/codemirror/codemirror.css",
+    "lib/elegant-icons/elegant-icons.css",
+    "lib/splitview/splitview.min.css",
+    "styles/app.css"
+  ],
+  
+  "scripts":[ 
+    "lib/codemirror/codemirror.js",
+    "lib/apollo/apollo.js",
+    "lib/splitview/splitview.min.js",
+    "lib/jszip/jszip.js",
+    "lib/jszip/FileSaver.js", 
+    "scripts/app.js"
+  ],
+
+  "frame":{
+    "stylesheets":[
+      "lib/elegant-icons/elegant-icons.css",
+      "styles/app.css"
+    ],
+    
+    "scripts":[ 
+      "scripts/frame.js"
+    ]
+  }
+
+}

@@ -1,0 +1,93 @@
+body, html { 
+  height: 100%;
+  margin: 0;
+  background-color:$theme-base-bg;
+  color:$theme-base-font-color;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+.absolute{position:absolute;}
+.bottom{bottom:0;}
+
+*:focus{outline:none;}
+
+::selection {
+  background: $theme-color;
+  color:#EEE;
+}
+
+.visible{display:inline-block !important;}
+
+.project-name{
+
+  float: left;
+  margin: 3px;
+  max-width: -webkit-calc(100% - 230px);
+  border: 1px solid transparent;
+  padding: 6px;
+  overflow: hidden;
+  white-space: nowrap;
+  line-height: 20px;
+
+  &.editing{
+    background-color: #333;
+    border: 1px solid #222;
+  }
+  
+}
+
+.icon_check{
+    margin: 11px 5px 0 2px;
+    color: #bbb;
+    display:none;
+    font-size: smaller;
+  }
+
+.app-name{
+  float: right;
+  margin: 9px 8px 0 5px;
+  font-size: 14px;
+}
+.app-logo{
+  background-image: url(/images/mockbox-logo.svg);
+  width: 122px;
+  height: 20px;
+  float:right;
+  background-size: cover;
+  margin-top: 11px;
+  margin-right: 10px;
+  background-repeat: no-repeat;
+}
+
+header {
+  color: #999;
+  background-color: #2A2A2A;
+  border: 1px solid #3C3C3C;
+  box-shadow: 0 0 5px #000;
+  font-size: 20px;
+  height: $topbar-height;
+  position: absolute;
+  right: 0;
+  z-index: 1010;
+  width:100%;
+
+  .icon:hover{
+    color:$theme-color;
+    cursor:pointer;
+  }
+
+  &.open { 
+    width:-webkit-calc( 100% - #{ $sidebar-width } );  
+  }
+}
+
+iframe {
+    border: none;
+  }
+
+
+
+
+
+
+

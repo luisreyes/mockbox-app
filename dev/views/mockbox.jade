@@ -1,0 +1,97 @@
+doctype html
+html
+  head
+
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+
+    // Styles
+    
+    each stylesheet in stylesheets
+      link(rel="stylesheet" type="text/css" href=stylesheet)
+
+  body
+    section#app-window-frame.window-bar
+      span#app-window-controls.window-controls
+        span.window-min.icon_minus-06
+        span.window-max.icon_plus
+        span.window-close.icon.icon_close
+      div.window-drag
+
+    section.app-frame.frame-top
+    section.app-frame.frame-right
+    section.app-frame.frame-bottom
+    section.app-frame.frame-left
+
+    // Menu Sidebar
+    
+    section#app-sidebar.sidebar
+      section.content
+        ul
+          li.new.transition 
+            span.icon.icon_document
+            span NEW
+
+          li.save.transition 
+            span.icon.icon_drive_alt
+            span SAVE
+
+          li.export.transition 
+            span.icon.icon_folder_download
+            span EXPORT
+          
+          li.load.transition 
+            span.icon.icon_download
+            span LOAD
+
+          li.transition
+            span.icon.icon_cogs
+            span SETTINGS
+        
+        ul.absolute.bottom
+          
+          li.twitter.transition 
+            span.icon.social_twitter
+            span @mockboxio
+
+          li.email.transition 
+            span.icon.icon_mail
+            span SUPPORT
+
+
+    // Header
+
+    header#app-header.header.transition.open
+      span#app-sidebar-toggle.sidebar-toggle.icon(data-icon="a")
+      span.project-name.transition New box
+      span.icon.icon_check
+      span.app-logo
+
+    // SplitView container
+    
+    section#app-editors.editors.transition.open
+      
+      section#html.code-box
+        section.bar
+          section.title HTML
+        section.code
+
+      section#css.code-box
+        section.bar
+          section.title CSS
+        section.code
+
+      section#js.code-box
+        section.bar
+          section.title JS
+        section.code
+
+      section#view.code-box
+        section.bar
+          section.title VIEW
+        section.code
+          iframe(id="compiled-view" src="mockbox_prototype.html" width="100%" height="100%")
+              
+    // Scripts
+    
+    each script in scripts
+      script( type="text/javascript" src=script)

@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    link(rel="stylesheet" type="text/css" href="styles/iframe.css")
+  
+  style#mockbox-prototype-styles
+  
+  body
+
+  script.
+    window.addEventListener('message', function(event) {
+      document.body.innerHTML = event.data.html;
+      document.getElementById('mockbox-prototype-styles').innerHTML = event.data.css;
+      
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.innerHTML = event.data.js;
+      document.body.appendChild(script);
+    });

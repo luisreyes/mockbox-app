@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "MockBox",
+  "version": "0.7",
+  "description": "Prototype builder",
+  "sandbox": {
+    "pages": ["mockbox_prototype.html"]
+  },
+  "icons": { 
+    "16": "icons/mockbox16.png",
+    "32": "icons/mockbox32.png",
+    "48": "icons/mockbox48.png", 
+    "96": "icons/mockbox96.png" ,
+    "128": "icons/mockbox128.png" ,
+    "256": "icons/mockbox256.png"},
+  "app": {
+    "background": {
+      "scripts": ["background.js"]
+    }
+  },
+  "permissions": [
+    "notifications",
+    {"fileSystem": ["write", "retainEntries", "directory"]},
+    "storage"
+  ]
+}
