@@ -23,6 +23,6 @@ _mock.notify = (function(){
     send: function(o){
       _notify(o)
     }
-  }
+  };
 
 }());

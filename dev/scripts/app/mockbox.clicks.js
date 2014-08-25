@@ -3,16 +3,19 @@ _mock.clicks = (function(){
   var
 
   wndMain = chrome.app.window.get('main'),
-  windowControls = document.getElementById('app-window-controls'),
+  windowControls = document.getElementById("app-window-controls"),
   sidebar = document.getElementById('app-sidebar'),
   header = document.getElementById('app-header'),
   nodeName = header.querySelector('.project-name'),
+  popoutWrapper = document.getElementById('app-popout'),
+  popoutBase = popoutWrapper.querySelector('.base'),
 
   buttons = {
     new       :sidebar.querySelector('.new'),
     save      :sidebar.querySelector('.save'),
     load      :sidebar.querySelector('.load'),
     export    :sidebar.querySelector('.export'),
+    settings  :sidebar.querySelector('.settings'),
     twitter   :sidebar.querySelector('.twitter'),
     email     :sidebar.querySelector('.email'),
     check     :header.querySelector('.icon_check'),
@@ -46,15 +49,39 @@ _mock.clicks = (function(){
       chrome.app.window.current().close();
     });
     
+    popoutBase.addEventListener('click', function(){
+      var curWindow = chrome.app.window.get(_mock.popout.getCurrentId());
+      curWindow.focus();
+      curWindow.drawAttention();
+    });
+
     // Sidebar Buttons Action
 
     buttons.new.addEventListener( 'click', _mock.reset );
 
     buttons.save.addEventListener( 'click', _mock.save );
 
-    buttons.load.addEventListener( 'click', _mock.load );
+    buttons.load.addEventListener( 'click', function(e){
+      var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
+      if(!apollo.hasClass(element, 'inactive')){
+        _mock.popout.open('load');
+      }
+    });
 
-    buttons.export.addEventListener( 'click', _mock.export );
+    buttons.export.addEventListener( 'click', function(e){
+      var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
+      if(!apollo.hasClass(element, 'inactive')){
+        _mock.popout.open('export');
+      }
+    });
+
+    buttons.settings.addEventListener( 'click', function(e){
+      var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
+      if(!apollo.hasClass(element, 'inactive')){
+        _mock.popout.open('settings');
+      }
+    });
+    
     
     buttons.twitter.addEventListener( 'click', function(){
       openLink('twitter');
@@ -106,6 +133,6 @@ _mock.clicks = (function(){
         apollo.removeClass(buttons[b],c);
       }
     }
-  }
+  };
 
 }());

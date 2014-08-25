@@ -58,6 +58,18 @@ gulp.task( 'compile_js', function () {
     .pipe( concat('app.js') )
     .pipe( gulp.dest( 'app/scripts/' ));
 
+
+  // Minify, Bundle, Obsfucate JavaScript
+  gulp.src( 'dev/scripts/popout/*.js' )
+    .pipe(order([
+      "popout.js",
+      "*.js",
+      "popout_end.js"
+    ]))
+    //.pipe( uglify() )
+    .pipe( concat('popout.js') )
+    .pipe( gulp.dest( 'app/scripts/' ));
+
 });
 
 

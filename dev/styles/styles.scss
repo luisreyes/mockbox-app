@@ -6,8 +6,9 @@ body, html {
   font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-.absolute{position:absolute;}
-.bottom{bottom:0;}
+.absolute{ position:absolute; }
+.bottom{ bottom:0; }
+.visible{ display:block; }
 
 *:focus{outline:none;}
 

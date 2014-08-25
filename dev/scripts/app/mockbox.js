@@ -53,6 +53,17 @@ var MockBox;
 
     // Init Clicks
     _mock.clicks.init();
+
+    chrome.runtime.onMessage.addListener(function(data) {
+      switch(data.message){
+         
+         case 'closePopout': _mock.popout.close(data.popoutId);
+         break;
+
+         default: return;
+         break;
+      }
+    });
   }
 
   /*******************/
@@ -224,9 +235,9 @@ var MockBox;
     },
     reset:function(){
       currentGui = null;
-      document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New box'
+      document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New Mock'
       clearEditors();
     }
-  }
+  };
 
 }());

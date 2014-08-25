@@ -18,28 +18,6 @@ _mock.storage = (function(){
     chrome.storage.sync.set({'editors':data}, function(){});
   }
 
-  // function restoreFromLastGui(){
-  //   chrome.storage.sync.get('lastId', function(result){
-  //     _mock.database.restoreEditorsFromId(result['lastId']);
-  //   });
-  // }
-  
-  // function setLastGui(gui){
-  //   chrome.storage.sync.set({'lastId':gui}, null);
-  // }  
-
-  // return {
-  //   editors:{
-  //     
-  //     save: function(id){
-  //       setLastGui(id);
-  //     }  
-  //   },
-  //   drop:function(){
-  //     chrome.storage.sync.clear();
-  //   }
-  // }
-
   return {
     editors:{
       restore: function(){
@@ -58,6 +36,6 @@ _mock.storage = (function(){
     purge:function(){
       chrome.storage.sync.clear();
     }
-  }
+  };
 
 }());

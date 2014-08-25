@@ -1,0 +1,35 @@
+doctype html
+html
+  head
+
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+
+    // Styles
+    
+    each stylesheet in stylesheets
+      link(rel="stylesheet" type="text/css" href=stylesheet)
+
+  body
+    section#app-window-frame.window-bar
+      span#app-popout-controls.window-controls
+        span.window-close.icon.icon_close
+      div.popout-drag
+
+    section.app-frame.frame-top
+    section.app-frame.frame-right
+    section.app-frame.frame-bottom
+    section.app-frame.frame-left
+
+    header.popout-header
+      span.popout-title-icon
+        block titleIcon
+      span.popout-title
+        block title 
+    section.popout-content
+      block content
+
+    
+    // Scripts
+    
+    each script in popout.scripts
+      script( type="text/javascript" src=script)

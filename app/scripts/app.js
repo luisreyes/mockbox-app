@@ -53,6 +53,17 @@ var MockBox;
 
     // Init Clicks
     _mock.clicks.init();
+
+    chrome.runtime.onMessage.addListener(function(data) {
+      switch(data.message){
+         
+         case 'closePopout': _mock.popout.close(data.popoutId);
+         break;
+
+         default: return;
+         break;
+      }
+    });
   }
 
   /*******************/
@@ -224,10 +235,10 @@ var MockBox;
     },
     reset:function(){
       currentGui = null;
-      document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New box'
+      document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New Mock'
       clearEditors();
     }
-  }
+  };
 
 }());
 _mock.clicks = (function(){
@@ -235,16 +246,19 @@ _mock.clicks = (function(){
   var
 
   wndMain = chrome.app.window.get('main'),
-  windowControls = document.getElementById('app-window-controls'),
+  windowControls = document.getElementById("app-window-controls"),
   sidebar = document.getElementById('app-sidebar'),
   header = document.getElementById('app-header'),
   nodeName = header.querySelector('.project-name'),
+  popoutWrapper = document.getElementById('app-popout'),
+  popoutBase = popoutWrapper.querySelector('.base'),
 
   buttons = {
     new       :sidebar.querySelector('.new'),
     save      :sidebar.querySelector('.save'),
     load      :sidebar.querySelector('.load'),
     export    :sidebar.querySelector('.export'),
+    settings  :sidebar.querySelector('.settings'),
     twitter   :sidebar.querySelector('.twitter'),
     email     :sidebar.querySelector('.email'),
     check     :header.querySelector('.icon_check'),
@@ -278,15 +292,39 @@ _mock.clicks = (function(){
       chrome.app.window.current().close();
     });
     
+    popoutBase.addEventListener('click', function(){
+      var curWindow = chrome.app.window.get(_mock.popout.getCurrentId());
+      curWindow.focus();
+      curWindow.drawAttention();
+    });
+
     // Sidebar Buttons Action
 
     buttons.new.addEventListener( 'click', _mock.reset );
 
     buttons.save.addEventListener( 'click', _mock.save );
 
-    buttons.load.addEventListener( 'click', _mock.load );
+    buttons.load.addEventListener( 'click', function(e){
+      var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
+      if(!apollo.hasClass(element, 'inactive')){
+        _mock.popout.open('load');
+      }
+    });
 
-    buttons.export.addEventListener( 'click', _mock.export );
+    buttons.export.addEventListener( 'click', function(e){
+      var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
+      if(!apollo.hasClass(element, 'inactive')){
+        _mock.popout.open('export');
+      }
+    });
+
+    buttons.settings.addEventListener( 'click', function(e){
+      var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
+      if(!apollo.hasClass(element, 'inactive')){
+        _mock.popout.open('settings');
+      }
+    });
+    
     
     buttons.twitter.addEventListener( 'click', function(){
       openLink('twitter');
@@ -338,13 +376,10 @@ _mock.clicks = (function(){
         apollo.removeClass(buttons[b],c);
       }
     }
-  }
+  };
 
 }());
 _mock.database = (function(){
-
-  // https://developer.chrome.com/apps/offline_apps
-  // http://www.w3.org/TR/IndexedDB/
 
   var indexedDb = {};
   indexedDb.db = null;
@@ -494,7 +529,7 @@ _mock.database = (function(){
     getAll:function(){
       indexedDb.getAllEntries();
     }
-  }
+  };
 
 }());
 _mock.notify = (function(){
@@ -522,7 +557,41 @@ _mock.notify = (function(){
     send: function(o){
       _notify(o)
     }
+  };
+
+}());
+_mock.popout = (function(){
+'use strict'; 
+  var 
+  popoutWrapper = document.getElementById('app-popout'),
+  popoutBase = popoutWrapper.querySelector('.base'),
+  currentId = '';
+
+  function _open(loc){
+    currentId = loc;
+    apollo.addClass(popoutBase, 'visible');
+    chrome.app.window.get(loc).show();
+    // should then invoke _mock.load('gui'); OR _mock.export();
   }
+
+  function _close(loc){
+    currentId = '';
+    apollo.removeClass(popoutBase, 'visible');
+    chrome.app.window.get(loc).hide();
+    // should then invoke _mock.load('gui'); OR _mock.export();
+  }
+
+  return {
+    open: function(location){
+      _open(location);
+    },
+    close: function(location){
+      _close(location);
+    },
+    getCurrentId: function(){
+      return currentId;
+    }
+  };
 
 }());
 /*! Local Storage - Used for temp data
@@ -545,28 +614,6 @@ _mock.storage = (function(){
     chrome.storage.sync.set({'editors':data}, function(){});
   }
 
-  // function restoreFromLastGui(){
-  //   chrome.storage.sync.get('lastId', function(result){
-  //     _mock.database.restoreEditorsFromId(result['lastId']);
-  //   });
-  // }
-  
-  // function setLastGui(gui){
-  //   chrome.storage.sync.set({'lastId':gui}, null);
-  // }  
-
-  // return {
-  //   editors:{
-  //     
-  //     save: function(id){
-  //       setLastGui(id);
-  //     }  
-  //   },
-  //   drop:function(){
-  //     chrome.storage.sync.clear();
-  //   }
-  // }
-
   return {
     editors:{
       restore: function(){
@@ -585,7 +632,7 @@ _mock.storage = (function(){
     purge:function(){
       chrome.storage.sync.clear();
     }
-  }
+  };
 
 }());
   _mock.init();

@@ -9,6 +9,13 @@
     width:-webkit-calc(100% - 100px);
     height: 100%;
   }
+
+  .popout-drag{
+    -webkit-app-region: drag;
+    width:-webkit-calc(100% - 50px);
+    height: 100%;
+  }
+
   .window-controls{ 
     position: absolute;
     top: 0;

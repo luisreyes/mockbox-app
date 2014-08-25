@@ -1,8 +1,5 @@
 _mock.database = (function(){
 
-  // https://developer.chrome.com/apps/offline_apps
-  // http://www.w3.org/TR/IndexedDB/
-
   var indexedDb = {};
   indexedDb.db = null;
   
@@ -151,6 +148,6 @@ _mock.database = (function(){
     getAll:function(){
       indexedDb.getAllEntries();
     }
-  }
+  };
 
 }());

@@ -16,18 +16,18 @@
     "lib/apollo/apollo.js",
     "lib/splitview/splitview.min.js",
     "lib/jszip/jszip.js",
-    "lib/jszip/FileSaver.js", 
+    "lib/jszip/FileSaver.js",
     "scripts/app.js"
   ],
 
-  "frame":{
+  "popout":{
     "stylesheets":[
       "lib/elegant-icons/elegant-icons.css",
       "styles/app.css"
     ],
     
     "scripts":[ 
-      "scripts/frame.js"
+      "scripts/popout.js"
     ]
   }
 
