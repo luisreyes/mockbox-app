@@ -7,14 +7,17 @@ var Popout;
 (function(){ var _pop = (function(){
 'use strict';
 
-  
+  var baseDoc = chrome.app.window.get('main').contentWindow.document;
 
   function init(){
     _pop.clicks.init();
   }
 
   return {
-    init: init
+    init: init,
+    getBaseDoc: function(){
+      return baseDoc;
+    }
   };
 
 }());

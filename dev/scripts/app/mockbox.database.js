@@ -1,6 +1,8 @@
 _mock.database = (function(){
 
-  var indexedDb = {};
+  var reqResult,
+  listeningForResult = false,
+  indexedDb = {};
   indexedDb.db = null;
   
   function init() {
@@ -87,28 +89,32 @@ _mock.database = (function(){
     };
   };
 
-  indexedDb.getAllEntries = function() {
-    //var todos = document.getElementById("todoItems");
-    //todos.innerHTML = "";
+  indexedDb.getAll = function() {
     var db = indexedDb.db;
-    var trans = db.transaction("editor", "readwrite");
-    var store = trans.objectStore("editor");
+    var transaction = db.transaction(["editor"]);
+    var objectStore = transaction.objectStore("editor");
 
-    // Get everything in the store;
-    var keyRange = IDBKeyRange.lowerBound(0);
-    var cursorRequest = store.openCursor(keyRange);
+    var items = [];
+    var request = objectStore.openCursor();
 
-    cursorRequest.onsuccess = function(e) {
-      var result = e.target.result;
-      if(!!result == false)
-        return;
-
-      //renderEditor(result.value);
-      //result.continue();
-      //console.log(result);
+    request.onsuccess = function(event) {
+      var cursor = event.target.result;
+      if (cursor) {
+        items.push(cursor.value);
+        cursor.continue();
+      }
+      else {
+        reqResult = items;
+        _mock.events.dispatch('dbresult');
+        //alert("Got all items: " + items);
+      }
     };
 
-    cursorRequest.onerror = indexedDb.onerror;
+
+    
+    request.onerror = function(event) {
+      // Handle errors!
+    };
   }; 
 
   indexedDb.setEditorsFromId = function(id) {
@@ -123,16 +129,14 @@ _mock.database = (function(){
       _mock.restore(request.result);
     };
     
-    request.onerror = function(event) {
-      // Handle errors!
-      //console.log('No Entry Match in DB');
-    };
+    request.onerror = function(event) {};
   }; 
-
-  //var todo = document.getElementById('todo');
-
-  //html5rocks.indexedDb.addTodo(todo.value);
-  //todo.value = '';
+  function onDbResult(callback){
+    callback(reqResult);
+    _mock.events.removeListener('dbresult', function(){
+      onDbResult(callback);
+    });
+  }
   window.addEventListener("DOMContentLoaded", init, false);
   
   return {
@@ -145,8 +149,14 @@ _mock.database = (function(){
     restoreEditorsFromId: function(id){
       indexedDb.setEditorsFromId(id);
     },
-    getAll:function(){
-      indexedDb.getAllEntries();
+    getAll:function(callback){
+      indexedDb.getAll();
+      if(!listeningForResult){
+        _mock.events.addListener('dbresult', function(){
+          onDbResult(callback);
+        });
+        listeningForResult = true;
+      }
     }
   };
 

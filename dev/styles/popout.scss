@@ -26,9 +26,30 @@
   font-size: smaller;
 }
 
+.popout-content{
+  margin-top: 30px;
+}
+
 .popout-header{
   line-height: 28px;
   text-indent: 8px;
   height: 28px;
   font-size: initial;
+}
+
+.load-list{
+  list-style-type: none;
+padding: 0;
+border: 1px solid #222;
+margin: 40px 10px 10px;
+background-color: $theme-color-dark;
+box-shadow: inset 0px 3px 6px #111;
+
+  li{
+    padding: 10px;
+    border-bottom: 1px solid #222;
+    &:hover{
+      background-color: $theme-color;
+    }
+  }
 }

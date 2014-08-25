@@ -5,14 +5,16 @@ _mock.popout = (function(){
   popoutBase = popoutWrapper.querySelector('.base'),
   currentId = '';
 
-  function _open(loc){
+  function _open(loc, callback){
     currentId = loc;
     apollo.addClass(popoutBase, 'visible');
     chrome.app.window.get(loc).show();
-    // should then invoke _mock.load('gui'); OR _mock.export();
+    if(callback){
+      callback();
+    }
   }
 
-  function _close(loc){
+  function _close(loc, callback){
     currentId = '';
     apollo.removeClass(popoutBase, 'visible');
     chrome.app.window.get(loc).hide();
@@ -20,11 +22,11 @@ _mock.popout = (function(){
   }
 
   return {
-    open: function(location){
-      _open(location);
+    open: function(location, callback){
+      _open(location, callback);
     },
-    close: function(location){
-      _close(location);
+    close: function(location, callback){
+      _close(location, callback);
     },
     getCurrentId: function(){
       return currentId;

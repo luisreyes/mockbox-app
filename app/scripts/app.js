@@ -60,6 +60,9 @@ var MockBox;
          case 'closePopout': _mock.popout.close(data.popoutId);
          break;
 
+         case 'loadItem': _mock.database.restoreEditorsFromId(data.gui);
+         break;
+
          default: return;
          break;
       }
@@ -289,7 +292,10 @@ _mock.clicks = (function(){
     });
 
     buttons.appClose.addEventListener('click', function(e){
-      chrome.app.window.current().close();
+      var allWindows = chrome.app.window.getAll();
+      for(var i = 0; i < allWindows.length; i++){
+        allWindows[i].close();
+      }
     });
     
     popoutBase.addEventListener('click', function(){
@@ -307,7 +313,10 @@ _mock.clicks = (function(){
     buttons.load.addEventListener( 'click', function(e){
       var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
       if(!apollo.hasClass(element, 'inactive')){
-        _mock.popout.open('load');
+        _mock.load.init();
+        _mock.popout.open('load', function(){
+          _mock.load.generateList();
+        });
       }
     });
 
@@ -381,7 +390,9 @@ _mock.clicks = (function(){
 }());
 _mock.database = (function(){
 
-  var indexedDb = {};
+  var reqResult,
+  listeningForResult = false,
+  indexedDb = {};
   indexedDb.db = null;
   
   function init() {
@@ -468,28 +479,32 @@ _mock.database = (function(){
     };
   };
 
-  indexedDb.getAllEntries = function() {
-    //var todos = document.getElementById("todoItems");
-    //todos.innerHTML = "";
+  indexedDb.getAll = function() {
     var db = indexedDb.db;
-    var trans = db.transaction("editor", "readwrite");
-    var store = trans.objectStore("editor");
+    var transaction = db.transaction(["editor"]);
+    var objectStore = transaction.objectStore("editor");
 
-    // Get everything in the store;
-    var keyRange = IDBKeyRange.lowerBound(0);
-    var cursorRequest = store.openCursor(keyRange);
+    var items = [];
+    var request = objectStore.openCursor();
 
-    cursorRequest.onsuccess = function(e) {
-      var result = e.target.result;
-      if(!!result == false)
-        return;
-
-      //renderEditor(result.value);
-      //result.continue();
-      //console.log(result);
+    request.onsuccess = function(event) {
+      var cursor = event.target.result;
+      if (cursor) {
+        items.push(cursor.value);
+        cursor.continue();
+      }
+      else {
+        reqResult = items;
+        _mock.events.dispatch('dbresult');
+        //alert("Got all items: " + items);
+      }
     };
 
-    cursorRequest.onerror = indexedDb.onerror;
+
+    
+    request.onerror = function(event) {
+      // Handle errors!
+    };
   }; 
 
   indexedDb.setEditorsFromId = function(id) {
@@ -504,16 +519,14 @@ _mock.database = (function(){
       _mock.restore(request.result);
     };
     
-    request.onerror = function(event) {
-      // Handle errors!
-      //console.log('No Entry Match in DB');
-    };
+    request.onerror = function(event) {};
   }; 
-
-  //var todo = document.getElementById('todo');
-
-  //html5rocks.indexedDb.addTodo(todo.value);
-  //todo.value = '';
+  function onDbResult(callback){
+    callback(reqResult);
+    _mock.events.removeListener('dbresult', function(){
+      onDbResult(callback);
+    });
+  }
   window.addEventListener("DOMContentLoaded", init, false);
   
   return {
@@ -526,10 +539,102 @@ _mock.database = (function(){
     restoreEditorsFromId: function(id){
       indexedDb.setEditorsFromId(id);
     },
-    getAll:function(){
-      indexedDb.getAllEntries();
+    getAll:function(callback){
+      indexedDb.getAll();
+      if(!listeningForResult){
+        _mock.events.addListener('dbresult', function(){
+          onDbResult(callback);
+        });
+        listeningForResult = true;
+      }
     }
   };
+
+}());
+_mock.events = (function () {
+    'use strict';
+    //Private Methods and Vars
+    var _events = [];
+
+    //Public Methods
+    return {
+        
+        addListener: function (event, callback) {
+            _events[event] = _events[event] || [];
+            if (_events[event]) {
+                _events[event].push(callback);
+            }
+        },
+
+        removeListener: function (event, callback) {
+            if (_events[event]) {
+                var listeners = _events[event];
+                for (var i = listeners.length - 1; i >= 0; --i) {
+                    if (listeners[i] === callback) {
+                        listeners.splice(i, 1);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+
+        dispatch: function (event) {
+            if (_events[event]) {
+                var listeners = _events[event], len = listeners.length;
+                while (len--) {
+                    listeners[len](this); //callback with self
+                }
+            }
+        }
+    }
+} ());
+_mock.load = (function(){
+  'use strict';
+
+  var 
+  doc,
+  _availableIds,
+  listContainer;
+
+  function init(){
+    doc = chrome.app.window.get('load').contentWindow.document;
+  }
+
+  function setAvailableIds(){
+    _mock.database.getAll(function(result){
+      _availableIds = result; 
+      listContainer = doc.getElementById('mocks-list');
+      listContainer.innerHTML = "";
+      
+      for (var i=0; i < _availableIds.length;i++){
+        var newLi = doc.createElement('li');
+        newLi.id = _availableIds[i].gui;
+        newLi.addEventListener('click', function(){
+           load(this.id);
+        });
+        
+        newLi.innerHTML = _availableIds[i].name;
+        listContainer.appendChild(newLi);
+      } 
+    });
+    
+  }
+
+  function load(gui){
+    chrome.runtime.sendMessage({message:'loadItem', gui:gui});
+    _mock.reset();
+    _mock.popout.close('load');
+  }
+
+  return {
+    init: function(){
+      if(!doc) init();
+    },
+    generateList: function(){
+      setAvailableIds();
+    }
+  }
 
 }());
 _mock.notify = (function(){
@@ -567,14 +672,16 @@ _mock.popout = (function(){
   popoutBase = popoutWrapper.querySelector('.base'),
   currentId = '';
 
-  function _open(loc){
+  function _open(loc, callback){
     currentId = loc;
     apollo.addClass(popoutBase, 'visible');
     chrome.app.window.get(loc).show();
-    // should then invoke _mock.load('gui'); OR _mock.export();
+    if(callback){
+      callback();
+    }
   }
 
-  function _close(loc){
+  function _close(loc, callback){
     currentId = '';
     apollo.removeClass(popoutBase, 'visible');
     chrome.app.window.get(loc).hide();
@@ -582,11 +689,11 @@ _mock.popout = (function(){
   }
 
   return {
-    open: function(location){
-      _open(location);
+    open: function(location, callback){
+      _open(location, callback);
     },
-    close: function(location){
-      _close(location);
+    close: function(location, callback){
+      _close(location, callback);
     },
     getCurrentId: function(){
       return currentId;

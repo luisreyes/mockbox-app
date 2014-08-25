@@ -60,6 +60,9 @@ var MockBox;
          case 'closePopout': _mock.popout.close(data.popoutId);
          break;
 
+         case 'loadItem': _mock.database.restoreEditorsFromId(data.gui);
+         break;
+
          default: return;
          break;
       }

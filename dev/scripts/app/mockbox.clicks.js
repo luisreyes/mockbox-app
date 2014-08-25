@@ -46,7 +46,10 @@ _mock.clicks = (function(){
     });
 
     buttons.appClose.addEventListener('click', function(e){
-      chrome.app.window.current().close();
+      var allWindows = chrome.app.window.getAll();
+      for(var i = 0; i < allWindows.length; i++){
+        allWindows[i].close();
+      }
     });
     
     popoutBase.addEventListener('click', function(){
@@ -64,7 +67,10 @@ _mock.clicks = (function(){
     buttons.load.addEventListener( 'click', function(e){
       var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
       if(!apollo.hasClass(element, 'inactive')){
-        _mock.popout.open('load');
+        _mock.load.init();
+        _mock.popout.open('load', function(){
+          _mock.load.generateList();
+        });
       }
     });
 
