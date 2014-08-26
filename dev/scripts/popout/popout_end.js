@@ -2,6 +2,6 @@
   _pop.init();
   
   //Expose
-  Popout = {};
+  popout = {};
 
 }());

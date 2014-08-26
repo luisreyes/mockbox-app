@@ -10,6 +10,11 @@ html
       link(rel="stylesheet" type="text/css" href=stylesheet)
 
   body
+    section.app-frame.frame-top
+    section.app-frame.frame-right
+    section.app-frame.frame-bottom
+    section.app-frame.frame-left
+      
     section#app-window-frame.window-bar
       span#app-window-controls.window-controls
         span.window-min.icon_minus-06
@@ -17,17 +22,12 @@ html
         span.window-close.icon.icon_close
       div.window-drag
 
-    section.app-frame.frame-top
-    section.app-frame.frame-right
-    section.app-frame.frame-bottom
-    section.app-frame.frame-left
 
     // Popout
     
     section#app-popout.popout
-      section.base
-    //-   section#app-popout-frame.frame
-    //-     iframe(id="compiled-view" src="popout_load.html" width="100%" height="100%")
+      section.overlay
+
 
     // Menu Sidebar
     
@@ -46,9 +46,9 @@ html
             span.icon.icon_folder_download
             span EXPORT
           
-          li.load.transition 
-            span.icon.icon_download
-            span LOAD
+          li.mocks.transition 
+            span.icon.icon_grid-2x2
+            span MOCKS
 
           li.settings.transition
             span.icon.icon_cogs

@@ -2,7 +2,7 @@
 /*  Author: Luis Reyes <luis@luisreyes.com>
 /*  Url: mockbox.io
 */
-var MockBox; 
+var mockbox; 
 
 (function(){ var _mock = (function(){
 'use strict'; 
@@ -61,6 +61,9 @@ var MockBox;
          break;
 
          case 'loadItem': _mock.database.restoreEditorsFromId(data.gui);
+         break;
+
+         case 'deleteItem': _mock.database.delete(data.gui);
          break;
 
          default: return;
@@ -248,41 +251,68 @@ _mock.clicks = (function(){
 'use strict'; 
   var
 
+  // Main Chrome Window
   wndMain = chrome.app.window.get('main'),
+  
+  // Main Chrome Window Controls (Minimize, Maximize, Close)
   windowControls = document.getElementById("app-window-controls"),
+  
+  // Main Sidebar Container
   sidebar = document.getElementById('app-sidebar'),
+  
+  // Main Header
   header = document.getElementById('app-header'),
-  nodeName = header.querySelector('.project-name'),
-  popoutWrapper = document.getElementById('app-popout'),
-  popoutBase = popoutWrapper.querySelector('.base'),
 
+  // Project Name on Main Header
+  mockName = header.querySelector('.project-name'),
+  
+  // Popout element on Main Window
+  popoutWrapper = document.getElementById('app-popout'),
+  
+  // Popout element on Main Window
+  popoutOverlay = popoutWrapper.querySelector('.overlay'),
+
+  // Collection of buttons
   buttons = {
+
+    // Navigation
     new       :sidebar.querySelector('.new'),
     save      :sidebar.querySelector('.save'),
-    load      :sidebar.querySelector('.load'),
+    mocks      :sidebar.querySelector('.mocks'),
     export    :sidebar.querySelector('.export'),
     settings  :sidebar.querySelector('.settings'),
     twitter   :sidebar.querySelector('.twitter'),
     email     :sidebar.querySelector('.email'),
+    
+    // Header Bar
     check     :header.querySelector('.icon_check'),
+    
+    // Application Chrome Controls
     appMin    :windowControls.querySelector('.window-min'),
     appMax    :windowControls.querySelector('.window-max'),
     appClose  :windowControls.querySelector('.window-close')
+
   },
 
+  // External Links
   links = {
     twitter:'https://twitter.com/mockboxio',
     email:'mailto:boxes@mockbox.io?subject=Hello MockBox'
   };
 
+  // Main Listeners
   function addListeners(){
     
-    // Window Frame Buttons Action
+    // ---------------------------------------------- //
+    // Application Chrome Window Frame Buttons Action
+    // ---------------------------------------------- //
 
+    // Minimize Window
     buttons.appMin.addEventListener('click', function(e){
       chrome.app.window.current().minimize();
     });
 
+    // Toggle Maximize Window
     buttons.appMax.addEventListener('click', function(e){
       if(chrome.app.window.current().isMaximized()){
         chrome.app.window.current().restore();
@@ -291,6 +321,7 @@ _mock.clicks = (function(){
       }
     });
 
+    // Close Application and all it's Windows
     buttons.appClose.addEventListener('click', function(e){
       var allWindows = chrome.app.window.getAll();
       for(var i = 0; i < allWindows.length; i++){
@@ -298,24 +329,45 @@ _mock.clicks = (function(){
       }
     });
     
-    popoutBase.addEventListener('click', function(){
+
+
+
+    // ---------------------------------------------- //
+    // Additional Clicks
+    // ---------------------------------------------- //
+
+
+    // Overlay click to trigger Focus and Attention to Popout Window
+    popoutOverlay.addEventListener('click', function(){
       var curWindow = chrome.app.window.get(_mock.popout.getCurrentId());
       curWindow.focus();
       curWindow.drawAttention();
     });
+    
+    // Project Name Accept
+    buttons.check.addEventListener( 'click', function(){
+     mockName.blur();
+    });
+
+
+    // ---------------------------------------------- //
+    // Additional Clicks
+    // ---------------------------------------------- //    
 
     // Sidebar Buttons Action
 
+    // New Button
     buttons.new.addEventListener( 'click', _mock.reset );
 
+    // Save Button
     buttons.save.addEventListener( 'click', _mock.save );
 
-    buttons.load.addEventListener( 'click', function(e){
+    buttons.mocks.addEventListener( 'click', function(e){
       var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
       if(!apollo.hasClass(element, 'inactive')){
-        _mock.load.init();
-        _mock.popout.open('load', function(){
-          _mock.load.generateList();
+        views.mockmanager.init();
+        _mock.popout.open('mocks', function(){
+          views.mockmanager.generateList();
         });
       }
     });
@@ -343,9 +395,7 @@ _mock.clicks = (function(){
       openLink('email');
     });
 
-    buttons.check.addEventListener( 'click', function(){
-     nodeName.blur();
-    });
+    
   }
 
   function openLink(loc){
@@ -353,18 +403,18 @@ _mock.clicks = (function(){
   }
 
   function clickToEditProjectName(){
-    nodeName.addEventListener('click', function(){
-      nodeName.setAttribute('tabindex','-1');
-      nodeName.setAttribute('contenteditable','true');
-      apollo.addClass(nodeName,'editing');
-      apollo.addClass(nodeName.nextSibling,'visible');
+    mockName.addEventListener('click', function(){
+      mockName.setAttribute('tabindex','-1');
+      mockName.setAttribute('contenteditable','true');
+      apollo.addClass(mockName,'editing');
+      apollo.addClass(mockName.nextSibling,'visible');
     });
 
-    nodeName.addEventListener('blur', function(){
+    mockName.addEventListener('blur', function(){
         
-      nodeName.setAttribute('contenteditable','false');
-      apollo.removeClass(nodeName,'editing');
-      apollo.removeClass(nodeName.nextSibling,'visible');
+      mockName.setAttribute('contenteditable','false');
+      apollo.removeClass(mockName,'editing');
+      apollo.removeClass(mockName.nextSibling,'visible');
     
     });
   }
@@ -589,54 +639,6 @@ _mock.events = (function () {
         }
     }
 } ());
-_mock.load = (function(){
-  'use strict';
-
-  var 
-  doc,
-  _availableIds,
-  listContainer;
-
-  function init(){
-    doc = chrome.app.window.get('load').contentWindow.document;
-  }
-
-  function setAvailableIds(){
-    _mock.database.getAll(function(result){
-      _availableIds = result; 
-      listContainer = doc.getElementById('mocks-list');
-      listContainer.innerHTML = "";
-      
-      for (var i=0; i < _availableIds.length;i++){
-        var newLi = doc.createElement('li');
-        newLi.id = _availableIds[i].gui;
-        newLi.addEventListener('click', function(){
-           load(this.id);
-        });
-        
-        newLi.innerHTML = _availableIds[i].name;
-        listContainer.appendChild(newLi);
-      } 
-    });
-    
-  }
-
-  function load(gui){
-    chrome.runtime.sendMessage({message:'loadItem', gui:gui});
-    _mock.reset();
-    _mock.popout.close('load');
-  }
-
-  return {
-    init: function(){
-      if(!doc) init();
-    },
-    generateList: function(){
-      setAvailableIds();
-    }
-  }
-
-}());
 _mock.notify = (function(){
 'use strict'; 
 
@@ -669,12 +671,12 @@ _mock.popout = (function(){
 'use strict'; 
   var 
   popoutWrapper = document.getElementById('app-popout'),
-  popoutBase = popoutWrapper.querySelector('.base'),
+  popoutOverlay = popoutWrapper.querySelector('.overlay'),
   currentId = '';
 
   function _open(loc, callback){
     currentId = loc;
-    apollo.addClass(popoutBase, 'visible');
+    apollo.addClass(popoutOverlay, 'visible');
     chrome.app.window.get(loc).show();
     if(callback){
       callback();
@@ -683,7 +685,7 @@ _mock.popout = (function(){
 
   function _close(loc, callback){
     currentId = '';
-    apollo.removeClass(popoutBase, 'visible');
+    apollo.removeClass(popoutOverlay, 'visible');
     chrome.app.window.get(loc).hide();
     // should then invoke _mock.load('gui'); OR _mock.export();
   }
@@ -742,13 +744,52 @@ _mock.storage = (function(){
   };
 
 }());
+_mock.utils = (function(){
+  'use strict';
+
+  function toDate(eObj){
+    var mEpoch = parseInt(eObj), dDate = new Date();
+
+    if(mEpoch<10000000000) mEpoch *= 1000; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+
+    dDate.setTime(mEpoch);
+    
+    return dDate.toLocaleDateString();
+  }
+
+  Element.prototype.remove = function() {
+      this.parentElement.removeChild(this);
+  }
+  
+  NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+      for(var i = 0, len = this.length; i < len; i++) {
+          if(this[i] && this[i].parentElement) {
+              this[i].parentElement.removeChild(this[i]);
+          }
+      }
+  }
+  return {
+    toDate: function(epoch){
+      return toDate(epoch);
+    }
+  }
+
+}());
   _mock.init();
 
   //Expose
-  MockBox = {
+  mockbox = {
     load:function(gui){
       _mock.database.restoreEditorsFromId(gui);
-    }
+    },
+    getAll:function(callback){
+      return _mock.database.getAll(callback);
+    },
+    popout:_mock.popout,
+    reset:function(){
+      return _mock.reset();
+    },
+    utils:_mock.utils
   };
 
 }());

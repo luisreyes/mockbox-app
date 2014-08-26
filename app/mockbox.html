@@ -3,26 +3,20 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Styles-->
-    <link rel="stylesheet" type="text/css" href="lib/codemirror/theme/ambiance.css">
-    <link rel="stylesheet" type="text/css" href="lib/codemirror/theme/eclipse.css">
-    <link rel="stylesheet" type="text/css" href="lib/codemirror/theme/mbo.css">
-    <link rel="stylesheet" type="text/css" href="lib/codemirror/theme/solarized.css">
-    <link rel="stylesheet" type="text/css" href="lib/codemirror/codemirror.css">
-    <link rel="stylesheet" type="text/css" href="lib/elegant-icons/elegant-icons.css">
-    <link rel="stylesheet" type="text/css" href="lib/splitview/splitview.min.css">
-    <link rel="stylesheet" type="text/css" href="styles/app.css">
+    <link rel="stylesheet" type="text/css" href="styles/lib.css">
+    <link rel="stylesheet" type="text/css" href="styles/mockbox.css">
   </head>
   <body>
-    <section id="app-window-frame" class="window-bar"><span id="app-window-controls" class="window-controls"><span class="window-min icon_minus-06"></span><span class="window-max icon_plus"></span><span class="window-close icon icon_close"></span></span>
-      <div class="window-drag"></div>
-    </section>
     <section class="app-frame frame-top"></section>
     <section class="app-frame frame-right"></section>
     <section class="app-frame frame-bottom"></section>
     <section class="app-frame frame-left"></section>
+    <section id="app-window-frame" class="window-bar"><span id="app-window-controls" class="window-controls"><span class="window-min icon_minus-06"></span><span class="window-max icon_plus"></span><span class="window-close icon icon_close"></span></span>
+      <div class="window-drag"></div>
+    </section>
     <!-- Popout-->
     <section id="app-popout" class="popout">
-      <section class="base"></section>
+      <section class="overlay"></section>
     </section>
     <!-- Menu Sidebar-->
     <section id="app-sidebar" class="sidebar">
@@ -31,7 +25,7 @@
           <li class="new transition"> <span class="icon icon_document"></span><span>NEW</span></li>
           <li class="save transition"> <span class="icon icon_drive_alt"></span><span>SAVE</span></li>
           <li class="export transition"> <span class="icon icon_folder_download"></span><span>EXPORT</span></li>
-          <li class="load transition"> <span class="icon icon_download"></span><span>LOAD</span></li>
+          <li class="mocks transition"> <span class="icon icon_grid-2x2"></span><span>MOCKS</span></li>
           <li class="settings transition"><span class="icon icon_cogs"></span><span>SETTINGS</span></li>
         </ul>
         <ul class="absolute bottom">
@@ -72,11 +66,8 @@
       </section>
     </section>
     <!-- Scripts-->
-    <script type="text/javascript" src="lib/codemirror/codemirror.js"></script>
-    <script type="text/javascript" src="lib/apollo/apollo.js"></script>
-    <script type="text/javascript" src="lib/splitview/splitview.min.js"></script>
-    <script type="text/javascript" src="lib/jszip/jszip.js"></script>
-    <script type="text/javascript" src="lib/jszip/FileSaver.js"></script>
-    <script type="text/javascript" src="scripts/app.js"></script>
+    <script type="text/javascript" src="scripts/lib.js"></script>
+    <script type="text/javascript" src="scripts/views.js"></script>
+    <script type="text/javascript" src="scripts/mockbox.js"></script>
   </body>
 </html>

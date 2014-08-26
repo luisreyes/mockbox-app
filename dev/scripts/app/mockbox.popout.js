@@ -2,12 +2,12 @@ _mock.popout = (function(){
 'use strict'; 
   var 
   popoutWrapper = document.getElementById('app-popout'),
-  popoutBase = popoutWrapper.querySelector('.base'),
+  popoutOverlay = popoutWrapper.querySelector('.overlay'),
   currentId = '';
 
   function _open(loc, callback){
     currentId = loc;
-    apollo.addClass(popoutBase, 'visible');
+    apollo.addClass(popoutOverlay, 'visible');
     chrome.app.window.get(loc).show();
     if(callback){
       callback();
@@ -16,7 +16,7 @@ _mock.popout = (function(){
 
   function _close(loc, callback){
     currentId = '';
-    apollo.removeClass(popoutBase, 'visible');
+    apollo.removeClass(popoutOverlay, 'visible');
     chrome.app.window.get(loc).hide();
     // should then invoke _mock.load('gui'); OR _mock.export();
   }

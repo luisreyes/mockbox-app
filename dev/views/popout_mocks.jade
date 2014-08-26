@@ -1,0 +1,23 @@
+extends mockbox_popout.jade
+
+block title
+  span Mocks
+block titleIcon
+  span.icon_grid-2x2
+
+block content
+  section
+    ul#mocks-list.load-list.transition
+  
+  section#list-item-template(style="display:none")
+    li.list-item.transition
+      table
+        tr
+          td.list-item-data
+            span.list-item-title
+            br
+            span.list-item-subtitle
+          td.list-item-actions
+            span.list-item-load.icon.icon_pencil
+            span.list-item-delete.icon.icon_trash
+

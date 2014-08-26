@@ -1,29 +1,20 @@
 {
 
   "stylesheets":[
-    "lib/codemirror/theme/ambiance.css",
-    "lib/codemirror/theme/eclipse.css",
-    "lib/codemirror/theme/mbo.css",
-    "lib/codemirror/theme/solarized.css",
-    "lib/codemirror/codemirror.css",
-    "lib/elegant-icons/elegant-icons.css",
-    "lib/splitview/splitview.min.css",
-    "styles/app.css"
+    "styles/lib.css",
+    "styles/mockbox.css"
   ],
   
   "scripts":[ 
-    "lib/codemirror/codemirror.js",
-    "lib/apollo/apollo.js",
-    "lib/splitview/splitview.min.js",
-    "lib/jszip/jszip.js",
-    "lib/jszip/FileSaver.js",
-    "scripts/app.js"
+    "scripts/lib.js",
+    "scripts/views.js",
+    "scripts/mockbox.js"
   ],
 
   "popout":{
     "stylesheets":[
       "lib/elegant-icons/elegant-icons.css",
-      "styles/app.css"
+      "styles/mockbox.css"
     ],
     
     "scripts":[ 

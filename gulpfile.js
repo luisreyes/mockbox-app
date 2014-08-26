@@ -33,7 +33,7 @@ gulp.task( 'compile_sass', function () {
   gulp.src( 'dev/styles/core.scss' )
     .pipe( sass() )
     .pipe( cssmin() )
-    .pipe( concat('app.css') )
+    .pipe( concat('mockbox.css') )
     .pipe( gulp.dest( 'app/styles/' ));
 
   // Compile, Minify, Bundle Sass to Css
@@ -41,6 +41,12 @@ gulp.task( 'compile_sass', function () {
     .pipe( sass() )
     .pipe( cssmin() )
     .pipe( concat('iframe.css') )
+    .pipe( gulp.dest( 'app/styles/' ));
+
+  // Compile, Minify, Bundle Sass to Css
+  gulp.src( 'dev/scripts/**/*.css' )
+    .pipe( cssmin() )
+    .pipe( concat('lib.css') )
     .pipe( gulp.dest( 'app/styles/' ));
 
 });
@@ -55,7 +61,7 @@ gulp.task( 'compile_js', function () {
       "mockbox_end.js"
     ]))
     //.pipe( uglify() )
-    .pipe( concat('app.js') )
+    .pipe( concat('mockbox.js') )
     .pipe( gulp.dest( 'app/scripts/' ));
 
 
@@ -68,6 +74,19 @@ gulp.task( 'compile_js', function () {
     ]))
     //.pipe( uglify() )
     .pipe( concat('popout.js') )
+    .pipe( gulp.dest( 'app/scripts/' ));
+
+
+  // Minify, Bundle, Obsfucate JavaScript
+  gulp.src( 'dev/scripts/views/*.js' )
+    //.pipe( uglify() )
+    .pipe( concat('views.js') )
+    .pipe( gulp.dest( 'app/scripts/' ));
+
+  // Minify, Bundle, Obsfucate JavaScript
+  gulp.src( 'dev/scripts/lib/**/*.js' )
+    //.pipe( uglify() )
+    .pipe( concat('lib.js') )
     .pipe( gulp.dest( 'app/scripts/' ));
 
 });

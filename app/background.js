@@ -23,15 +23,14 @@ chrome.app.runtime.onLaunched.addListener(function() {
     }
   });
 
-  chrome.app.window.create('popout_load.html', {
-    'id': 'load',
+  chrome.app.window.create('popout_mocks.html', {
+    'id': 'mocks',
     'frame':'none',
     'hidden':true,
-    'minWidth':320,
-    'minHeight':568,
+    'resizable':false,
     'bounds': {
-      'width': 800,
-      'height': 600
+      'width': 600,
+      'height': 460
     }
   });
 

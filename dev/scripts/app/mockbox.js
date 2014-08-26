@@ -2,7 +2,7 @@
 /*  Author: Luis Reyes <luis@luisreyes.com>
 /*  Url: mockbox.io
 */
-var MockBox; 
+var mockbox; 
 
 (function(){ var _mock = (function(){
 'use strict'; 
@@ -61,6 +61,9 @@ var MockBox;
          break;
 
          case 'loadItem': _mock.database.restoreEditorsFromId(data.gui);
+         break;
+
+         case 'deleteItem': _mock.database.delete(data.gui);
          break;
 
          default: return;

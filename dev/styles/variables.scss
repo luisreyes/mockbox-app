@@ -10,8 +10,9 @@ $theme-base-font-color:#CCC;
 $theme-color: #719fd4;
 $theme-color-dark : darken($theme-color, 25%);
 $theme-color-darker : darken($theme-color, 30%);
+$theme-color-darkest : darken($theme-color, 35%);
 
 
 $app-frame-width: 1px;
 $app-frame-type: solid;
-$app-frame-color:#333;
+$app-frame-color:#444;

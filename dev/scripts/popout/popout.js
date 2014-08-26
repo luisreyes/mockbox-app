@@ -2,7 +2,7 @@
 /*  Author: Luis Reyes <luis@luisreyes.com>
 /*  Url: mockbox.io
 */
-var Popout; 
+var popout; 
 
 (function(){ var _pop = (function(){
 'use strict';
