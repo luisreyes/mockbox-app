@@ -12,7 +12,10 @@
     reset:function(){
       return _mock.reset();
     },
-    utils:_mock.utils
+    utils:_mock.utils,
+    notify:function(o){
+      _mock.notify.send(o);
+    }
   };
 
 }());

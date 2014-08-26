@@ -7,11 +7,10 @@ _mock.notify = (function(){
     var data = options || {},
         o = {
           type: data.type || 'basic',
-          title: data.title || 'No Tilte',
-          message: data.message || 'No Message',
-          iconUrl: data.iconUrl || ""
+          title: data.title || 'MockBox',
+          message: data.message || '',
+          iconUrl: data.iconUrl || "icons/mockbox96.png"
         };
-    
     chrome.notifications.create('id'+_counter, o, _callback);
   }
 

@@ -7,11 +7,7 @@ var views;
 (function(){ var _v = (function(){
 'use strict';
 
-  //var baseDoc = chrome.app.window.get('main').contentWindow.document;
-
-  function init(){
-    
-  }
+  function init(){}
 
   return {
     init: init

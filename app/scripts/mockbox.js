@@ -469,10 +469,8 @@ _mock.database = (function(){
       }
 
       var store = db.createObjectStore("editor",{keyPath: "gui"});
-      var projectNameIndex = store.createIndex("by_name", "name"),
-          htmlIndex = store.createIndex("by_html", "html"),
-          cssIndex = store.createIndex("by_css", "css"),
-          jsIndex = store.createIndex("by_js", "js");
+      var createdByIndex = store.createIndex("by_createdBy", "createdBy"),
+          guiIndex = store.createIndex("by_gui", "gui");
     };
 
     request.onsuccess = function(e) {
@@ -498,14 +496,14 @@ _mock.database = (function(){
       "css": data.css,
       "js": data.js,
       "createdBy" : data.author || 'Someone',
-      "UpdatedBy" : data.author || 'Someone',
+      "updatedBy" : data.author || 'Someone',
       "createdOn" : new Date().getTime(),
       "updatedOn" : new Date().getTime()
     });
 
     entry.onsuccess = function(e) {
       // Re-render all the editors
-      //console.log('New Entry Added');
+      mockbox.notify({iconUrl:'icons/notifications/check.png',message:'Saved Successfully'});
     };
 
     entry.onerror = function(e) {
@@ -521,7 +519,7 @@ _mock.database = (function(){
     var request = store.delete(id);
 
     request.onsuccess = function(e) {
-      //console.log('Entry Removed');
+      mockbox.notify({iconUrl:'icons/notifications/error.png', message:'Deleted'});
     };
 
     request.onerror = function(e) {
@@ -648,11 +646,10 @@ _mock.notify = (function(){
     var data = options || {},
         o = {
           type: data.type || 'basic',
-          title: data.title || 'No Tilte',
-          message: data.message || 'No Message',
-          iconUrl: data.iconUrl || ""
+          title: data.title || 'MockBox',
+          message: data.message || '',
+          iconUrl: data.iconUrl || "icons/mockbox96.png"
         };
-    
     chrome.notifications.create('id'+_counter, o, _callback);
   }
 
@@ -789,7 +786,10 @@ _mock.utils = (function(){
     reset:function(){
       return _mock.reset();
     },
-    utils:_mock.utils
+    utils:_mock.utils,
+    notify:function(o){
+      _mock.notify.send(o);
+    }
   };
 
 }());
