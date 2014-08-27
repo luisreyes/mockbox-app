@@ -1,5 +1,4 @@
   _mock.init();
-
   //Expose
   mockbox = {
     load:function(gui){

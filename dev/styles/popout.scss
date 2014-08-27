@@ -1,7 +1,7 @@
 .popout{
 
   .overlay{
-    background-color: #333;
+    background-color: #000;
     opacity: .5;
     width: 100%;
     height: 100%;
@@ -54,6 +54,14 @@ footer{
   .cancel{float:left;}
   
   .continue{ float:right; }
+}
+
+.load-list-empty{
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  font-size: larger;
+  text-align: center;
 }
 
 .load-list{

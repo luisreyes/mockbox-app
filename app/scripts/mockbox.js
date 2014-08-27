@@ -64,7 +64,7 @@ var mockbox;
          break;
 
          case 'continuePopout': 
-            _mock.utils.confirmCallback();
+            _mock.popout.confirmCallback();
             _mock.popout.close(data.popoutId);
          break;
 
@@ -264,7 +264,7 @@ var mockbox;
     },
     reset:function(){
       if(mockbox.isDirty()){
-        mockbox.utils.confirm('continue',function(){
+        mockbox.popout.confirm('continue',function(){
           _reset();            
         });      
       }else{
@@ -342,18 +342,36 @@ _mock.clicks = (function(){
 
     // Toggle Maximize Window
     buttons.appMax.addEventListener('click', function(e){
+      // Check if the window is maximized
       if(chrome.app.window.current().isMaximized()){
+        // Set back to size
         chrome.app.window.current().restore();
       }else{
+        // Maximize to screen
         chrome.app.window.current().maximize();
       }
     });
 
     // Close Application and all it's Windows
     buttons.appClose.addEventListener('click', function(e){
-      var allWindows = chrome.app.window.getAll();
-      for(var i = 0; i < allWindows.length; i++){
-        allWindows[i].close();
+      // Before closing the app check if any data needs saving
+      if(mockbox.isDirty()){
+        // Display Confirm Dialog
+        mockbox.popout.confirm('continue',function(){
+          // If continue the close
+          closeMethods();
+        });
+      }else{
+        // There is no need to save, close the app
+        closeMethods();
+      }  
+
+      // Encapsulated code to close the app
+      function closeMethods(){
+        var allWindows = chrome.app.window.getAll();
+        for(var i = 0; i < allWindows.length; i++){
+          allWindows[i].close();
+        }
       }
     });
     
@@ -367,6 +385,8 @@ _mock.clicks = (function(){
 
     // Overlay click to trigger Focus and Attention to Popout Window
     popoutOverlay.addEventListener('click', function(){
+      // Set the current window var to the current window
+      // This method is used to brin attention to a window in case it falls behind the main window
       var curWindow = chrome.app.window.get(_mock.popout.getCurrentId());
       curWindow.focus();
       curWindow.drawAttention();
@@ -391,35 +411,60 @@ _mock.clicks = (function(){
     buttons.save.addEventListener( 'click', _mock.save );
 
     buttons.mocks.addEventListener( 'click', function(e){
+      
+      // Verify the click happens opn the LI in the sidebar navigation
       var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
+      
+      // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        views.mockmanager.init();
+        // init the views js file
+        views.mocks.init();
+        // Open the window and run the function
         _mock.popout.open('mocks', function(){
-          views.mockmanager.generateList();
+          // Generate the list to display
+          views.mocks.generateList();
         });
       }
     });
 
+
     buttons.export.addEventListener( 'click', function(e){
+      
+      // Verify the click happens opn the LI in the sidebar navigation
       var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
+      
+      // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        _mock.popout.open('export');
+        // Open the window and run the function
+        _mock.popout.open('export', function(){
+          // Methods to run on window load
+          // TODO
+        });
       }
     });
 
     buttons.settings.addEventListener( 'click', function(e){
+
+      // Verify the click happens opn the LI in the sidebar navigation
       var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
+      
+      // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        _mock.popout.open('settings');
+        // Open the window and run the function
+        _mock.popout.open('settings', function(){
+          // Methods to run on window load
+          // TODO
+        });
       }
     });
     
-    
     buttons.twitter.addEventListener( 'click', function(){
+      // Open external page
       openLink('twitter');
     });
 
     buttons.email.addEventListener( 'click', function(){
+      // Open external page
       openLink('email');
     });
 
@@ -427,24 +472,43 @@ _mock.clicks = (function(){
   }
 
   function openLink(loc){
+    // Open external page
     window.open(links[loc], '_blank');
   }
 
   function clickToEditProjectName(){
+    // Cache initial value to manage dirty flag
     var initValue = mockName.innerHTML, newValue;
+    // On click of the field
     mockName.addEventListener('click', function(){
+      
+      // Add tabindex for 'focus' management
       mockName.setAttribute('tabindex','-1');
+      
+      //Set attribute to edit the content
       mockName.setAttribute('contenteditable','true');
+      
+      // Set classes for editing styles
       apollo.addClass(mockName,'editing');
+      // Display the check to accept changes
       apollo.addClass(mockName.nextSibling,'visible');
       
     });
 
+    // On 'blur' of the field
     mockName.addEventListener('blur', function(){
+      
+      // Cache new value for comparison and dirty flag management
       newValue = mockName.innerHTML;
+
+      //Set dirty if it is
       _mock.utils.isDirty(!(newValue === initValue));  
+      
+      // Restore to non edit styles
       mockName.setAttribute('contenteditable','false');
       apollo.removeClass(mockName,'editing');
+      
+      // Hide 'check'
       apollo.removeClass(mockName.nextSibling,'visible');
     
     });
@@ -452,9 +516,13 @@ _mock.clicks = (function(){
 
   return {
     init: function(){
+      // Add Button listeners
       addListeners();
+      // Addlistener to name edit
       clickToEditProjectName();
     },
+
+    // Methods to manipulate classes on button i.e add 'inactive' class to buttons from outside this namespace
     buttons:{
       toggleClass:function(b, c){
         apollo.toggleClass(buttons[b],c);
@@ -477,7 +545,8 @@ _mock.database = (function(){
   indexedDb.db = null;
   
   function init() {
-    indexedDb.open(); // open displays the data previously saved
+    // open displays the data previously saved
+    indexedDb.open(); 
   }
 
   function getUID() {
@@ -702,6 +771,7 @@ _mock.popout = (function(){
   var 
   popoutWrapper = document.getElementById('app-popout'),
   popoutOverlay = popoutWrapper.querySelector('.overlay'),
+  _confirmCallback = null,
   currentId = '';
 
   function _open(loc, callback){
@@ -720,6 +790,20 @@ _mock.popout = (function(){
     // should then invoke _mock.load('gui'); OR _mock.export();
   }
 
+  function callConfirmCallback(){
+    _confirmCallback();
+  }
+
+  function _confirm(type, callback){
+    currentId = 'confirm';
+    chrome.runtime.sendMessage({message:'confirmType', type:type});
+    chrome.app.window.get('confirm').show();
+    apollo.addClass(popoutOverlay, 'visible');
+    if(callback){
+      _confirmCallback = callback;
+    }
+  }
+
   return {
     open: function(location, callback){
       _open(location, callback);
@@ -729,6 +813,12 @@ _mock.popout = (function(){
     },
     getCurrentId: function(){
       return currentId;
+    },
+    confirm: function(type, callback){
+      _confirm(type,callback);
+    }, 
+    confirmCallback: function(){
+      callConfirmCallback();
     }
   };
 
@@ -776,8 +866,8 @@ _mock.storage = (function(){
 }());
 _mock.utils = (function(){
   'use strict';
-  var _isDirty = false,
-      _confirmCallback = null;
+  var _isDirty = false;
+
   function toDate(eObj){
     var mEpoch = parseInt(eObj), dDate = new Date();
 
@@ -800,17 +890,7 @@ _mock.utils = (function(){
       }
   }
 
-  function callConfirmCallback(){
-    _confirmCallback();
-  }
-
-  function _confirm(type, callback){
-    chrome.runtime.sendMessage({message:'confirmType', type:type});
-    chrome.app.window.get('confirm').show();
-    if(callback){
-      _confirmCallback = callback;
-    }
-  }
+  
 
   return {
     toDate: function(epoch){
@@ -822,18 +902,12 @@ _mock.utils = (function(){
       }else{
         return _isDirty;
       }
-    },
-    confirm: function(type, callback){
-      _confirm(type,callback);
-    }, 
-    confirmCallback: function(){
-      callConfirmCallback();
     }
+    
   }
 
 }());
   _mock.init();
-
   //Expose
   mockbox = {
     load:function(gui){

@@ -1,21 +1,3 @@
-/*! MockBox - Prorotype builder
-/*  Author: Luis Reyes <luis@luisreyes.com>
-/*  Url: mockbox.io
-*/
-var views; 
-
-(function(){ var _v = (function(){
-'use strict';
-
-  function init(){}
-
-  return {
-    init: init
-  };
-
-}());
-
-
 _v.mocks = (function(){
   'use strict';
 
@@ -115,11 +97,5 @@ _v.mocks = (function(){
       setAvailableIds();
     }
   }
-
-}());
-  _v.init();
-
-  //Expose
-  views = _v;
 
 }());

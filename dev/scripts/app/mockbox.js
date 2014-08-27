@@ -64,7 +64,7 @@ var mockbox;
          break;
 
          case 'continuePopout': 
-            _mock.utils.confirmCallback();
+            _mock.popout.confirmCallback();
             _mock.popout.close(data.popoutId);
          break;
 
@@ -264,7 +264,7 @@ var mockbox;
     },
     reset:function(){
       if(mockbox.isDirty()){
-        mockbox.utils.confirm('continue',function(){
+        mockbox.popout.confirm('continue',function(){
           _reset();            
         });      
       }else{

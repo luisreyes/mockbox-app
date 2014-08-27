@@ -6,7 +6,8 @@ _mock.database = (function(){
   indexedDb.db = null;
   
   function init() {
-    indexedDb.open(); // open displays the data previously saved
+    // open displays the data previously saved
+    indexedDb.open(); 
   }
 
   function getUID() {

@@ -20,7 +20,6 @@ var popout;
     _pop.clicks.init();
 
     chrome.runtime.onMessage.addListener(function(data) {
-      debugger;
       if(data.message === 'confirmType'){
         document.getElementById("popout-title").innerHTML = confirmTitle[data.type];
         document.getElementById("confirm-message").innerHTML = confirmMessage[data.type];
