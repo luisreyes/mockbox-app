@@ -7,23 +7,24 @@ var mockbox;
 (function(){ var _mock = (function(){
 'use strict'; 
   
-  var _p = {},
+  var editors = {},
       currentGui = null,
-      nodeHtml = document.getElementById('html').querySelector('.code'),
-      nodeCss  = document.getElementById('css').querySelector('.code'),
-      nodeJs   = document.getElementById('js').querySelector('.code'),
-      nodeView = document.getElementById('view').querySelector('.code'),
+      domHtml = document.getElementById('html').querySelector('.code'),
+      domCss  = document.getElementById('css').querySelector('.code'),
+      domJs   = document.getElementById('js').querySelector('.code'),
+      domView = document.getElementById('view').querySelector('.code'),
       header = document.getElementById('app-header'),
       sidebar = document.getElementById('app-sidebar'),
       sidebarToggle = document.getElementById('app-sidebar-toggle'),
-      nodeEditors = document.getElementById('app-editors');
+      domEditors = document.getElementById('app-editors'),
+      defaultLayout = '50,50,25';
 
   function init(){
     
     //Init splitview
     splitview.init({
       main:'app-editors',
-      layout:'50,50,25',
+      layout: defaultLayout,
       containers:{
         tl:'html',
         tr:'css',
@@ -37,16 +38,10 @@ var mockbox;
     
     sidebarToggle.addEventListener('click', function(e){
     
-      apollo.toggleClass(nodeEditors, 'open');
+      apollo.toggleClass(domEditors, 'open');
       apollo.toggleClass(header, 'open');
     
     });
-
-    function sidebarToggleAnimationEnd(){
-      apollo.toggleClass(sidebar, 'open'); 
-      apollo.toggleClass(nodeEditors, 'open');
-    }
-
 
     // Restore from memory
     //_mock.storage.editors.restore();
@@ -60,10 +55,17 @@ var mockbox;
          case 'closePopout': _mock.popout.close(data.popoutId);
          break;
 
-         case 'loadItem': _mock.database.restoreEditorsFromId(data.gui);
+         case 'loadItem': 
+            _mock.database.restoreEditorsFromId(data.gui);
          break;
 
-         case 'deleteItem': _mock.database.delete(data.gui);
+         case 'deleteItem': 
+            _mock.database.delete(data.gui);
+         break;
+
+         case 'continuePopout': 
+            _mock.utils.confirmCallback();
+            _mock.popout.close(data.popoutId);
          break;
 
          default: return;
@@ -87,9 +89,9 @@ var mockbox;
                      mode: "vbscript"}]};
 
     // Initialize Main Code Editors
-    _p.html  = new CodeMirror(nodeHtml,  { mode: mixedMode });
-    _p.js    = new CodeMirror(nodeJs,    { mode: 'javascript' });
-    _p.css   = new CodeMirror(nodeCss,   { mode: 'css' });
+    editors.html  = new CodeMirror(domHtml,  { mode: mixedMode });
+    editors.js    = new CodeMirror(domJs,    { mode: 'javascript' });
+    editors.css   = new CodeMirror(domCss,   { mode: 'css' });
 
     // Set CodeMirror Options to all editors
     setGlobalEditorOption('lineNumbers', true);
@@ -100,33 +102,36 @@ var mockbox;
 
     // Listen for viewport size change
     splitview.addEventListener('resize', function(){
-      
+      //Set Dirty to trigger save. Since layout is saved with project
+      _mock.utils.isDirty(true);
       // Refresh all editors (CodeMirror's gutter fix)
-      for (var type in _p) {
-        _p[type].refresh();
+      for (var type in editors) {
+        editors[type].refresh();
       }
     });
 
 
-    _p.html.on('change', onEditorChange);
-    _p.js  .on('change', onEditorChange);
-    _p.css .on('change', onEditorChange);
+    editors.html.on('change', onEditorChange);
+    editors.js  .on('change', onEditorChange);
+    editors.css .on('change', onEditorChange);
     
     onEditorChange();
+    _mock.utils.isDirty(false);
   }
 
   function setGlobalEditorOption(option, val){
     
     // Get passed 'option' and 'value' and set
     // it to all editors in the collection.
-    for (var type in _p) {
-      _p[type].setOption(option, val);
+    for (var type in editors) {
+      editors[type].setOption(option, val);
     }
   }
 
   function areAllEmpty(){
-    for (var type in _p) {
-      if(_p[type].getValue() !== ""){
+    // Check if all editors are empty
+    for (var type in editors) {
+      if(editors[type].getValue() !== ""){
         return true;
       }
     }
@@ -134,20 +139,23 @@ var mockbox;
   }
 
   function clearEditors(){
-    for (var type in _p) {
-      _p[type].setValue("");
-      _p[type].clearHistory();
-      _p[type].clearGutter();
+    // Loop all editors
+    for (var type in editors) {
+      editors[type].setValue("");
+      editors[type].clearHistory();
+      editors[type].clearGutter();
     }
   }
 
   function setEditorsData(data){
     if(data){
       document.getElementById('app-header').querySelector('.project-name').innerHTML = data.name;
-      _p.html.setValue(data['html']);
-      _p.js.setValue(data['js']);
-      _p.css.setValue(data['css']);
+      editors.html.setValue(data['html']);
+      editors.js.setValue(data['js']);
+      editors.css.setValue(data['css']);
+      splitview.setLayout(data['layout'][0],data['layout'][1],data['layout'][2]);
       updateIframe();
+      _mock.utils.isDirty(false);
     }else{
       setGlobalEditorOption('value', '');
     }
@@ -160,10 +168,12 @@ var mockbox;
 
   function onEditorChange(){
     updateIframe();
+    _mock.utils.isDirty(true);
     if(areAllEmpty()){
       _mock.clicks.buttons.removeClass('save','inactive');
       _mock.clicks.buttons.removeClass('export','inactive');
     }else{
+
       _mock.clicks.buttons.addClass('save','inactive');
       _mock.clicks.buttons.addClass('export','inactive');
     }
@@ -173,13 +183,22 @@ var mockbox;
 
 
   function getSaveData(){
+    var size0 = document.getElementById('html').style.height,
+        size1 = document.getElementById('css').style.width,
+        size2 = document.getElementById('css').style.height;
     return {
           gui : currentGui,
           name: document.getElementById('app-header').querySelector('.project-name').innerHTML,
-          html: _p.html.getValue(),
-          js  : _p.js.getValue(),
-          css : _p.css.getValue()
+          html: editors.html.getValue(),
+          js  : editors.js.getValue(),
+          css : editors.css.getValue(),
+          layout: [
+            size0.substr(0,size0.length-1),
+            size1.substr(0,size1.length-1),
+            size2.substr(0,size2.length-1)
+            ]
         }
+
   }
 
   function exportPackage(){
@@ -188,9 +207,9 @@ var mockbox;
         styles = zip.folder("styles"),
         scripts = zip.folder("scripts");
     
-    zip.file("index.html", _atHeader+'\n<!DOCTYPE html>\n<html>\n<head>\n<link rel="stylesheet" type="text/css" href="styles/atype.styles.css">\n</head>\n<body>\n'+_p.html.getValue()+'\n<script type="text/javascript" src="scripts/atype.scripts.js"></script>\n</body>\n</html>');
-    styles.file("atype.styles.css", _p.css.getValue());
-    scripts.file("atype.scripts.js", _p.js.getValue());
+    zip.file("index.html", _atHeader+'\n<!DOCTYPE html>\n<html>\n<head>\n<link rel="stylesheet" type="text/css" href="styles/atype.styles.css">\n</head>\n<body>\n'+editors.html.getValue()+'\n<script type="text/javascript" src="scripts/atype.scripts.js"></script>\n</body>\n</html>');
+    styles.file("atype.styles.css", editors.css.getValue());
+    scripts.file("atype.scripts.js", editors.js.getValue());
     
     var content = zip.generate({type:"blob"});
     
@@ -212,6 +231,15 @@ var mockbox;
    
   }
 
+  function _reset(){
+    currentGui = null;
+    document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New Mock';
+    var l = defaultLayout.split(',');
+    splitview.setLayout(l[0],l[1],l[2]);
+    clearEditors();
+    _mock.utils.isDirty(false);
+  }
+
   return {
     init: function(){
       init();
@@ -219,17 +247,12 @@ var mockbox;
     restore: function(data){
       setEditorsData(data);
     },
-    gui: {
-      get: function(){ 
-        return currentGui; 
-      },
-      set:function(gui){ 
-        currentGui = gui;
-        //saveGuiToLs();
+    gui: function(){
+      if(arguments.length){
+        currentGui = arguments[0];
+      }else{
+        return currentGui;
       }
-    },
-    load: function(gui){
-      _mock.database.restoreEditorsFromId(gui);
     },
     export: function(){
       exportPackage();
@@ -240,9 +263,14 @@ var mockbox;
       }
     },
     reset:function(){
-      currentGui = null;
-      document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New Mock'
-      clearEditors();
+      if(mockbox.isDirty()){
+        mockbox.utils.confirm('continue',function(){
+          _reset();            
+        });      
+      }else{
+        _reset();  
+      }
+      
     }
   };
 
@@ -403,15 +431,18 @@ _mock.clicks = (function(){
   }
 
   function clickToEditProjectName(){
+    var initValue = mockName.innerHTML, newValue;
     mockName.addEventListener('click', function(){
       mockName.setAttribute('tabindex','-1');
       mockName.setAttribute('contenteditable','true');
       apollo.addClass(mockName,'editing');
       apollo.addClass(mockName.nextSibling,'visible');
+      
     });
 
     mockName.addEventListener('blur', function(){
-        
+      newValue = mockName.innerHTML;
+      _mock.utils.isDirty(!(newValue === initValue));  
       mockName.setAttribute('contenteditable','false');
       apollo.removeClass(mockName,'editing');
       apollo.removeClass(mockName.nextSibling,'visible');
@@ -484,10 +515,10 @@ _mock.database = (function(){
     var db = indexedDb.db,
         trans = db.transaction("editor", "readwrite"),
         store = trans.objectStore("editor"),
-        currentGui = _mock.gui.get() || getUID();
+        currentGui = _mock.gui() || getUID();
 
-    _mock.gui.set(currentGui);
-
+    _mock.gui(currentGui);
+    
     // Put Entry
     var entry = store.put({
       "gui" : currentGui,
@@ -495,6 +526,8 @@ _mock.database = (function(){
       "html": data.html,
       "css": data.css,
       "js": data.js,
+      "layout": data.layout,
+      "layout": data.layout,
       "createdBy" : data.author || 'Someone',
       "updatedBy" : data.author || 'Someone',
       "createdOn" : new Date().getTime(),
@@ -503,6 +536,7 @@ _mock.database = (function(){
 
     entry.onsuccess = function(e) {
       // Re-render all the editors
+      mockbox.isDirty(false);
       mockbox.notify({iconUrl:'icons/notifications/check.png',message:'Saved Successfully'});
     };
 
@@ -544,7 +578,6 @@ _mock.database = (function(){
       else {
         reqResult = items;
         _mock.events.dispatch('dbresult');
-        //alert("Got all items: " + items);
       }
     };
 
@@ -563,7 +596,7 @@ _mock.database = (function(){
     
     request.onsuccess = function(event) {
       // Do something with the request.result!
-      _mock.gui.set(request.result.gui)
+      _mock.gui(request.result.gui);
       _mock.restore(request.result);
     };
     
@@ -743,7 +776,8 @@ _mock.storage = (function(){
 }());
 _mock.utils = (function(){
   'use strict';
-
+  var _isDirty = false,
+      _confirmCallback = null;
   function toDate(eObj){
     var mEpoch = parseInt(eObj), dDate = new Date();
 
@@ -765,9 +799,35 @@ _mock.utils = (function(){
           }
       }
   }
+
+  function callConfirmCallback(){
+    _confirmCallback();
+  }
+
+  function _confirm(type, callback){
+    chrome.runtime.sendMessage({message:'confirmType', type:type});
+    chrome.app.window.get('confirm').show();
+    if(callback){
+      _confirmCallback = callback;
+    }
+  }
+
   return {
     toDate: function(epoch){
       return toDate(epoch);
+    }, 
+    isDirty:function(){
+      if(arguments.length){
+        _isDirty = arguments[0];
+      }else{
+        return _isDirty;
+      }
+    },
+    confirm: function(type, callback){
+      _confirm(type,callback);
+    }, 
+    confirmCallback: function(){
+      callConfirmCallback();
     }
   }
 
@@ -789,7 +849,8 @@ _mock.utils = (function(){
     utils:_mock.utils,
     notify:function(o){
       _mock.notify.send(o);
-    }
+    },
+    isDirty:_mock.utils.isDirty
   };
 
 }());

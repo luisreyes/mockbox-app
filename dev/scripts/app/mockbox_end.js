@@ -15,7 +15,8 @@
     utils:_mock.utils,
     notify:function(o){
       _mock.notify.send(o);
-    }
+    },
+    isDirty:_mock.utils.isDirty
   };
 
 }());

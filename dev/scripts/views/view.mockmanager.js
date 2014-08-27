@@ -32,11 +32,11 @@ _v.mockmanager = (function(){
         liSubtitle.innerHTML = 'by ' + _availableIds[i].createdBy +' on '+ mockbox.utils.toDate(_availableIds[i].createdOn);
 
         liLoad.addEventListener('click', function(){
-           load(this.getAttribute('data-reference-id'));
+          load(this.getAttribute('data-reference-id'));
         });
 
         liDelete.addEventListener('click', function(){
-           remove(this.getAttribute('data-reference-id'));
+          remove(this.getAttribute('data-reference-id'));
         });
         
         
@@ -47,17 +47,31 @@ _v.mockmanager = (function(){
   }
 
   function load(gui){
-    chrome.runtime.sendMessage({message:'loadItem', gui:gui});
-    mockbox.reset();
-    mockbox.popout.close('mocks');
+    if(mockbox.isDirty()){
+      mockbox.utils.confirm('continue',function(){
+        loadMethods();
+      });
+    }else{
+      loadMethods();
+    }  
+
+    function loadMethods(){
+      console.log('LOAD');
+      chrome.runtime.sendMessage({message:'loadItem', gui:gui});
+      mockbox.reset();
+      mockbox.popout.close('mocks');
+    }
   }
 
   function remove(gui){
-    chrome.runtime.sendMessage({message:'deleteItem', gui:gui});
+    mockbox.utils.confirm('delete',function(){
+      chrome.runtime.sendMessage({message:'deleteItem', gui:gui});
     
-    // Visual of Deleting
-    var item = doc.getElementById(gui);
-    apollo.addClass(item,'deleted');
+      // Visual of Deleting
+      var item = doc.getElementById(gui);
+      apollo.addClass(item,'deleted');
+    });
+    
   }
 
 

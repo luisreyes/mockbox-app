@@ -154,15 +154,18 @@ _mock.clicks = (function(){
   }
 
   function clickToEditProjectName(){
+    var initValue = mockName.innerHTML, newValue;
     mockName.addEventListener('click', function(){
       mockName.setAttribute('tabindex','-1');
       mockName.setAttribute('contenteditable','true');
       apollo.addClass(mockName,'editing');
       apollo.addClass(mockName.nextSibling,'visible');
+      
     });
 
     mockName.addEventListener('blur', function(){
-        
+      newValue = mockName.innerHTML;
+      _mock.utils.isDirty(!(newValue === initValue));  
       mockName.setAttribute('contenteditable','false');
       apollo.removeClass(mockName,'editing');
       apollo.removeClass(mockName.nextSibling,'visible');

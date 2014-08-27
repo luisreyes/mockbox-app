@@ -46,4 +46,15 @@ chrome.app.runtime.onLaunched.addListener(function() {
     }
   });
 
+  chrome.app.window.create('popout_confirm.html', {
+    'id': 'confirm',
+    'frame':'none',
+    'hidden':true,
+    'resizable':false,
+    'bounds': {
+      'width': 400,
+      'height': 200
+    }
+  });
+
 });

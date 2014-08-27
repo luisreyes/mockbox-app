@@ -6,9 +6,26 @@ var popout;
 
 (function(){ var _pop = (function(){
 'use strict';
+  var confirmTitle={
+    continue: 'You have unsaved changes',
+    delete: 'You are trying to delete this mock'
+  }
+
+  var confirmMessage = {
+    continue: 'Are you sure you want to continue?',
+    delete: 'Are you sure you want to delete it?'
+  }
 
   function init(){
     _pop.clicks.init();
+
+    chrome.runtime.onMessage.addListener(function(data) {
+      debugger;
+      if(data.message === 'confirmType'){
+        document.getElementById("popout-title").innerHTML = confirmTitle[data.type];
+        document.getElementById("confirm-message").innerHTML = confirmMessage[data.type];
+      }
+    });
   }
 
   return {

@@ -1,0 +1,13 @@
+extends mockbox_popout.jade
+
+block title
+  span#popout-title
+block titleIcon
+  span.icon_error-triangle
+
+block content
+  section.confirm-wrapper
+    section#confirm-message.confirm-text Do you want to continue?
+  footer#confirm-buttons
+    button.cancel cancel
+    button.continue continue

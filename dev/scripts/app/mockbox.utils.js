@@ -1,6 +1,7 @@
 _mock.utils = (function(){
   'use strict';
-
+  var _isDirty = false,
+      _confirmCallback = null;
   function toDate(eObj){
     var mEpoch = parseInt(eObj), dDate = new Date();
 
@@ -22,9 +23,35 @@ _mock.utils = (function(){
           }
       }
   }
+
+  function callConfirmCallback(){
+    _confirmCallback();
+  }
+
+  function _confirm(type, callback){
+    chrome.runtime.sendMessage({message:'confirmType', type:type});
+    chrome.app.window.get('confirm').show();
+    if(callback){
+      _confirmCallback = callback;
+    }
+  }
+
   return {
     toDate: function(epoch){
       return toDate(epoch);
+    }, 
+    isDirty:function(){
+      if(arguments.length){
+        _isDirty = arguments[0];
+      }else{
+        return _isDirty;
+      }
+    },
+    confirm: function(type, callback){
+      _confirm(type,callback);
+    }, 
+    confirmCallback: function(){
+      callConfirmCallback();
     }
   }
 

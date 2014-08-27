@@ -44,10 +44,10 @@ _mock.database = (function(){
     var db = indexedDb.db,
         trans = db.transaction("editor", "readwrite"),
         store = trans.objectStore("editor"),
-        currentGui = _mock.gui.get() || getUID();
+        currentGui = _mock.gui() || getUID();
 
-    _mock.gui.set(currentGui);
-
+    _mock.gui(currentGui);
+    
     // Put Entry
     var entry = store.put({
       "gui" : currentGui,
@@ -55,6 +55,8 @@ _mock.database = (function(){
       "html": data.html,
       "css": data.css,
       "js": data.js,
+      "layout": data.layout,
+      "layout": data.layout,
       "createdBy" : data.author || 'Someone',
       "updatedBy" : data.author || 'Someone',
       "createdOn" : new Date().getTime(),
@@ -63,6 +65,7 @@ _mock.database = (function(){
 
     entry.onsuccess = function(e) {
       // Re-render all the editors
+      mockbox.isDirty(false);
       mockbox.notify({iconUrl:'icons/notifications/check.png',message:'Saved Successfully'});
     };
 
@@ -104,7 +107,6 @@ _mock.database = (function(){
       else {
         reqResult = items;
         _mock.events.dispatch('dbresult');
-        //alert("Got all items: " + items);
       }
     };
 
@@ -123,7 +125,7 @@ _mock.database = (function(){
     
     request.onsuccess = function(event) {
       // Do something with the request.result!
-      _mock.gui.set(request.result.gui)
+      _mock.gui(request.result.gui);
       _mock.restore(request.result);
     };
     

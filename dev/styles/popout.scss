@@ -38,6 +38,23 @@
   height: 28px;
   font-size: initial;
 }
+.confirm-wrapper{
+
+  .confirm-text{
+    font-size:larger;
+    width: 100%;
+    text-align: center;
+    padding-top: 42px
+  }
+
+}
+
+footer{
+
+  .cancel{float:left;}
+  
+  .continue{ float:right; }
+}
 
 .load-list{
   list-style-type: none;
