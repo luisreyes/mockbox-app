@@ -1,0 +1,64 @@
+.colors{
+  margin-top:50px;
+  span{
+    width:50px;
+    height:50px;
+    display: inline-block;
+  
+  }
+  
+  .c0{ background-color: $base-color-0; }
+  .c1{ background-color: $base-color-1; }
+  .c2{ background-color: $base-color-2; }
+  .c3{ background-color: $base-color-3; }
+  .c4{ background-color: $base-color-4; }
+
+  .c5{ background-color: $base-color-0; }
+  .c6{ background-color: $base-color-1; }
+  .c7{ background-color: $base-color-2; }
+  .c8{ background-color: $base-color-3; }
+  .c9{ background-color: $base-color-4; }
+
+  .c10{ background-color: $accent-light-color-0; }
+  .c11{ background-color: $accent-light-color-1; }
+  .c12{ background-color: $accent-light-color-2; }
+  .c13{ background-color: $accent-light-color-3; }
+  .c14{ background-color: $accent-light-color-4; }
+
+  .c15{ background-color: $accent-dark-color-0; }
+  .c16{ background-color: $accent-dark-color-1; }
+  .c17{ background-color: $accent-dark-color-2; }
+  .c18{ background-color: $accent-dark-color-3; }
+  .c19{ background-color: $accent-dark-color-4; }
+
+}
+
+
+// section.colors
+//     section Base Dark
+//     span.c0
+//     span.c1
+//     span.c2
+//     span.c3
+//     span.c4
+    
+//     section Base Light
+//     span.c5
+//     span.c6
+//     span.c7
+//     span.c8
+//     span.c9
+    
+//     section Accent Light
+//     span.c10
+//     span.c11
+//     span.c12
+//     span.c13
+//     span.c14
+    
+//     section Accent Dark
+//     span.c15
+//     span.c16
+//     span.c17
+//     span.c18
+//     span.c19

@@ -1,8 +1,8 @@
 body, html { 
   height: 100%;
   margin: 0;
-  background-color:$theme-base-bg;
-  color:$theme-base-font-color;
+  background-color:$base-color-2;
+  color:$base-color-font;
   font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
@@ -14,7 +14,7 @@ body, html {
 *:focus{outline:none;}
 
 ::selection {
-  background: $theme-color;
+  background: $accent-color;
   color:#EEE;
 }
 
@@ -32,15 +32,15 @@ body, html {
   line-height: 20px;
 
   &.editing{
-    background-color: #333;
-    border: 1px solid #222;
+    background-color: $base-color-3;
+    border: 1px solid $base-color-1;
   }
   
 }
 
 .icon_check{
     margin: 11px 5px 0 2px;
-    color: #bbb;
+    color: $base-color-font;
     display:none;
     font-size: smaller;
   }
@@ -62,10 +62,10 @@ body, html {
 }
 
 header {
-  color: #999;
-  background-color: #2A2A2A;
-  border: 1px solid #3C3C3C;
-  box-shadow: 0 0 5px #000;
+  color: $base-color-font;
+  background-color: $base-color-2;
+  border: 1px solid $base-color-3;
+  box-shadow: 0 0 5px $base-color-shadow;
   font-size: 20px;
   height: $topbar-height;
   position: absolute;
@@ -74,7 +74,7 @@ header {
   width:100%;
 
   .icon:hover{
-    color:$theme-color;
+    color:$accent-color;
     cursor:pointer;
   }
 
@@ -84,9 +84,9 @@ header {
 }
 
 footer {
-  color: #999;
-  background-color: #2A2A2A;
-  border-top: 1px solid #3C3C3C;
+  color: $base-color-font;
+  background-color: $base-color-1;
+  border-top: 1px solid $base-color-2;
   font-size: 20px;
   position: absolute;
   bottom:0;
@@ -98,17 +98,18 @@ footer {
 }
 
 button{
-  background-color: #222;
-  color: #ccc;
-  border: 1px solid #444;
+  background-color: $accent-dark-color-1;
+  color: #999;
+  border: 1px solid $accent-dark-color-2;
   padding: 5px 10px;
   border-radius: 3px;
 
   &:hover{
-    border-color: $theme-color-dark;
+    border-color: $accent-color;
   }
   &:active{
-    background-color:$theme-color-dark;
+    color:#333;
+    background-color:$accent-color;
   }
 
   &.cancel{

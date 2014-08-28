@@ -3,6 +3,42 @@ $sidebar-width : 150px;
 $topbar-height : 40px;
 $topbar-height-frame : 30px;
 
+$base-color: #333;
+$base-color-font: #999;
+$base-color-shadow: #111;
+
+$base-color-0: #111;
+$base-color-1: #222;
+$base-color-2: #333;
+$base-color-3: #444;
+$base-color-4: #555;
+
+// $base-color: #333;
+// $base-color-font: #666;
+// $base-color-shadow: #999;
+
+// $base-color-0: #AAA;
+// $base-color-1: #BBB;
+// $base-color-2: #CCC;
+// $base-color-3: #DDD;
+// $base-color-4: #EEE;
+
+$accent-color: #719fd4;//#B37662;//#9F71AD;
+$accent-color-font: $accent-color;
+$accent-color-font-hover: #FFF;
+// Accent Color Lighten
+$accent-light-color-0 : lighten($accent-color, 15%);
+$accent-light-color-1 : lighten($accent-color, 12%);
+$accent-light-color-2 : lighten($accent-color, 9%);
+$accent-light-color-3 : lighten($accent-color, 6%);
+$accent-light-color-4 : lighten($accent-color, 3%);
+// Accent Color Darken
+$accent-dark-color-0 : darken($accent-color, 25%);
+$accent-dark-color-1 : darken($accent-color, 30%);
+$accent-dark-color-2 : darken($accent-color, 35%);
+$accent-dark-color-3 : darken($accent-color, 40%);
+$accent-dark-color-4 : darken($accent-color, 45%);
+
 
 // Colors
 $theme-base-bg: #333;
@@ -16,3 +52,46 @@ $theme-color-darkest : darken($theme-color, 35%);
 $app-frame-width: 1px;
 $app-frame-type: solid;
 $app-frame-color:#444;
+
+
+
+/*
+
+// Section sizes
+$sidebar-width : 150px;
+$topbar-height : 40px;
+$topbar-height-frame : 30px;
+
+$app-frame-width: 1px;
+$app-frame-type: solid;
+$app-frame-color:#444;
+
+// Font Colors
+$theme-base-font-color:#333;//#CCC;
+
+// Base Color
+$theme-base-color: #ccc;//#333;
+
+// Accent Color 
+$theme-color: #719fd4;
+
+//Base Color Lighten
+$theme-base-color-light0: lighten($theme-base-color, 25%);
+$theme-base-color-light1: lighten($theme-base-color, 30%);
+$theme-base-color-light2: lighten($theme-base-color, 35%);
+$theme-base-color-light3: lighten($theme-base-color, 40%);
+
+//Base Color Darken
+$theme-base-color-dark0: darken($theme-base-color, 2%);
+$theme-base-color-dark1: darken($theme-base-color, 4%);
+$theme-base-color-dark2: darken($theme-base-color, 6%);
+$theme-base-color-dark3: darken($theme-base-color, 8%);
+
+
+// Accent Color Darken
+$theme-color-dark0 : darken($theme-color, 25%);
+$theme-color-dark1 : darken($theme-color, 30%);
+$theme-color-dark2 : darken($theme-color, 35%);
+$theme-color-dark3 : darken($theme-color, 40%);
+
+*/

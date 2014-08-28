@@ -1,27 +1,27 @@
 .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
-  background-color: #3c3c3c;
+  background-color: $base-color-3;
 }
 
 ::-webkit-scrollbar {
   -webkit-appearance:none;
   width:12px;
   height:12px;
-  background-color:#333;
+  background-color:$base-color-2;
 }
 
 ::-webkit-scrollbar-thumb {
   border-radius:12px;
-  border:4px solid rgba(255,255,255,0);
+  border:4px solid $base-color-2;
   background-clip:content-box;
   background-color:#666;
 }
 ::-webkit-scrollbar-thumb:hover {
   border-radius:12px;
-  border:4px solid rgba(255,255,255,0);
+  border:4px solid $base-color-2;
   background-clip:content-box;
-  background-color:$theme-color;
+  background-color:$accent-color;
 }
 
 ::-webkit-scrollbar-corner {
-  background-color:#222;
+  background-color:$base-color-1;
 }
