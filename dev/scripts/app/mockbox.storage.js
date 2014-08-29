@@ -8,30 +8,26 @@
 _mock.storage = (function(){
 'use strict'; 
 
-  function setEditorValues(){
-    chrome.storage.sync.get('editors', function(result){
-      _mock.restoreFromMemory(result['editors']);
+  function _restorePreferences(){
+    chrome.storage.sync.get('settings', function(result){
+      chrome.runtime.sendMessage({message:'restoreSettings', preferences:result});
     });
   }
 
-  function saveEditorData(data){
-    chrome.storage.sync.set({'editors':data}, function(){});
+  function _savePreferences(data){
+    chrome.storage.sync.set({'settings':data}, function(){
+      console.log('setting saved');
+    });
   }
 
   return {
-    editors:{
+    preferences:{
       restore: function(){
-        restoreFromGui();
-      },
-      setValues: function(){
-        setEditorValues();
-      },
-      get: function(){
-        setEditorValues();
+        _restorePreferences();
       },
       save: function(data){
-        saveEditorData(data);
-      }  
+        _savePreferences(data);
+      }
     },
     purge:function(){
       chrome.storage.sync.clear();

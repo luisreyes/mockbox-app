@@ -17,7 +17,8 @@ var mockbox;
       sidebar = document.getElementById('app-sidebar'),
       sidebarToggle = document.getElementById('app-sidebar-toggle'),
       domEditors = document.getElementById('app-editors'),
-      defaultLayout = '50,50,25';
+      defaultLayout = '50,50,25',
+      settings = {};
 
   function init(){
     
@@ -44,7 +45,7 @@ var mockbox;
     });
 
     // Restore from memory
-    //_mock.storage.editors.restore();
+    _mock.storage.preferences.restore();
 
     // Init Clicks
     _mock.clicks.init();
@@ -66,6 +67,36 @@ var mockbox;
          case 'continuePopout': 
             _mock.popout.confirmCallback();
             _mock.popout.close(data.popoutId);
+         break;
+
+         case 'saveSettings': 
+            data.settings.lastGui = currentGui;
+            _mock.storage.preferences.save(data.settings);
+            
+            var editorTheme = (data.settings.theme === 'dark') ? 'mbo' : 'xq-light';
+            //document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + data.settings.theme + '.css');
+
+            var windows = chrome.app.window.getAll();
+            for(var i in windows){
+              windows[i].contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + data.settings.theme + '.css');
+            }
+
+            setGlobalEditorOption('theme', editorTheme);
+         break;
+
+         case 'restoreSettings': 
+            settings = data.preferences;
+            var data = settings,
+                editorTheme = (data.settings.theme === 'dark') ? 'mbo' : 'xq-light';
+            
+            var windows = chrome.app.window.getAll();
+            for(var i in windows){
+              windows[i].contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + data.settings.theme + '.css');
+            }
+
+            _mock.database.restoreEditorsFromId(data.settings.lastGui);
+
+            setGlobalEditorOption('theme', editorTheme);
          break;
 
          default: return;
@@ -161,9 +192,12 @@ var mockbox;
     }
   }
 
-  function saveGuiToLs(){
-    _mock.storage.editors.save(currentGui);
-    updateIframe();
+  function savePreferences(){
+    var data ={
+      'loadLast':true,
+      'theme':'light'
+    };
+    _mock.storage.preferences.save(data);
   }
 
   function onEditorChange(){
@@ -177,7 +211,6 @@ var mockbox;
       _mock.clicks.buttons.addClass('save','inactive');
       _mock.clicks.buttons.addClass('export','inactive');
     }
-    _mock.storage.editors.save(getSaveData());
 
   }
 
@@ -243,6 +276,9 @@ var mockbox;
   return {
     init: function(){
       init();
+    },
+    settings: function(){ 
+      return settings;
     },
     restore: function(data){
       setEditorsData(data);

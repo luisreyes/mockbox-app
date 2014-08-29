@@ -1,3 +1,5 @@
+/*! Global styles */
+
 body, html { 
   height: 100%;
   margin: 0;
@@ -6,12 +8,13 @@ body, html {
   font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
+.transition{ -webkit-transition: all 0.2s; }
 .absolute{ position:absolute; }
 .bottom{ bottom:0; }
 .visible{ display:block; }
 .hidden {display:none; }
-
 *:focus{outline:none;}
+.clear{clear:both;}
 
 ::selection {
   background: $accent-color;
@@ -52,7 +55,7 @@ body, html {
 }
 .app-logo{
   background-image: url(/images/mockbox-logo.svg);
-  width: 122px;
+  width: 106px;
   height: 20px;
   float:right;
   background-size: cover;
@@ -99,7 +102,7 @@ footer {
 
 button{
   background-color: $accent-dark-color-1;
-  color: #999;
+  color: $base-color-button;
   border: 1px solid $accent-dark-color-2;
   padding: 5px 10px;
   border-radius: 3px;
@@ -130,6 +133,25 @@ iframe {
     border: none;
   }
 
+select{
+  background: $accent-dark-color-0;
+  border: 1px solid $accent-dark-color-0;
+  color:$base-color-button;
+  padding: 2px 10px;
+  border-radius: 4px;
+  margin-left: 10px;
+  
+  option{ 
+    background-color:$accent-color;
+    color:#333;
+  }
+
+  &:active, &:hover{ 
+    background: $accent-color;
+    color:#333;
+  }
+
+}
 
 
 

@@ -38,11 +38,10 @@ chrome.app.runtime.onLaunched.addListener(function() {
     'id': 'settings',
     'frame':'none',
     'hidden':true,
-    'minWidth':320,
-    'minHeight':568,
+    'resizable':false,
     'bounds': {
-      'width': 800,
-      'height': 600
+      'width': 320,
+      'height': 500
     }
   });
 

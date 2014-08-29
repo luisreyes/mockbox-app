@@ -173,10 +173,12 @@ _mock.clicks = (function(){
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
+        // init the views js file
+        views.settings.init();
         // Open the window and run the function
         _mock.popout.open('settings', function(){
-          // Methods to run on window load
-          // TODO
+          // Generate the list to display
+          views.settings.restoreSettingStates(mockbox.getSettings());
         });
       }
     });

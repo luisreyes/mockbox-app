@@ -7,6 +7,7 @@ cssmin = require( 'gulp-minify-css' ),
 concat = require( 'gulp-concat' ),
 uglify = require( 'gulp-uglify' ),
 jade = require( 'gulp-jade' ),
+header = require( 'gulp-header' ),
 order = require( 'gulp-order' ),
 locals = require( './locals.json' );
 
@@ -30,10 +31,17 @@ gulp.task( 'compile_jade', function () {
 gulp.task( 'compile_sass', function () {
 
   // Compile, Minify, Bundle Sass to Css
-  gulp.src( 'dev/styles/core.scss' )
+  gulp.src( 'dev/styles/core-light.scss' )
     .pipe( sass() )
     .pipe( cssmin() )
-    .pipe( concat('mockbox.css') )
+    .pipe( concat('mockbox-light.css') )
+    .pipe( gulp.dest( 'app/styles/' ));
+
+  // Compile, Minify, Bundle Sass to Css
+  gulp.src( 'dev/styles/core-dark.scss' )
+    .pipe( sass() )
+    .pipe( cssmin() )
+    .pipe( concat('mockbox-dark.css') )
     .pipe( gulp.dest( 'app/styles/' ));
 
   // Compile, Minify, Bundle Sass to Css

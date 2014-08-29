@@ -3,8 +3,8 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Styles-->
-    <link rel="stylesheet" type="text/css" href="styles/lib.css">
-    <link rel="stylesheet" type="text/css" href="styles/mockbox.css">
+    <link id="lib-styles" rel="stylesheet" type="text/css" href="styles/lib.css">
+    <link id="mockbox-styles" rel="stylesheet" type="text/css" href="styles/mockbox-dark.css">
   </head>
   <body>
     <section class="app-frame frame-top"></section>
@@ -16,7 +16,28 @@
     </section>
     <header class="popout-header"><span class="popout-title-icon"><span class="icon_cog"></span></span><span class="popout-title"><span>Settings</span></span></header>
     <section class="popout-content">
-      <p>hello setttings</p>
+      <section id="settings-options" class="settings-options">
+        <section class="field">
+          <section class="field-title">Themes:</section>
+          <section class="field-option"><span>Select a theme</span>
+            <select id="settings-theme-select" class="input">
+              <option>light</option>
+              <option>dark</option>
+            </select>
+            <section class="clear"></section>
+          </section>
+        </section>
+        <section class="field">
+          <section class="field-title">Application startup:</section>
+          <section class="field-option"><span>Autoload last </span>
+            <input id="settings-open-check" type="checkbox" class="input">
+          </section>
+        </section>
+      </section>
+      <footer id="settings-footer">
+        <button class="cancel">cancel</button>
+        <button class="ok">ok</button>
+      </footer>
     </section>
     <!-- Scripts-->
     <script type="text/javascript" src="scripts/popout.js"></script>

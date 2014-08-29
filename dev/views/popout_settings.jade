@@ -6,4 +6,21 @@ block titleIcon
   span.icon_cog
 
 block content
-  p hello setttings
+  section#settings-options.settings-options
+    section.field
+      section.field-title Themes:
+      section.field-option
+        span Select a theme
+        select.input#settings-theme-select
+            option light
+            option dark
+        section.clear
+    section.field
+      section.field-title Application startup:
+      section.field-option
+        span Autoload last 
+        input.input#settings-open-check(type="checkbox")
+
+  footer#settings-footer
+    button.cancel cancel
+    button.ok ok

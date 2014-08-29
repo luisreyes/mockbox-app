@@ -6,8 +6,8 @@ html
 
     // Styles
     
-    each stylesheet in stylesheets
-      link(rel="stylesheet" type="text/css" href=stylesheet)
+    each sheet, index in stylesheets
+      link(id=index rel="stylesheet" type="text/css" href=sheet)
 
   body
     section.app-frame.frame-top

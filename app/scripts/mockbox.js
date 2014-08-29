@@ -17,7 +17,8 @@ var mockbox;
       sidebar = document.getElementById('app-sidebar'),
       sidebarToggle = document.getElementById('app-sidebar-toggle'),
       domEditors = document.getElementById('app-editors'),
-      defaultLayout = '50,50,25';
+      defaultLayout = '50,50,25',
+      settings = {};
 
   function init(){
     
@@ -44,7 +45,7 @@ var mockbox;
     });
 
     // Restore from memory
-    //_mock.storage.editors.restore();
+    _mock.storage.preferences.restore();
 
     // Init Clicks
     _mock.clicks.init();
@@ -66,6 +67,36 @@ var mockbox;
          case 'continuePopout': 
             _mock.popout.confirmCallback();
             _mock.popout.close(data.popoutId);
+         break;
+
+         case 'saveSettings': 
+            data.settings.lastGui = currentGui;
+            _mock.storage.preferences.save(data.settings);
+            
+            var editorTheme = (data.settings.theme === 'dark') ? 'mbo' : 'xq-light';
+            //document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + data.settings.theme + '.css');
+
+            var windows = chrome.app.window.getAll();
+            for(var i in windows){
+              windows[i].contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + data.settings.theme + '.css');
+            }
+
+            setGlobalEditorOption('theme', editorTheme);
+         break;
+
+         case 'restoreSettings': 
+            settings = data.preferences;
+            var data = settings,
+                editorTheme = (data.settings.theme === 'dark') ? 'mbo' : 'xq-light';
+            
+            var windows = chrome.app.window.getAll();
+            for(var i in windows){
+              windows[i].contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + data.settings.theme + '.css');
+            }
+
+            _mock.database.restoreEditorsFromId(data.settings.lastGui);
+
+            setGlobalEditorOption('theme', editorTheme);
          break;
 
          default: return;
@@ -161,9 +192,12 @@ var mockbox;
     }
   }
 
-  function saveGuiToLs(){
-    _mock.storage.editors.save(currentGui);
-    updateIframe();
+  function savePreferences(){
+    var data ={
+      'loadLast':true,
+      'theme':'light'
+    };
+    _mock.storage.preferences.save(data);
   }
 
   function onEditorChange(){
@@ -177,7 +211,6 @@ var mockbox;
       _mock.clicks.buttons.addClass('save','inactive');
       _mock.clicks.buttons.addClass('export','inactive');
     }
-    _mock.storage.editors.save(getSaveData());
 
   }
 
@@ -243,6 +276,9 @@ var mockbox;
   return {
     init: function(){
       init();
+    },
+    settings: function(){ 
+      return settings;
     },
     restore: function(data){
       setEditorsData(data);
@@ -450,10 +486,12 @@ _mock.clicks = (function(){
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
+        // init the views js file
+        views.settings.init();
         // Open the window and run the function
         _mock.popout.open('settings', function(){
-          // Methods to run on window load
-          // TODO
+          // Generate the list to display
+          views.settings.restoreSettingStates(mockbox.getSettings());
         });
       }
     });
@@ -833,30 +871,26 @@ _mock.popout = (function(){
 _mock.storage = (function(){
 'use strict'; 
 
-  function setEditorValues(){
-    chrome.storage.sync.get('editors', function(result){
-      _mock.restoreFromMemory(result['editors']);
+  function _restorePreferences(){
+    chrome.storage.sync.get('settings', function(result){
+      chrome.runtime.sendMessage({message:'restoreSettings', preferences:result});
     });
   }
 
-  function saveEditorData(data){
-    chrome.storage.sync.set({'editors':data}, function(){});
+  function _savePreferences(data){
+    chrome.storage.sync.set({'settings':data}, function(){
+      console.log('setting saved');
+    });
   }
 
   return {
-    editors:{
+    preferences:{
       restore: function(){
-        restoreFromGui();
-      },
-      setValues: function(){
-        setEditorValues();
-      },
-      get: function(){
-        setEditorValues();
+        _restorePreferences();
       },
       save: function(data){
-        saveEditorData(data);
-      }  
+        _savePreferences(data);
+      }
     },
     purge:function(){
       chrome.storage.sync.clear();
@@ -912,6 +946,9 @@ _mock.utils = (function(){
   mockbox = {
     load:function(gui){
       _mock.database.restoreEditorsFromId(gui);
+    },
+    getSettings: function(){
+      return _mock.settings();
     },
     getAll:function(callback){
       return _mock.database.getAll(callback);

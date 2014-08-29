@@ -4,6 +4,9 @@
     load:function(gui){
       _mock.database.restoreEditorsFromId(gui);
     },
+    getSettings: function(){
+      return _mock.settings();
+    },
     getAll:function(callback){
       return _mock.database.getAll(callback);
     },

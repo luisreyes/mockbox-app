@@ -1,9 +1,9 @@
 {
 
-  "stylesheets":[
-    "styles/lib.css",
-    "styles/mockbox.css"
-  ],
+  "stylesheets":{
+    "lib-styles":"styles/lib.css",
+    "mockbox-styles":"styles/mockbox-dark.css"
+    },
   
   "scripts":[ 
     "scripts/lib.js",
@@ -12,10 +12,10 @@
   ],
 
   "popout":{
-    "stylesheets":[
-      "lib/elegant-icons/elegant-icons.css",
-      "styles/mockbox.css"
-    ],
+    "stylesheets":{
+      "lib-styles":"lib/elegant-icons/elegant-icons.css",
+      "mockbox-styles": "styles/mockbox-dark.css"
+    },
     
     "scripts":[ 
       "scripts/popout.js"
