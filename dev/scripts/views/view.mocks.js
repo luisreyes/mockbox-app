@@ -63,7 +63,6 @@ _v.mocks = (function(){
     }  
 
     function loadMethods(){
-      console.log('LOAD');
       chrome.runtime.sendMessage({message:'loadItem', gui:gui});
       mockbox.reset();
       mockbox.popout.close('mocks');

@@ -16,7 +16,8 @@ _pop.clicks = (function(){
       };
 
       if(_currentId === 'settings'){
-        buttons.okBtn = document.getElementById("settings-footer").querySelector('.ok');
+        buttons.okBtn = document.getElementById("settings-footer").querySelector('.ok'),
+        buttons.cancelBtn = document.getElementById("settings-footer").querySelector('.cancel');
       }
 
       addListeners();
@@ -51,11 +52,15 @@ _pop.clicks = (function(){
           message:'saveSettings', 
           settings:{
             theme: document.getElementById('settings-theme-select').value,
-            openOnLoad:document.getElementById('settings-open-check').checked
+            autoload:document.getElementById('settings-open-check').checked
           }
         };
 
         chrome.runtime.sendMessage(data);
+        chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
+      });
+
+      buttons.cancelBtn.addEventListener('click', function(e){
         chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
       });
     }

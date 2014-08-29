@@ -18,7 +18,8 @@ var mockbox;
       sidebarToggle = document.getElementById('app-sidebar-toggle'),
       domEditors = document.getElementById('app-editors'),
       defaultLayout = '50,50,25',
-      settings = {};
+      _settings = {},
+      windows = [];
 
   function init(){
     
@@ -50,10 +51,21 @@ var mockbox;
     // Init Clicks
     _mock.clicks.init();
 
+    // Collect All Windows
+    windows = chrome.app.window.getAll();
+
     chrome.runtime.onMessage.addListener(function(data) {
       switch(data.message){
          
          case 'closePopout': _mock.popout.close(data.popoutId);
+         break;
+
+         case 'closeApp':
+            // Save to storage
+            saveSettings();
+            
+            // Loop and close all windows
+            _mock.windows.closeAll();
          break;
 
          case 'loadItem': 
@@ -69,40 +81,57 @@ var mockbox;
             _mock.popout.close(data.popoutId);
          break;
 
+
          case 'saveSettings': 
-            data.settings.lastGui = currentGui;
-            _mock.storage.preferences.save(data.settings);
-            
-            var editorTheme = (data.settings.theme === 'dark') ? 'mbo' : 'xq-light';
-            //document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + data.settings.theme + '.css');
+          
+          // Cache the settings to a global var
+          _settings = data.settings;
+          
+          //Save to storage
+          saveSettings();
 
-            var windows = chrome.app.window.getAll();
-            for(var i in windows){
-              windows[i].contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + data.settings.theme + '.css');
-            }
-
-            setGlobalEditorOption('theme', editorTheme);
+          // Apply settings         
+          setSettings();
          break;
 
-         case 'restoreSettings': 
-            settings = data.preferences;
-            var data = settings,
-                editorTheme = (data.settings.theme === 'dark') ? 'mbo' : 'xq-light';
-            
-            var windows = chrome.app.window.getAll();
-            for(var i in windows){
-              windows[i].contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + data.settings.theme + '.css');
-            }
+         case 'restoreSettings':
+          
+          // Cache the settings to a global var
+          _settings = data.settings;
 
-            _mock.database.restoreEditorsFromId(data.settings.lastGui);
+          // Open last if lastGui is avaliable
+          if(_settings.lastGui && _settings.autoload){
+            _mock.database.restoreEditorsFromId(_settings.lastGui);
+          }
 
-            setGlobalEditorOption('theme', editorTheme);
+          // Apply settings     
+          setSettings();
          break;
 
          default: return;
          break;
       }
     });
+  }
+
+  function saveSettings(){
+    // Add currentGui to the settings model
+    _settings.lastGui = currentGui;
+    
+    // Save the settings
+    _mock.storage.preferences.save(_settings);
+  }
+
+  function setSettings(){
+    // Set Convert to theme css name
+    var theme = (_settings.theme === 'dark') ? 'mbo' : 'xq-light';
+    
+    //Set Editos Theme
+    setGlobalEditorOption('theme', theme);
+    
+    // Change css file
+    chrome.app.window.get('main').contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + _settings.theme + '.css');
+
   }
 
   /*******************/
@@ -273,12 +302,14 @@ var mockbox;
     _mock.utils.isDirty(false);
   }
 
+  mockbox = this;
+
   return {
     init: function(){
       init();
     },
-    settings: function(){ 
-      return settings;
+    getSettings: function(){ 
+      return _settings;
     },
     restore: function(data){
       setEditorsData(data);

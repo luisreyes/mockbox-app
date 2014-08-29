@@ -5,7 +5,7 @@
       _mock.database.restoreEditorsFromId(gui);
     },
     getSettings: function(){
-      return _mock.settings();
+      return _mock.getSettings();
     },
     getAll:function(callback){
       return _mock.database.getAll(callback);

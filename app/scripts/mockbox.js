@@ -18,7 +18,8 @@ var mockbox;
       sidebarToggle = document.getElementById('app-sidebar-toggle'),
       domEditors = document.getElementById('app-editors'),
       defaultLayout = '50,50,25',
-      settings = {};
+      _settings = {},
+      windows = [];
 
   function init(){
     
@@ -50,10 +51,21 @@ var mockbox;
     // Init Clicks
     _mock.clicks.init();
 
+    // Collect All Windows
+    windows = chrome.app.window.getAll();
+
     chrome.runtime.onMessage.addListener(function(data) {
       switch(data.message){
          
          case 'closePopout': _mock.popout.close(data.popoutId);
+         break;
+
+         case 'closeApp':
+            // Save to storage
+            saveSettings();
+            
+            // Loop and close all windows
+            _mock.windows.closeAll();
          break;
 
          case 'loadItem': 
@@ -69,40 +81,57 @@ var mockbox;
             _mock.popout.close(data.popoutId);
          break;
 
+
          case 'saveSettings': 
-            data.settings.lastGui = currentGui;
-            _mock.storage.preferences.save(data.settings);
-            
-            var editorTheme = (data.settings.theme === 'dark') ? 'mbo' : 'xq-light';
-            //document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + data.settings.theme + '.css');
+          
+          // Cache the settings to a global var
+          _settings = data.settings;
+          
+          //Save to storage
+          saveSettings();
 
-            var windows = chrome.app.window.getAll();
-            for(var i in windows){
-              windows[i].contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + data.settings.theme + '.css');
-            }
-
-            setGlobalEditorOption('theme', editorTheme);
+          // Apply settings         
+          setSettings();
          break;
 
-         case 'restoreSettings': 
-            settings = data.preferences;
-            var data = settings,
-                editorTheme = (data.settings.theme === 'dark') ? 'mbo' : 'xq-light';
-            
-            var windows = chrome.app.window.getAll();
-            for(var i in windows){
-              windows[i].contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + data.settings.theme + '.css');
-            }
+         case 'restoreSettings':
+          
+          // Cache the settings to a global var
+          _settings = data.settings;
 
-            _mock.database.restoreEditorsFromId(data.settings.lastGui);
+          // Open last if lastGui is avaliable
+          if(_settings.lastGui && _settings.autoload){
+            _mock.database.restoreEditorsFromId(_settings.lastGui);
+          }
 
-            setGlobalEditorOption('theme', editorTheme);
+          // Apply settings     
+          setSettings();
          break;
 
          default: return;
          break;
       }
     });
+  }
+
+  function saveSettings(){
+    // Add currentGui to the settings model
+    _settings.lastGui = currentGui;
+    
+    // Save the settings
+    _mock.storage.preferences.save(_settings);
+  }
+
+  function setSettings(){
+    // Set Convert to theme css name
+    var theme = (_settings.theme === 'dark') ? 'mbo' : 'xq-light';
+    
+    //Set Editos Theme
+    setGlobalEditorOption('theme', theme);
+    
+    // Change css file
+    chrome.app.window.get('main').contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + _settings.theme + '.css');
+
   }
 
   /*******************/
@@ -273,12 +302,14 @@ var mockbox;
     _mock.utils.isDirty(false);
   }
 
+  mockbox = this;
+
   return {
     init: function(){
       init();
     },
-    settings: function(){ 
-      return settings;
+    getSettings: function(){ 
+      return _settings;
     },
     restore: function(data){
       setEditorsData(data);
@@ -404,10 +435,7 @@ _mock.clicks = (function(){
 
       // Encapsulated code to close the app
       function closeMethods(){
-        var allWindows = chrome.app.window.getAll();
-        for(var i = 0; i < allWindows.length; i++){
-          allWindows[i].close();
-        }
+        chrome.runtime.sendMessage({message:'closeApp'});
       }
     });
     
@@ -453,10 +481,10 @@ _mock.clicks = (function(){
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        // init the views js file
-        views.mocks.init();
         // Open the window and run the function
         _mock.popout.open('mocks', function(){
+          // init the views js file
+          views.mocks.init();
           // Generate the list to display
           views.mocks.generateList();
         });
@@ -486,11 +514,11 @@ _mock.clicks = (function(){
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        // init the views js file
-        views.settings.init();
         // Open the window and run the function
         _mock.popout.open('settings', function(){
-          // Generate the list to display
+          // init the views js file
+          views.settings.init();
+          // Restore settings from memory
           views.settings.restoreSettingStates(mockbox.getSettings());
         });
       }
@@ -812,20 +840,16 @@ _mock.popout = (function(){
   _confirmCallback = null,
   currentId = '';
 
-  function _open(loc, callback){
-    currentId = loc;
+  function _open(id, callback){
+    currentId = id;
     apollo.addClass(popoutOverlay, 'visible');
-    chrome.app.window.get(loc).show();
-    if(callback){
-      callback();
-    }
+    _mock.windows.show(id,callback);
   }
 
-  function _close(loc, callback){
+  function _close(id, callback){
     currentId = '';
     apollo.removeClass(popoutOverlay, 'visible');
-    chrome.app.window.get(loc).hide();
-    // should then invoke _mock.load('gui'); OR _mock.export();
+    _mock.windows.hide(id);
   }
 
   function callConfirmCallback(){
@@ -834,20 +858,24 @@ _mock.popout = (function(){
 
   function _confirm(type, callback){
     currentId = 'confirm';
-    chrome.runtime.sendMessage({message:'confirmType', type:type});
-    chrome.app.window.get('confirm').show();
-    apollo.addClass(popoutOverlay, 'visible');
-    if(callback){
-      _confirmCallback = callback;
-    }
+    
+    _mock.popout.open('confirm', function(){
+      chrome.runtime.sendMessage({message:'confirmType', type:type});
+      apollo.addClass(popoutOverlay, 'visible');
+      if(callback){
+        _confirmCallback = callback;
+      }
+    });
+
+    
   }
 
   return {
-    open: function(location, callback){
-      _open(location, callback);
+    open: function(id, callback){
+      _open(id, callback);
     },
-    close: function(location, callback){
-      _close(location, callback);
+    close: function(id, callback){
+      _close(id, callback);
     },
     getCurrentId: function(){
       return currentId;
@@ -871,25 +899,30 @@ _mock.popout = (function(){
 _mock.storage = (function(){
 'use strict'; 
 
-  function _restorePreferences(){
+  function _restoreSettings(){
     chrome.storage.sync.get('settings', function(result){
-      chrome.runtime.sendMessage({message:'restoreSettings', preferences:result});
+      
+      var restoreData = {
+        theme: result.settings.theme || 'dark',
+        lastGui: result.settings.lastGui || null,
+        autoload: result.settings.autoload || false
+      }
+
+      chrome.runtime.sendMessage({message:'restoreSettings', settings:restoreData});
     });
   }
 
-  function _savePreferences(data){
-    chrome.storage.sync.set({'settings':data}, function(){
-      console.log('setting saved');
-    });
+  function _saveSettings(data){
+    chrome.storage.sync.set({'settings':data});
   }
 
   return {
     preferences:{
       restore: function(){
-        _restorePreferences();
+        _restoreSettings();
       },
       save: function(data){
-        _savePreferences(data);
+        _saveSettings(data);
       }
     },
     purge:function(){
@@ -941,6 +974,158 @@ _mock.utils = (function(){
   }
 
 }());
+_mock.windows = (function(){
+'use strict'; 
+  var ids = ['main'];
+
+  var globals ={
+    frame:'none',
+    hidden:false
+  }
+  var model = {
+    
+    confirm :{
+      file:'popout_confirm.html',
+      exists: false,
+      options:{
+        id:'confirm',
+        frame: globals.frame,
+        hidden: globals.hidden,
+        resizable:false,
+        bounds: {
+          width: 400,
+          height: 200
+        }
+      }
+    },
+
+    mocks :{
+      file:'popout_mocks.html',
+      exists: false,
+      options:{
+        id:'mocks',
+        frame: globals.frame,
+        hidden: globals.hidden,
+        resizable:false,
+        bounds: {
+          width: 600,
+          height: 460
+        }
+      }
+    },
+
+    settings :{
+      file:'popout_settings.html',
+      exists: false,
+      options:{
+        id:'settings',
+        frame: globals.frame,
+        hidden: globals.hidden,
+        resizable:false,
+        bounds: {
+          width: 400,
+          height: 400
+        }
+      }
+    },
+
+    export :{
+      file:'popout_export.html',
+      exists: false,
+      options:{
+        id:'export',
+        frame: globals.frame,
+        hidden: globals.hidden,
+        resizable:false,
+        bounds: {
+          width: 600,
+          height: 460
+        }
+      }
+    }
+
+  };
+
+  function _showCreate(id, callback){
+    
+    if(!model[id].exists){
+      
+      // Create Window
+      chrome.app.window.create(model[id].file, model[id].options, function(w){
+        // Window Callback
+        ids.push(id);
+        model[id].exists = true;
+        w.contentWindow.addEventListener("DOMContentLoaded", function(){
+          setWindowProperties(w);
+          if(callback){
+            callback();
+          }
+        }, false);        
+
+      });
+      
+    }else{
+      var win = chrome.app.window.get(id);
+      win.show();
+      setWindowProperties(win);
+      if(callback){
+        callback();
+      }  
+      
+    }
+  }
+
+  function setWindowProperties(win){
+    var theme = mockbox.getSettings().theme,
+        mainBounds = chrome.app.window.get('main').getBounds(),
+        winBounds = win.getBounds();
+    win.setBounds({
+      left: Math.round((mainBounds.left+mainBounds.width/2) - (winBounds.width/2)),
+      top: Math.round((mainBounds.top+mainBounds.height/2) - (winBounds.height/2))
+    })
+    win.contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + theme + '.css');
+  }
+
+  function _hide(id, callback){
+    if(model[id].exists){
+      chrome.app.window.get(id).hide();
+      if(callback){
+        callback();
+      }
+    }
+  }
+
+  function _closeAll(){
+    ids.forEach(function(id){
+      _close(id);
+    });
+    
+  }
+
+  function _close(id){
+    chrome.app.window.get(id).close();
+    
+  }
+
+  return {
+    show: function(id, callback){
+      _showCreate(id, callback);
+    },
+    hide: function(id, callback){
+      _hide(id, callback);
+    },
+    closeAll:function(){
+      _closeAll();
+    },
+    close:function(id){
+      _close(id);
+    },
+    getAll: function(){
+      return chrome.app.window.getAll();
+    }
+  };
+
+}());
   _mock.init();
   //Expose
   mockbox = {
@@ -948,7 +1133,7 @@ _mock.utils = (function(){
       _mock.database.restoreEditorsFromId(gui);
     },
     getSettings: function(){
-      return _mock.settings();
+      return _mock.getSettings();
     },
     getAll:function(callback){
       return _mock.database.getAll(callback);

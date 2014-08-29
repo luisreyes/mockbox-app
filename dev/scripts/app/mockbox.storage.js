@@ -8,25 +8,30 @@
 _mock.storage = (function(){
 'use strict'; 
 
-  function _restorePreferences(){
+  function _restoreSettings(){
     chrome.storage.sync.get('settings', function(result){
-      chrome.runtime.sendMessage({message:'restoreSettings', preferences:result});
+      
+      var restoreData = {
+        theme: result.settings.theme || 'dark',
+        lastGui: result.settings.lastGui || null,
+        autoload: result.settings.autoload || false
+      }
+
+      chrome.runtime.sendMessage({message:'restoreSettings', settings:restoreData});
     });
   }
 
-  function _savePreferences(data){
-    chrome.storage.sync.set({'settings':data}, function(){
-      console.log('setting saved');
-    });
+  function _saveSettings(data){
+    chrome.storage.sync.set({'settings':data});
   }
 
   return {
     preferences:{
       restore: function(){
-        _restorePreferences();
+        _restoreSettings();
       },
       save: function(data){
-        _savePreferences(data);
+        _saveSettings(data);
       }
     },
     purge:function(){

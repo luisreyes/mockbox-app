@@ -6,20 +6,16 @@ _mock.popout = (function(){
   _confirmCallback = null,
   currentId = '';
 
-  function _open(loc, callback){
-    currentId = loc;
+  function _open(id, callback){
+    currentId = id;
     apollo.addClass(popoutOverlay, 'visible');
-    chrome.app.window.get(loc).show();
-    if(callback){
-      callback();
-    }
+    _mock.windows.show(id,callback);
   }
 
-  function _close(loc, callback){
+  function _close(id, callback){
     currentId = '';
     apollo.removeClass(popoutOverlay, 'visible');
-    chrome.app.window.get(loc).hide();
-    // should then invoke _mock.load('gui'); OR _mock.export();
+    _mock.windows.hide(id);
   }
 
   function callConfirmCallback(){
@@ -28,20 +24,24 @@ _mock.popout = (function(){
 
   function _confirm(type, callback){
     currentId = 'confirm';
-    chrome.runtime.sendMessage({message:'confirmType', type:type});
-    chrome.app.window.get('confirm').show();
-    apollo.addClass(popoutOverlay, 'visible');
-    if(callback){
-      _confirmCallback = callback;
-    }
+    
+    _mock.popout.open('confirm', function(){
+      chrome.runtime.sendMessage({message:'confirmType', type:type});
+      apollo.addClass(popoutOverlay, 'visible');
+      if(callback){
+        _confirmCallback = callback;
+      }
+    });
+
+    
   }
 
   return {
-    open: function(location, callback){
-      _open(location, callback);
+    open: function(id, callback){
+      _open(id, callback);
     },
-    close: function(location, callback){
-      _close(location, callback);
+    close: function(id, callback){
+      _close(id, callback);
     },
     getCurrentId: function(){
       return currentId;

@@ -91,10 +91,7 @@ _mock.clicks = (function(){
 
       // Encapsulated code to close the app
       function closeMethods(){
-        var allWindows = chrome.app.window.getAll();
-        for(var i = 0; i < allWindows.length; i++){
-          allWindows[i].close();
-        }
+        chrome.runtime.sendMessage({message:'closeApp'});
       }
     });
     
@@ -140,10 +137,10 @@ _mock.clicks = (function(){
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        // init the views js file
-        views.mocks.init();
         // Open the window and run the function
         _mock.popout.open('mocks', function(){
+          // init the views js file
+          views.mocks.init();
           // Generate the list to display
           views.mocks.generateList();
         });
@@ -173,11 +170,11 @@ _mock.clicks = (function(){
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        // init the views js file
-        views.settings.init();
         // Open the window and run the function
         _mock.popout.open('settings', function(){
-          // Generate the list to display
+          // init the views js file
+          views.settings.init();
+          // Restore settings from memory
           views.settings.restoreSettingStates(mockbox.getSettings());
         });
       }

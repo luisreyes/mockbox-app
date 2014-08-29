@@ -8,19 +8,19 @@ _v.settings = (function(){
   }
 
   
-  function restoreStates(data){
+  function restoreStates(settings){
     // Set Theme
-    doc.getElementById('settings-theme-select').value = data.settings.theme;
+    doc.getElementById('settings-theme-select').value = settings.theme;
     //Set Last Worked on Checkbox
-    doc.getElementById('settings-open-check').checked = data.settings.openOnLoad;
+    doc.getElementById('settings-open-check').checked = settings.autoload;
   }
 
   return {
     init: function(){
       if(!doc) init();
     },
-    restoreSettingStates: function(data){
-      restoreStates(data);
+    restoreSettingStates: function(settings){
+      restoreStates(settings);
     }
   }
 
