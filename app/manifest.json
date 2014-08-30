@@ -18,9 +18,19 @@
       "scripts": ["background.js"]
     }
   },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuBWiizvqsXcHSyGDMf31sHozB/+nSq3tqQMBgZC5u4nAInX5vUBuiPi/BlFCrSlqy3OArpC3I77H2LQifpvIrYQtZnC6KpxT/8ce7LHny3rKH38xFYdLnIbEmhZy3TDxtTi9lMD4rohsqehma3aRFhZM6Rq9cGM3LLfcpB1dbR3mRPzG5ZTlanznJPHP8ei/K2S1/20X2Hvk0TowpET5twBnp8fLFP3xl4/o/yNYA8SQMSYrqVFERuInzIVXubSAWsFFiwgBPIcqU6R0pG0HRyiyeXunP3c2x5ebVcmyvo/d9XW7hWPLu2Or2FWEodhDepF23sd6aWsbt5T52zcNBwIDAQAB",
   "permissions": [
+    "identity",
     "notifications",
     {"fileSystem": ["write", "retainEntries", "directory"]},
     "storage"
-  ]
+  ],
+  "oauth2": {
+    "client_id": "71660103387-2enhlcncq54i15h66076c4fe5j5est7g.apps.googleusercontent.com",
+    "scopes": [
+      "profile",
+      "https://www.googleapis.com/auth/drive.appdata",
+      "https://www.googleapis.com/auth/drive.file"
+    ]
+  }
 }

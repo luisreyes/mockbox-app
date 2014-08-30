@@ -45,6 +45,10 @@ var mockbox;
     
     });
 
+    _mock.oauth.getToken({'interactive':false},function(token){
+      _mock.oauth.getProfile();
+    });
+
     // Restore from memory
     _mock.storage.preferences.restore();
 
@@ -95,7 +99,6 @@ var mockbox;
          break;
 
          case 'restoreSettings':
-          
           // Cache the settings to a global var
           _settings = data.settings;
 
@@ -107,6 +110,22 @@ var mockbox;
           // Apply settings     
           setSettings();
          break;
+
+          case 'signin':
+            _mock.oauth.getToken({'interactive':true},function(token){
+              debugger;
+            });
+          break;
+
+          case 'onProfileData':
+            console.log(data);
+            var profileContainer = document.getElementById('profile-container');
+            var imageNode = profileContainer.querySelector('.profile-img');
+            var nameNode = profileContainer.querySelector('.profile-name');
+            debugger;
+            imageNode.setAttribute('src',data.profile.image.url);
+            nameNode.innerHTML(data.profile.displayName);
+          break;
 
          default: return;
          break;
@@ -832,6 +851,51 @@ _mock.notify = (function(){
   };
 
 }());
+_mock.oauth = (function(){
+  'use strict';
+
+  function _getToken(type,callback){
+    
+    chrome.identity.getAuthToken(type, callback);
+  }
+
+  function _getProfile(){
+    chrome.identity.getProfileUserInfo(function(userInfo){
+      //make url request here
+      
+      if(userInfo.id){
+        var url = 'https://www.googleapis.com/plus/v1/people/'+userInfo.id+'?fields=displayName%2C+image/url&key=AIzaSyCgvqfmrNPXDPB-p1JGUINbqhhKG_awYOY';
+        var response = {};
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.onload = function (e) {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              response = JSON.parse(xhr.responseText);
+              chrome.runtime.sendMessage({message:'onProfileData', profile:response});
+            } else {
+              console.error(xhr.statusText);
+            }
+          }
+        };
+        xhr.onerror = function (e) {
+          console.error(xhr.statusText);
+        };
+        xhr.send(null);
+      }
+    });
+  }
+
+  return {
+    getToken:function(t,c){
+      _getToken(t,c);
+    },
+    getProfile:function(){
+      _getProfile();
+    }
+  }
+
+}());
 _mock.popout = (function(){
 'use strict'; 
   var 
@@ -901,14 +965,15 @@ _mock.storage = (function(){
 
   function _restoreSettings(){
     chrome.storage.sync.get('settings', function(result){
-      
-      var restoreData = {
-        theme: result.settings.theme || 'dark',
-        lastGui: result.settings.lastGui || null,
-        autoload: result.settings.autoload || false
+      var data = {};
+      if(!result.settings){
+        data.theme = 'dark';
+        data.lastGui = null;
+        data.autoload = true;
+      }else{
+        data = result.settings;
       }
-
-      chrome.runtime.sendMessage({message:'restoreSettings', settings:restoreData});
+      chrome.runtime.sendMessage({message:'restoreSettings', settings:data});
     });
   }
 

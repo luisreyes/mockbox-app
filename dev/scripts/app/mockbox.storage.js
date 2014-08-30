@@ -10,14 +10,15 @@ _mock.storage = (function(){
 
   function _restoreSettings(){
     chrome.storage.sync.get('settings', function(result){
-      
-      var restoreData = {
-        theme: result.settings.theme || 'dark',
-        lastGui: result.settings.lastGui || null,
-        autoload: result.settings.autoload || false
+      var data = {};
+      if(!result.settings){
+        data.theme = 'dark';
+        data.lastGui = null;
+        data.autoload = true;
+      }else{
+        data = result.settings;
       }
-
-      chrome.runtime.sendMessage({message:'restoreSettings', settings:restoreData});
+      chrome.runtime.sendMessage({message:'restoreSettings', settings:data});
     });
   }
 

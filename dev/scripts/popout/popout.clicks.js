@@ -16,6 +16,7 @@ _pop.clicks = (function(){
       };
 
       if(_currentId === 'settings'){
+        buttons.signinBtn = document.getElementById("settings-signin"),
         buttons.okBtn = document.getElementById("settings-footer").querySelector('.ok'),
         buttons.cancelBtn = document.getElementById("settings-footer").querySelector('.cancel');
       }
@@ -62,6 +63,10 @@ _pop.clicks = (function(){
 
       buttons.cancelBtn.addEventListener('click', function(e){
         chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
+      });
+
+      buttons.signinBtn.addEventListener('click', function(e){
+        chrome.runtime.sendMessage({message:'signin'});
       });
     }
     

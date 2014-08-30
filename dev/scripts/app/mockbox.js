@@ -45,6 +45,10 @@ var mockbox;
     
     });
 
+    _mock.oauth.getToken({'interactive':false},function(token){
+      _mock.oauth.getProfile();
+    });
+
     // Restore from memory
     _mock.storage.preferences.restore();
 
@@ -95,7 +99,6 @@ var mockbox;
          break;
 
          case 'restoreSettings':
-          
           // Cache the settings to a global var
           _settings = data.settings;
 
@@ -107,6 +110,22 @@ var mockbox;
           // Apply settings     
           setSettings();
          break;
+
+          case 'signin':
+            _mock.oauth.getToken({'interactive':true},function(token){
+              debugger;
+            });
+          break;
+
+          case 'onProfileData':
+            console.log(data);
+            var profileContainer = document.getElementById('profile-container');
+            var imageNode = profileContainer.querySelector('.profile-img');
+            var nameNode = profileContainer.querySelector('.profile-name');
+            debugger;
+            imageNode.setAttribute('src',data.profile.image.url);
+            nameNode.innerHTML(data.profile.displayName);
+          break;
 
          default: return;
          break;
