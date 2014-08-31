@@ -18,6 +18,9 @@
     notify:function(o){
       _mock.notify.send(o);
     },
+    isAuthenticated: function(){
+      return _mock.isAuthenticated();
+    },
     isDirty:_mock.utils.isDirty
   };
 

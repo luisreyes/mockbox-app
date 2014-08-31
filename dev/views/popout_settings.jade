@@ -9,8 +9,12 @@ block content
   section#settings-options.settings-options
     section.field
       section.field-title User Settings
-      section.field-option
-        span Signin to Google
+      section#settings-signin-container.field-option.hidden
+        span Signin with your Google account
+        button.input#settings-signin Signin
+        section.clear
+      section#settings-signout-container.field-option.hidden
+        span Signout
         button.input#settings-signin Signin
         section.clear
         

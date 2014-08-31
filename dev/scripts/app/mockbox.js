@@ -20,6 +20,7 @@ var mockbox;
       domEditors = document.getElementById('app-editors'),
       defaultLayout = '50,50,25',
       _settings = {},
+      isAuthenticated = false,
       sv;
 
   function init(){
@@ -120,18 +121,23 @@ var mockbox;
          break;
 
           case 'signin':
-            //debugger;
             _mock.oauth.getToken({'interactive':true}, function(token){
               // Get profile data
               _mock.oauth.getProfile();
             });
           break;
 
+          case 'later':
+            apollo.addClass(splashSignin, 'hidden');
+            apollo.removeClass(splashLoading, 'hidden');
+            closeSplash();
+          break;
+
           case 'onProfileData':
             var profileContainer = document.getElementById('profile-container');
             var imageNode = profileContainer.querySelector('.profile-img');
             var nameNode = profileContainer.querySelector('.profile-name');
-            
+            isAuthenticated = true;
             imageNode.setAttribute('src',data.profile.image.url);
             nameNode.innerHTML = data.profile.name.givenName;
             closeSplash();
@@ -344,6 +350,9 @@ var mockbox;
   return {
     init: function(){
       init();
+    },
+    isAuthenticated: function(){
+      return isAuthenticated;
     },
     getSettings: function(){ 
       return _settings;

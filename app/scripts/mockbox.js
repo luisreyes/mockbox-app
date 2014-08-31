@@ -20,6 +20,7 @@ var mockbox;
       domEditors = document.getElementById('app-editors'),
       defaultLayout = '50,50,25',
       _settings = {},
+      isAuthenticated = false,
       sv;
 
   function init(){
@@ -120,18 +121,23 @@ var mockbox;
          break;
 
           case 'signin':
-            //debugger;
             _mock.oauth.getToken({'interactive':true}, function(token){
               // Get profile data
               _mock.oauth.getProfile();
             });
           break;
 
+          case 'later':
+            apollo.addClass(splashSignin, 'hidden');
+            apollo.removeClass(splashLoading, 'hidden');
+            closeSplash();
+          break;
+
           case 'onProfileData':
             var profileContainer = document.getElementById('profile-container');
             var imageNode = profileContainer.querySelector('.profile-img');
             var nameNode = profileContainer.querySelector('.profile-name');
-            
+            isAuthenticated = true;
             imageNode.setAttribute('src',data.profile.image.url);
             nameNode.innerHTML = data.profile.name.givenName;
             closeSplash();
@@ -345,6 +351,9 @@ var mockbox;
     init: function(){
       init();
     },
+    isAuthenticated: function(){
+      return isAuthenticated;
+    },
     getSettings: function(){ 
       return _settings;
     },
@@ -411,11 +420,12 @@ _mock.clicks = (function(){
   buttons = {
 
     // Navigation
+    signinLink:sidebar.querySelector('.profile-name'),
     new       :sidebar.querySelector('.new'),
     save      :sidebar.querySelector('.save'),
     mocks     :sidebar.querySelector('.mocks'),
     export    :sidebar.querySelector('.export'),
-    profile   :sidebar.querySelector('.profile'),
+    profile   :sidebar.querySelector('.profile-settings'),
     twitter   :sidebar.querySelector('.twitter'),
     email     :sidebar.querySelector('.email'),
 
@@ -523,8 +533,18 @@ _mock.clicks = (function(){
       chrome.runtime.sendMessage({message:'signin', callback: 'closeSplash' });
     });
 
+    buttons.signinLink.addEventListener( 'click', function(e){
+      if(!mockbox.isAuthenticated()){
+        chrome.runtime.sendMessage({message:'signin', callback: 'closeSplash' });
+      }else{
+        buttons.profile.click();
+      }
+    });
+
     // Splash Later Button
-    buttons.later.addEventListener( 'click', _mock.save );
+    buttons.later.addEventListener( 'click', function(){
+      chrome.runtime.sendMessage({message:'later' });
+    });
 
     buttons.mocks.addEventListener( 'click', function(e){
       
@@ -1284,6 +1304,9 @@ _mock.windows = (function(){
     utils:_mock.utils,
     notify:function(o){
       _mock.notify.send(o);
+    },
+    isAuthenticated: function(){
+      return _mock.isAuthenticated();
     },
     isDirty:_mock.utils.isDirty
   };
