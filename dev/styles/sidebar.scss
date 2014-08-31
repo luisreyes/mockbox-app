@@ -11,7 +11,7 @@
   color:$accent-color;
   font-weight: bold;
   height: -webkit-calc(100% - 20px);
-  width: 100%;
+  width: $sidebar-width;
   position: absolute;
   z-index: 0;
 

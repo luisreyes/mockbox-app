@@ -14,6 +14,9 @@ _mock.clicks = (function(){
   // Main Header
   header = document.getElementById('app-header'),
 
+  // Splash
+  splash = document.getElementById('app-splash'),
+
   // Project Name on Main Header
   mockName = header.querySelector('.project-name'),
   
@@ -29,11 +32,15 @@ _mock.clicks = (function(){
     // Navigation
     new       :sidebar.querySelector('.new'),
     save      :sidebar.querySelector('.save'),
-    mocks      :sidebar.querySelector('.mocks'),
+    mocks     :sidebar.querySelector('.mocks'),
     export    :sidebar.querySelector('.export'),
-    settings  :sidebar.querySelector('.settings'),
+    profile   :sidebar.querySelector('.profile'),
     twitter   :sidebar.querySelector('.twitter'),
     email     :sidebar.querySelector('.email'),
+
+    //Splash
+    signin    :splash.querySelector('.signin'),
+    later     :splash.querySelector('.maybelater'),
     
     // Header Bar
     check     :header.querySelector('.icon_check'),
@@ -130,6 +137,14 @@ _mock.clicks = (function(){
     // Save Button
     buttons.save.addEventListener( 'click', _mock.save );
 
+    // Splash Signin Button
+    buttons.signin.addEventListener( 'click', function(){
+      chrome.runtime.sendMessage({message:'signin', callback: 'closeSplash' });
+    });
+
+    // Splash Later Button
+    buttons.later.addEventListener( 'click', _mock.save );
+
     buttons.mocks.addEventListener( 'click', function(e){
       
       // Verify the click happens opn the LI in the sidebar navigation
@@ -163,7 +178,7 @@ _mock.clicks = (function(){
       }
     });
 
-    buttons.settings.addEventListener( 'click', function(e){
+    buttons.profile.addEventListener( 'click', function(e){
 
       // Verify the click happens opn the LI in the sidebar navigation
       var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;

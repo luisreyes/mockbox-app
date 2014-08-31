@@ -11,17 +11,14 @@ body, html {
 .transition{ -webkit-transition: all 0.2s; }
 .absolute{ position:absolute; }
 .bottom{ bottom:0; }
-.visible{ display:block; }
 .hidden {display:none; }
-*:focus{outline:none;}
+.visible{ display:block; }
+.opaque{opacity:0 !important;}
 .clear{clear:both;}
 
-::selection {
-  background: $accent-color;
-  color:#EEE;
-}
+*:focus{outline:none;}
+::selection { background: $accent-color; color:#EEE; }
 
-.visible{display:inline-block !important;}
 
 .project-name{
 
@@ -100,61 +97,61 @@ footer {
 
 }
 
-button{
-  background-color: $accent-dark-color-1;
-  color: $base-color-button;
-  border: 1px solid $accent-dark-color-2;
-  padding: 5px 10px;
-  border-radius: 3px;
+.a{
+  cursor:pointer;
+  &:hover{ text-decoration: underline; }
+}
 
-  &:hover{
-    border-color: $accent-color;
-  }
-  &:active{
+
+iframe { border: none; }
+
+select{
+  option{ 
+    background-color:#CCC;
     color:#333;
-    background-color:$accent-color;
+  }
+
+}
+
+
+
+button, select {
+  box-shadow:inset 0px 1px 0px 0px $accent-dark-color-0;
+  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, $accent-dark-color-1), color-stop(1, $accent-dark-color-0) );
+  border-radius:3px;
+  text-indent:0;
+  border:1px solid $accent-dark-color-1;
+  display:inline-block;
+  color:$base-color-button;
+  text-decoration:none;
+  text-align:center;
+  text-shadow:1px 1px 0px $accent-dark-color-0;
+  min-width: 70px;
+  height: 35px;
+  cursor:pointer;
+  
+  &:hover {
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, $accent-dark-color-0), color-stop(1, $accent-dark-color-1) );
+    box-shadow:0px 1px 0px 0px $base-color-0;
+  }
+  &:active {
+    box-shadow:0px 1px 0px 0px $base-color-4;
   }
 
   &.cancel{
-    background-color:#67091c;
-    border-color:#333;
+    box-shadow:inset 0px 1px 0px 0px #994343;
+    text-shadow:1px 1px 0px #994343;
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #AA4B4B), color-stop(1, #994343) );
+    border-color:#AA4B4B;
     &:hover{
-      border-color: crimson;
+      background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #994343), color-stop(1, #AA4B4B) );
+      //box-shadow:0px 1px 0px 0px #994343;
     }
     &:active{
-      color: #333;
-      border-color:#67091c;
-      background-color:crimson;
+      //box-shadow:0px 1px 0px 0px #994343;
     }
   }
 }
-
-iframe {
-    border: none;
-  }
-
-select{
-  background: $accent-dark-color-0;
-  border: 1px solid $accent-dark-color-0;
-  color:$base-color-button;
-  padding: 2px 10px;
-  border-radius: 4px;
-  margin-left: 10px;
-  
-  option{ 
-    background-color:$accent-color;
-    color:#333;
-  }
-
-  &:active, &:hover{ 
-    background: $accent-color;
-    color:#333;
-  }
-
-}
-
-
-
-
+/* This button was generated using CSSButtonGenerator.com */
 
 

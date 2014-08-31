@@ -27,14 +27,25 @@ html
     
     section#app-popout.popout
       section.overlay
+      section#app-splash.splash.transition
+        section#app-splash-loading
+          section.spinner
+            section.dot1
+            section.dot2
+        section#app-splash-signin.splash-contents.hidden
+          section Welcome, let's begin by signing in and allowing access. This will enable the best experience and more features.
+          button.signin Sign in
+          span.a.maybelater Maybe later
 
 
     // Menu Sidebar
     
     section#app-sidebar.sidebar
       section#profile-container.profile
-        img.profile-img
+        img.profile-img(src="images/profile.png")
         span.profile-name
+        span.profile-settings.transition
+            span.icon.icon_cog
       section.content
         ul
           li.new.transition 
@@ -52,10 +63,6 @@ html
           li.mocks.transition 
             span.icon.icon_grid-2x2
             span MOCKS
-
-          li.settings.transition
-            span.icon.icon_cogs
-            span SETTINGS
         
         ul.absolute.bottom
           

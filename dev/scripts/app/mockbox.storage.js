@@ -12,7 +12,7 @@ _mock.storage = (function(){
     chrome.storage.sync.get('settings', function(result){
       var data = {};
       if(!result.settings){
-        data.theme = 'dark';
+        data.theme = 'light';
         data.lastGui = null;
         data.autoload = true;
       }else{

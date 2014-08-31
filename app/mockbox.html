@@ -17,17 +17,28 @@
     <!-- Popout-->
     <section id="app-popout" class="popout">
       <section class="overlay"></section>
+      <section id="app-splash" class="splash transition">
+        <section id="app-splash-loading">
+          <section class="spinner">
+            <section class="dot1"></section>
+            <section class="dot2"></section>
+          </section>
+        </section>
+        <section id="app-splash-signin" class="splash-contents hidden">
+          <section>Welcome, let's begin by signing in and allowing access. This will enable the best experience and more features.</section>
+          <button class="signin">Sign in</button><span class="a maybelater">Maybe later</span>
+        </section>
+      </section>
     </section>
     <!-- Menu Sidebar-->
     <section id="app-sidebar" class="sidebar">
-      <section id="profile-container" class="profile"><img class="profile-img"><span class="profile-name"></span></section>
+      <section id="profile-container" class="profile"><img src="images/profile.png" class="profile-img"><span class="profile-name"></span><span class="profile-settings transition"><span class="icon icon_cog"></span></span></section>
       <section class="content">
         <ul>
           <li class="new transition"> <span class="icon icon_document"></span><span>NEW</span></li>
           <li class="save transition"> <span class="icon icon_drive_alt"></span><span>SAVE</span></li>
           <li class="export transition"> <span class="icon icon_folder_download"></span><span>EXPORT</span></li>
           <li class="mocks transition"> <span class="icon icon_grid-2x2"></span><span>MOCKS</span></li>
-          <li class="settings transition"><span class="icon icon_cogs"></span><span>SETTINGS</span></li>
         </ul>
         <ul class="absolute bottom">
           <li class="twitter transition"> <span class="icon social_twitter"></span><span>@MockBoxIO</span></li>

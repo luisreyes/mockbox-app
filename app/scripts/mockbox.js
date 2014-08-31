@@ -12,19 +12,21 @@ var mockbox;
       domHtml = document.getElementById('html').querySelector('.code'),
       domCss  = document.getElementById('css').querySelector('.code'),
       domJs   = document.getElementById('js').querySelector('.code'),
-      domView = document.getElementById('view').querySelector('.code'),
       header = document.getElementById('app-header'),
-      sidebar = document.getElementById('app-sidebar'),
+      splash = document.getElementById('app-splash'),
+      splashSignin = document.getElementById('app-splash-signin'),
+      splashLoading = document.getElementById('app-splash-loading'),
       sidebarToggle = document.getElementById('app-sidebar-toggle'),
       domEditors = document.getElementById('app-editors'),
       defaultLayout = '50,50,25',
       _settings = {},
-      windows = [];
+      sv;
 
   function init(){
     
     //Init splitview
-    splitview.init({
+    sv = splitview;
+    sv.init({
       main:'app-editors',
       layout: defaultLayout,
       containers:{
@@ -38,15 +40,23 @@ var mockbox;
     // Initialize modules
     initEditors();
     
-    sidebarToggle.addEventListener('click', function(e){
+    sidebarToggle.addEventListener('click', function(){
     
       apollo.toggleClass(domEditors, 'open');
       apollo.toggleClass(header, 'open');
     
     });
 
+    // Get token for google account
     _mock.oauth.getToken({'interactive':false},function(token){
-      _mock.oauth.getProfile();
+      if (chrome.runtime.lastError) {
+        //callback(chrome.runtime.lastError);
+        apollo.removeClass(splashSignin, 'hidden');
+        apollo.addClass(splashLoading, 'hidden');
+      }else{
+        // Get profile data
+        _mock.oauth.getProfile();
+      }
     });
 
     // Restore from memory
@@ -55,13 +65,11 @@ var mockbox;
     // Init Clicks
     _mock.clicks.init();
 
-    // Collect All Windows
-    windows = chrome.app.window.getAll();
-
     chrome.runtime.onMessage.addListener(function(data) {
       switch(data.message){
          
-         case 'closePopout': _mock.popout.close(data.popoutId);
+         case 'closePopout': 
+          _mock.popout.close(data.popoutId);
          break;
 
          case 'closeApp':
@@ -112,25 +120,36 @@ var mockbox;
          break;
 
           case 'signin':
-            _mock.oauth.getToken({'interactive':true},function(token){
-              debugger;
+            //debugger;
+            _mock.oauth.getToken({'interactive':true}, function(token){
+              // Get profile data
+              _mock.oauth.getProfile();
             });
           break;
 
           case 'onProfileData':
-            console.log(data);
             var profileContainer = document.getElementById('profile-container');
             var imageNode = profileContainer.querySelector('.profile-img');
             var nameNode = profileContainer.querySelector('.profile-name');
-            debugger;
+            
             imageNode.setAttribute('src',data.profile.image.url);
-            nameNode.innerHTML(data.profile.displayName);
+            nameNode.innerHTML = data.profile.name.givenName;
+            closeSplash();
           break;
 
          default: return;
-         break;
       }
     });
+  }
+
+  function closeSplash(){
+    window.setTimeout(function(){
+      apollo.addClass(splash, 'opaque');
+      splash.addEventListener('webkitTransitionEnd', function() {
+        console.log('Transition complete!  This is the callback, no library needed!');
+        apollo.addClass(splash, 'hidden');
+      });
+    }, 1000);
   }
 
   function saveSettings(){
@@ -180,13 +199,16 @@ var mockbox;
     setGlobalEditorOption('theme', 'mbo');
 
     // Listen for viewport size change
-    splitview.addEventListener('resize', function(){
+    sv.addEventListener('resize', function(){
       //Set Dirty to trigger save. Since layout is saved with project
       _mock.utils.isDirty(true);
       // Refresh all editors (CodeMirror's gutter fix)
       for (var type in editors) {
-        editors[type].refresh();
+        if (editors.hasOwnProperty(type)) {
+          editors[type].refresh();
+        }
       }
+
     });
 
 
@@ -203,8 +225,10 @@ var mockbox;
     // Get passed 'option' and 'value' and set
     // it to all editors in the collection.
     for (var type in editors) {
-      editors[type].setOption(option, val);
-    }
+        if (editors.hasOwnProperty(type)) {
+          editors[type].setOption(option, val);
+        }
+      }
   }
 
   function areAllEmpty(){
@@ -220,32 +244,26 @@ var mockbox;
   function clearEditors(){
     // Loop all editors
     for (var type in editors) {
-      editors[type].setValue("");
-      editors[type].clearHistory();
-      editors[type].clearGutter();
+      if (editors.hasOwnProperty(type)) {
+        editors[type].setValue("");
+        editors[type].clearHistory();
+        editors[type].clearGutter();
+      }
     }
   }
 
   function setEditorsData(data){
     if(data){
       document.getElementById('app-header').querySelector('.project-name').innerHTML = data.name;
-      editors.html.setValue(data['html']);
-      editors.js.setValue(data['js']);
-      editors.css.setValue(data['css']);
-      splitview.setLayout(data['layout'][0],data['layout'][1],data['layout'][2]);
+      editors.html.setValue( data.html );
+      editors.js.setValue( data.js );
+      editors.css.setValue( data.css );
+      sv.setLayout( data.layout[0], data.layout[1], data.layout[2] );
       updateIframe();
       _mock.utils.isDirty(false);
     }else{
       setGlobalEditorOption('value', '');
     }
-  }
-
-  function savePreferences(){
-    var data ={
-      'loadLast':true,
-      'theme':'light'
-    };
-    _mock.storage.preferences.save(data);
   }
 
   function onEditorChange(){
@@ -278,7 +296,7 @@ var mockbox;
             size1.substr(0,size1.length-1),
             size2.substr(0,size2.length-1)
             ]
-        }
+        };
 
   }
 
@@ -298,14 +316,14 @@ var mockbox;
     chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName:'mockbox.prototype.zip'}, function(writableFileEntry) {
       writableFileEntry.createWriter(function(writer) {
         writer.onerror = errorHandler;
-        writer.onwriteend = function(e) {};
+        writer.onwriteend = function(e) { console.log(e); };
         writer.write(content, {type: 'application/zip'} );
       }, errorHandler);
     });
 
   }
 
-  function errorHandler(e){}
+  function errorHandler(e){ console.log(e); }
 
   function updateIframe(){
     document.getElementById('compiled-view').contentWindow.postMessage(getSaveData(), '*');
@@ -316,7 +334,7 @@ var mockbox;
     currentGui = null;
     document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New Mock';
     var l = defaultLayout.split(',');
-    splitview.setLayout(l[0],l[1],l[2]);
+    sv.setLayout(l[0],l[1],l[2]);
     clearEditors();
     _mock.utils.isDirty(false);
   }
@@ -377,6 +395,9 @@ _mock.clicks = (function(){
   // Main Header
   header = document.getElementById('app-header'),
 
+  // Splash
+  splash = document.getElementById('app-splash'),
+
   // Project Name on Main Header
   mockName = header.querySelector('.project-name'),
   
@@ -392,11 +413,15 @@ _mock.clicks = (function(){
     // Navigation
     new       :sidebar.querySelector('.new'),
     save      :sidebar.querySelector('.save'),
-    mocks      :sidebar.querySelector('.mocks'),
+    mocks     :sidebar.querySelector('.mocks'),
     export    :sidebar.querySelector('.export'),
-    settings  :sidebar.querySelector('.settings'),
+    profile   :sidebar.querySelector('.profile'),
     twitter   :sidebar.querySelector('.twitter'),
     email     :sidebar.querySelector('.email'),
+
+    //Splash
+    signin    :splash.querySelector('.signin'),
+    later     :splash.querySelector('.maybelater'),
     
     // Header Bar
     check     :header.querySelector('.icon_check'),
@@ -493,6 +518,14 @@ _mock.clicks = (function(){
     // Save Button
     buttons.save.addEventListener( 'click', _mock.save );
 
+    // Splash Signin Button
+    buttons.signin.addEventListener( 'click', function(){
+      chrome.runtime.sendMessage({message:'signin', callback: 'closeSplash' });
+    });
+
+    // Splash Later Button
+    buttons.later.addEventListener( 'click', _mock.save );
+
     buttons.mocks.addEventListener( 'click', function(e){
       
       // Verify the click happens opn the LI in the sidebar navigation
@@ -526,7 +559,7 @@ _mock.clicks = (function(){
       }
     });
 
-    buttons.settings.addEventListener( 'click', function(e){
+    buttons.profile.addEventListener( 'click', function(e){
 
       // Verify the click happens opn the LI in the sidebar navigation
       var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
@@ -853,6 +886,7 @@ _mock.notify = (function(){
 }());
 _mock.oauth = (function(){
   'use strict';
+  var profile = {};
 
   function _getToken(type,callback){
     
@@ -862,28 +896,68 @@ _mock.oauth = (function(){
   function _getProfile(){
     chrome.identity.getProfileUserInfo(function(userInfo){
       //make url request here
-      
       if(userInfo.id){
-        var url = 'https://www.googleapis.com/plus/v1/people/'+userInfo.id+'?fields=displayName%2C+image/url&key=AIzaSyCgvqfmrNPXDPB-p1JGUINbqhhKG_awYOY';
-        var response = {};
-        var xhr = new XMLHttpRequest();
+        
+        var url = 'https://www.googleapis.com/plus/v1/people/'+userInfo.id+'?fields=displayName%2C+name/givenName%2C+image/url&key=AIzaSyCgvqfmrNPXDPB-p1JGUINbqhhKG_awYOY',
+            response = {},
+            xhr = new XMLHttpRequest();
+        
         xhr.open("GET", url, true);
+        
         xhr.onload = function (e) {
+        
           if (xhr.readyState === 4) {
             if (xhr.status === 200) {
+           
               response = JSON.parse(xhr.responseText);
-              chrome.runtime.sendMessage({message:'onProfileData', profile:response});
+              profile = response;
+              loadImgBlob(response.image.url);
+           
             } else {
               console.error(xhr.statusText);
             }
           }
         };
+
         xhr.onerror = function (e) {
           console.error(xhr.statusText);
         };
-        xhr.send(null);
+        
+        xhr.send();
+
       }
     });
+
+    function loadImgBlob(url){
+     
+      var response = {},
+          xhr = new XMLHttpRequest();
+        
+        xhr.open("GET", url, true);
+        
+        xhr.responseType = 'blob';
+        
+        xhr.onload = function (e) {
+        
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+
+              profile.image.url = window.URL.createObjectURL( xhr.response );
+              chrome.runtime.sendMessage({message:'onProfileData', profile:profile});
+           
+            } else {
+              console.error(xhr.statusText);
+            }
+          }
+        };
+
+        xhr.onerror = function (e) {
+          console.error(xhr.statusText);
+        };
+        
+        xhr.send();
+
+    }
   }
 
   return {
@@ -967,7 +1041,7 @@ _mock.storage = (function(){
     chrome.storage.sync.get('settings', function(result){
       var data = {};
       if(!result.settings){
-        data.theme = 'dark';
+        data.theme = 'light';
         data.lastGui = null;
         data.autoload = true;
       }else{

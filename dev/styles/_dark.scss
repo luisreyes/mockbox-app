@@ -1,4 +1,8 @@
+.splash{ background-image: url(/images/splash_dark.png); }
 .app-logo{ background-position-y:0px; }
+$app-profile-bg: #222; 
+$app-profile-font: #666;
+$app-profile-font-hover:#999;
 
 $base-color: #333;
 $base-color-font: #AAA;
@@ -17,7 +21,7 @@ $accent-color-font-hover: #FFF;
 
 
 // Section sizes
-$sidebar-width : 150px;
+$sidebar-width : 220px;
 $topbar-height : 40px;
 $topbar-height-frame : 30px;
 

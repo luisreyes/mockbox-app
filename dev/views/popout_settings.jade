@@ -8,22 +8,24 @@ block titleIcon
 block content
   section#settings-options.settings-options
     section.field
-      section.field-title Themes:
+      section.field-title User Settings
+      section.field-option
+        span Signin to Google
+        button.input#settings-signin Signin
+        section.clear
+        
+    section.field
+      section.field-title Application Settings
+      section.field-option
+        span Autoload last 
+        input.input#settings-open-check(type="checkbox")
       section.field-option
         span Select a theme
         select.input#settings-theme-select
             option light
             option dark
         section.clear
-    section.field
-      section.field-title Application:
-      section.field-option
-        span Autoload last 
-        input.input#settings-open-check(type="checkbox")
-      section.field-option
-        span Signin to Google
-        button.input#settings-signin Signin
-
+          
   footer#settings-footer
     button.cancel cancel
     button.ok ok
