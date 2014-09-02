@@ -24,6 +24,20 @@ _mock.utils = (function(){
       }
   }
 
+  function _Collect(baseObj, updateObj) {
+    // Updates the base object with the new object
+    var obj = baseObj; {
+        for (var prop in updateObj) {
+            var val = updateObj[prop];
+            if (typeof val == "object") // this also applies to arrays or null!
+                update(obj[prop], val);
+            else
+                obj[prop] = val;
+        }
+    }
+    return obj;
+}
+
   
 
   return {
@@ -36,6 +50,9 @@ _mock.utils = (function(){
       }else{
         return _isDirty;
       }
+    },
+    Collect: function(baseObj, updateObj){
+      return _Collect(baseObj, updateObj);
     }
     
   }

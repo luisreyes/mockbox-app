@@ -35,6 +35,7 @@ _mock.database = (function(){
     };
 
     request.onsuccess = function(e) {
+      console.log('OPEN INDEXED DB');
       indexedDb.db = e.target.result;
     };
 
@@ -119,6 +120,7 @@ _mock.database = (function(){
   }; 
 
   indexedDb.setEditorsFromId = function(id) {
+    console.log(indexedDb.db);
     var db = indexedDb.db;
     var transaction = db.transaction(["editor"]);
     var objectStore = transaction.objectStore("editor");
@@ -138,9 +140,9 @@ _mock.database = (function(){
       onDbResult(callback);
     });
   }
-  window.addEventListener("DOMContentLoaded", init, false);
   
   return {
+    init:init,
     save: function(data){
       indexedDb.addEditEntry(data);
     },

@@ -1,4 +1,5 @@
-  _mock.init();
+  window.addEventListener("DOMContentLoaded", _mock.init, false);
+
   //Expose
   mockbox = {
     load:function(gui){

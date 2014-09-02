@@ -133,12 +133,15 @@ _v.settings = (function(){
     doc.getElementById('settings-open-check').checked = settings.autoload;
     // Check if is authenticated
     if(mockbox.isAuthenticated()){
+      console.log(settings);
       apollo.addClass(doc.getElementById('settings-signin-container'), 'hidden');
       apollo.removeClass(doc.getElementById('settings-signout-container'), 'hidden');
+      doc.getElementById('settings-signout-container').querySelector('.username').innerHTML = 'Boing Boing';
     }else{
       apollo.removeClass(doc.getElementById('settings-signin-container'), 'hidden');
       apollo.addClass(doc.getElementById('settings-signout-container'), 'hidden');
     }
+
   }
 
   return {

@@ -10,20 +10,19 @@ _mock.storage = (function(){
 
   function _restoreSettings(){
     chrome.storage.sync.get('settings', function(result){
-      var data = {};
       if(!result.settings){
-        data.theme = 'light';
-        data.lastGui = null;
-        data.autoload = true;
+        chrome.runtime.sendMessage({message:'onFirstRun'});
       }else{
-        data = result.settings;
+        chrome.runtime.sendMessage({message:'restoreSettings', settings:result.settings});
       }
-      chrome.runtime.sendMessage({message:'restoreSettings', settings:data});
     });
   }
 
-  function _saveSettings(data){
-    chrome.storage.sync.set({'settings':data});
+  function _saveSettings(data, callback){
+    chrome.storage.sync.set({'settings':data}, function(){
+      if(callback)
+        callback();
+    });
   }
 
   return {
@@ -31,8 +30,8 @@ _mock.storage = (function(){
       restore: function(){
         _restoreSettings();
       },
-      save: function(data){
-        _saveSettings(data);
+      save: function(data, callback){
+        _saveSettings(data, callback);
       }
     },
     purge:function(){

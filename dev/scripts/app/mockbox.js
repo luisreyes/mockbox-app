@@ -21,6 +21,7 @@ var mockbox;
       defaultLayout = '50,50,25',
       _settings = {},
       isAuthenticated = false,
+      lastToken = null,
       sv;
 
   function init(){
@@ -48,104 +49,131 @@ var mockbox;
     
     });
 
-    // Get token for google account
-    _mock.oauth.getToken({'interactive':false},function(token){
-      if (chrome.runtime.lastError) {
-        //callback(chrome.runtime.lastError);
-        apollo.removeClass(splashSignin, 'hidden');
-        apollo.addClass(splashLoading, 'hidden');
-      }else{
-        // Get profile data
-        _mock.oauth.getProfile();
-      }
-    });
-
-    // Restore from memory
-    _mock.storage.preferences.restore();
-
-    // Init Clicks
-    _mock.clicks.init();
-
     chrome.runtime.onMessage.addListener(function(data) {
       switch(data.message){
          
          case 'closePopout': 
-          _mock.popout.close(data.popoutId);
+          // Close the popout with the passed id
+            _mock.popout.close(data.popoutId);
          break;
 
          case 'closeApp':
-            // Save to storage
-            saveSettings();
-            
-            // Loop and close all windows
-            _mock.windows.closeAll();
+          // Save to storage
+            saveSettings(function(){
+              // Loop and close all windows
+                _mock.windows.closeAll();
+            });            
          break;
 
          case 'loadItem': 
+          // Restore working project from db by id
             _mock.database.restoreEditorsFromId(data.gui);
          break;
 
          case 'deleteItem': 
+          // Delete the item by the passed id
             _mock.database.delete(data.gui);
          break;
 
          case 'continuePopout': 
+          // Call methods to continue i.e "Yes I would ike to loose changes and close the application"
             _mock.popout.confirmCallback();
+          // Close the popout
             _mock.popout.close(data.popoutId);
          break;
 
-
-         case 'saveSettings': 
-          
+         case 'saveSettings':
           // Cache the settings to a global var
-          _settings = data.settings;
-          
+            _settings = _mock.utils.Collect(_settings, data.settings);          
           //Save to storage
-          saveSettings();
-
+            saveSettings();
           // Apply settings         
-          setSettings();
+            setSettings();
          break;
 
          case 'restoreSettings':
           // Cache the settings to a global var
-          _settings = data.settings;
+            _settings = data.settings;
+          // Apply settings     
+            setSettings();
+
+          if(!_settings.later){
+            // Get token for google account
+            _mock.oauth.getToken({'interactive':false},function(token){
+              if (chrome.runtime.lastError) {
+                console.log(chrome.runtime.lastError);
+              }else{
+                lastToken = token;
+                // Get profile data
+                _mock.oauth.getProfile();
+              }
+            });
+          }else{
+            closeSplash();
+          }
 
           // Open last if lastGui is avaliable
           if(_settings.lastGui && _settings.autoload){
             _mock.database.restoreEditorsFromId(_settings.lastGui);
           }
 
-          // Apply settings     
-          setSettings();
          break;
 
           case 'signin':
             _mock.oauth.getToken({'interactive':true}, function(token){
               // Get profile data
               _mock.oauth.getProfile();
+              _settings.later = false;
+            });
+          break;
+
+          case 'signout':
+            chrome.identity.removeCachedAuthToken(lastToken, function(){
+              console.log('revoked api');
             });
           break;
 
           case 'later':
+            _settings.later = true;
             apollo.addClass(splashSignin, 'hidden');
             apollo.removeClass(splashLoading, 'hidden');
             closeSplash();
+            saveSettings();
           break;
 
           case 'onProfileData':
-            var profileContainer = document.getElementById('profile-container');
-            var imageNode = profileContainer.querySelector('.profile-img');
-            var nameNode = profileContainer.querySelector('.profile-name');
+            var profileContainer = document.getElementById('profile-container'),
+                imageNode = profileContainer.querySelector('.profile-img'),
+                nameNode = profileContainer.querySelector('.profile-name');
+
             isAuthenticated = true;
             imageNode.setAttribute('src',data.profile.image.url);
             nameNode.innerHTML = data.profile.name.givenName;
             closeSplash();
           break;
 
-         default: return;
+          case 'onFirstRun':
+            apollo.removeClass(splashSignin, 'hidden');
+            apollo.addClass(splashLoading, 'hidden');
+
+            // Defulat App Settings
+            _settings.theme = 'light';
+            _settings.lastGui = null;
+            _settings.autoload = true;
+            _settings.later = false;
+          
+            saveSettings();
+          break;
+
+          default: return;
       }
     });
+
+    // Restore from memory
+    _mock.storage.preferences.restore();
+    
+    // Init Clicks
+    _mock.clicks.init();
   }
 
   function closeSplash(){
@@ -158,12 +186,11 @@ var mockbox;
     }, 1000);
   }
 
-  function saveSettings(){
+  function saveSettings(callback){
     // Add currentGui to the settings model
     _settings.lastGui = currentGui;
-    
     // Save the settings
-    _mock.storage.preferences.save(_settings);
+    _mock.storage.preferences.save(_settings, callback);
   }
 
   function setSettings(){
@@ -202,7 +229,7 @@ var mockbox;
     setGlobalEditorOption('fixedGutter', true);
     setGlobalEditorOption('styleActiveLine', true);
     setGlobalEditorOption('matchBrackets', true);
-    setGlobalEditorOption('theme', 'mbo');
+    setGlobalEditorOption('theme', 'xq-light');
 
     // Listen for viewport size change
     sv.addEventListener('resize', function(){
@@ -297,6 +324,7 @@ var mockbox;
           html: editors.html.getValue(),
           js  : editors.js.getValue(),
           css : editors.css.getValue(),
+          //later: _settings.later,
           layout: [
             size0.substr(0,size0.length-1),
             size1.substr(0,size1.length-1),
@@ -349,7 +377,9 @@ var mockbox;
 
   return {
     init: function(){
+      _mock.database.init();
       init();
+
     },
     isAuthenticated: function(){
       return isAuthenticated;

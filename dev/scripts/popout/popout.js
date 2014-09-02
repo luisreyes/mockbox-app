@@ -21,8 +21,11 @@ var popout;
 
     chrome.runtime.onMessage.addListener(function(data) {
       if(data.message === 'confirmType'){
-        document.getElementById("popout-title").innerHTML = confirmTitle[data.type];
-        document.getElementById("confirm-message").innerHTML = confirmMessage[data.type];
+        var p = document.getElementById("popout-title");
+        if(p){
+          p.innerHTML = confirmTitle[data.type];
+          document.getElementById("confirm-message").innerHTML = confirmMessage[data.type];
+        }
       }
     });
   }
