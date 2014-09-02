@@ -1,7 +1,6 @@
-
   _pop.init();
   
   //Expose
-  popout = {};
+  popout = _pop;
 
 }());

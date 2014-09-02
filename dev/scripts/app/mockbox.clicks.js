@@ -30,7 +30,8 @@ _mock.clicks = (function(){
   buttons = {
 
     // Navigation
-    signinLink:sidebar.querySelector('.profile-name'),
+    profileLink:sidebar.querySelector('.profile-name'),
+    profileImg:sidebar.querySelector('.profile-img'),
     new       :sidebar.querySelector('.new'),
     save      :sidebar.querySelector('.save'),
     mocks     :sidebar.querySelector('.mocks'),
@@ -140,15 +141,15 @@ _mock.clicks = (function(){
 
     // Splash Signin Button
     buttons.signin.addEventListener( 'click', function(){
-      chrome.runtime.sendMessage({message:'signin', callback: 'closeSplash' });
+      chrome.runtime.sendMessage({message:'allowAccess', callback: 'closeSplash' });
     });
 
-    buttons.signinLink.addEventListener( 'click', function(e){
-      if(!mockbox.isAuthenticated()){
-        chrome.runtime.sendMessage({message:'signin', callback: 'closeSplash' });
-      }else{
-        buttons.profile.click();
-      }
+    buttons.profileLink.addEventListener( 'click', function(e){
+      signinPreAuth();
+    });
+
+    buttons.profileImg.addEventListener( 'click', function(e){
+      signinPreAuth();
     });
 
     // Splash Later Button
@@ -222,6 +223,14 @@ _mock.clicks = (function(){
   function openLink(loc){
     // Open external page
     window.open(links[loc], '_blank');
+  }
+
+  function signinPreAuth(){
+    if(!mockbox.isAuthenticated()){
+        chrome.runtime.sendMessage({message:'allowAccess', callback: 'closeSplash' });
+      }else{
+        buttons.profile.click();
+      }
   }
 
   function clickToEditProjectName(){

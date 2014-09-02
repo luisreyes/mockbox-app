@@ -15,6 +15,7 @@ body, html {
 .visible{ display:block; }
 .opaque{opacity:0 !important;}
 .clear{clear:both;}
+.left-container{float:left;width: 69%;}
 
 *:focus{outline:none;}
 ::selection { background: $accent-color; color:#EEE; }
@@ -52,13 +53,13 @@ body, html {
 }
 .app-logo{
   background-image: url(/images/mockbox-logo.svg);
-  width: 106px;
   height: 20px;
   float:right;
-  background-size: cover;
+  background-size: 106px;
   margin-top: 11px;
   margin-right: 10px;
   background-repeat: no-repeat;
+  min-width: 23px;
 }
 
 header {
@@ -100,6 +101,10 @@ footer {
 .a{
   cursor:pointer;
   &:hover{ text-decoration: underline; }
+  &.small{ 
+    color:$accent-dark-color-0;
+    font-size:small;
+  }
 }
 
 

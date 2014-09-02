@@ -8,12 +8,14 @@ var popout;
 'use strict';
   var confirmTitle={
     continue: 'You have unsaved changes',
-    delete: 'You are trying to delete this mock'
+    delete: 'You are trying to delete this mock',
+    revoke:'Revoke Access?'
   }
 
   var confirmMessage = {
     continue: 'Are you sure you want to continue?',
-    delete: 'Are you sure you want to delete it?'
+    delete: 'Are you sure you want to delete it?',
+    revoke:'Are you sure you want to revoke all access?'
   }
 
   function init(){
@@ -53,8 +55,8 @@ _pop.clicks = (function(){
       };
 
       if(_currentId === 'settings'){
-        buttons.signinBtn = document.getElementById("settings-signin"),
-        buttons.signoutBtn = document.getElementById("settings-signout"),
+        buttons.allowBtn = document.getElementById("settings-allow"),
+        buttons.revokeBtn = document.getElementById("settings-revoke"),
         buttons.okBtn = document.getElementById("settings-footer").querySelector('.ok'),
         buttons.cancelBtn = document.getElementById("settings-footer").querySelector('.cancel');
       }
@@ -103,12 +105,12 @@ _pop.clicks = (function(){
         chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
       });
 
-      buttons.signinBtn.addEventListener('click', function(e){
-        chrome.runtime.sendMessage({message:'signin'});
+      buttons.allowBtn.addEventListener('click', function(e){
+        chrome.runtime.sendMessage({message:'allowAccess'});
       });
 
-      buttons.signoutBtn.addEventListener('click', function(e){
-        chrome.runtime.sendMessage({message:'signout'});
+      buttons.revokeBtn.addEventListener('click', function(e){
+        chrome.runtime.sendMessage({message:'revokeAccess'});
       });
     }
     
@@ -119,10 +121,9 @@ _pop.clicks = (function(){
   };
 
 }());
-
   _pop.init();
   
   //Expose
-  popout = {};
+  popout = _pop;
 
 }());

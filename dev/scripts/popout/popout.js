@@ -8,12 +8,14 @@ var popout;
 'use strict';
   var confirmTitle={
     continue: 'You have unsaved changes',
-    delete: 'You are trying to delete this mock'
+    delete: 'You are trying to delete this mock',
+    revoke:'Revoke Access?'
   }
 
   var confirmMessage = {
     continue: 'Are you sure you want to continue?',
-    delete: 'Are you sure you want to delete it?'
+    delete: 'Are you sure you want to delete it?',
+    revoke:'Are you sure you want to revoke all access?'
   }
 
   function init(){

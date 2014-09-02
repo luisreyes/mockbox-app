@@ -21,7 +21,7 @@ var mockbox;
       defaultLayout = '50,50,25',
       _settings = {},
       isAuthenticated = false,
-      lastToken = null,
+      currToken = null,
       sv;
 
   function init(){
@@ -101,9 +101,10 @@ var mockbox;
             // Get token for google account
             _mock.oauth.getToken({'interactive':false},function(token){
               if (chrome.runtime.lastError) {
-                console.log(chrome.runtime.lastError);
+                setSignedout('restore');
+                closeSplash();
               }else{
-                lastToken = token;
+                currToken = token;
                 // Get profile data
                 _mock.oauth.getProfile();
               }
@@ -119,17 +120,25 @@ var mockbox;
 
          break;
 
-          case 'signin':
+          case 'allowAccess':
             _mock.oauth.getToken({'interactive':true}, function(token){
-              // Get profile data
-              _mock.oauth.getProfile();
-              _settings.later = false;
+              if(token){
+                currToken = token;
+                // Get profile data
+                _mock.oauth.getProfile();
+                _settings.later = false;
+                updateSettingsPanel('allow');
+              }
             });
           break;
 
-          case 'signout':
-            chrome.identity.removeCachedAuthToken(lastToken, function(){
-              console.log('revoked api');
+          case 'revokeAccess':
+            mockbox.popout.confirm('revoke',function(){
+              // If continue then signout
+              chrome.identity.removeCachedAuthToken({token:currToken}, function(){
+                  setSignedout();
+                  updateSettingsPanel('revoke');
+                });
             });
           break;
 
@@ -180,10 +189,37 @@ var mockbox;
     window.setTimeout(function(){
       apollo.addClass(splash, 'opaque');
       splash.addEventListener('webkitTransitionEnd', function() {
-        console.log('Transition complete!  This is the callback, no library needed!');
         apollo.addClass(splash, 'hidden');
       });
     }, 1000);
+  }
+
+  function updateSettingsPanel(type){
+    if(chrome.app.window.get('settings')){
+      var settingsWindow = chrome.app.window.get('settings').contentWindow.document,
+          settingsAllow = settingsWindow.getElementById('settings-allow-container'),
+          settingsRevoke = settingsWindow.getElementById('settings-revoke-container');
+
+      if(type == 'revoke'){
+        apollo.removeClass(settingsAllow, 'hidden');
+        apollo.addClass(settingsRevoke, 'hidden');
+      }else if(type == 'allow'){
+        apollo.addClass(settingsAllow, 'hidden');
+        apollo.removeClass(settingsRevoke, 'hidden');
+      }
+    }
+
+  }
+
+  function setSignedout(){
+    var profileContainer = document.getElementById('profile-container'),
+        imageNode = profileContainer.querySelector('.profile-img'),
+        nameNode = profileContainer.querySelector('.profile-name');
+    
+    isAuthenticated = false;
+    _settings.later = true;
+    imageNode.setAttribute('src','images/profile.png');
+    nameNode.innerHTML = 'Signin';
   }
 
   function saveSettings(callback){

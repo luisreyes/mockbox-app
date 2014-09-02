@@ -1,8 +1,5 @@
 .splash{ background-image: url(/images/splash_dark.png); }
 .app-logo{ background-position-y:0px; }
-$app-profile-bg: #222; 
-$app-profile-font: #666;
-$app-profile-font-hover:#999;
 
 $base-color: #333;
 $base-color-font: #AAA;
@@ -41,3 +38,8 @@ $accent-dark-color-1 : darken($accent-color, 30%);
 $accent-dark-color-2 : darken($accent-color, 35%);
 $accent-dark-color-3 : darken($accent-color, 40%);
 $accent-dark-color-4 : darken($accent-color, 45%);
+
+
+$app-profile-bg: #222; 
+$app-profile-font: #666;
+$app-profile-font-hover:$accent-color;

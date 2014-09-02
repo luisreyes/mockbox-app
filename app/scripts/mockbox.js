@@ -21,7 +21,7 @@ var mockbox;
       defaultLayout = '50,50,25',
       _settings = {},
       isAuthenticated = false,
-      lastToken = null,
+      currToken = null,
       sv;
 
   function init(){
@@ -66,7 +66,7 @@ var mockbox;
          break;
 
          case 'loadItem': 
-          // Retor working projectf rom id
+          // Restore working project from db by id
             _mock.database.restoreEditorsFromId(data.gui);
          break;
 
@@ -101,9 +101,10 @@ var mockbox;
             // Get token for google account
             _mock.oauth.getToken({'interactive':false},function(token){
               if (chrome.runtime.lastError) {
-                console.log(chrome.runtime.lastError);
+                setSignedout('restore');
+                closeSplash();
               }else{
-                lastToken = token;
+                currToken = token;
                 // Get profile data
                 _mock.oauth.getProfile();
               }
@@ -119,17 +120,25 @@ var mockbox;
 
          break;
 
-          case 'signin':
+          case 'allowAccess':
             _mock.oauth.getToken({'interactive':true}, function(token){
-              // Get profile data
-              _mock.oauth.getProfile();
-              _settings.later = false;
+              if(token){
+                currToken = token;
+                // Get profile data
+                _mock.oauth.getProfile();
+                _settings.later = false;
+                updateSettingsPanel('allow');
+              }
             });
           break;
 
-          case 'signout':
-            chrome.identity.removeCachedAuthToken(lastToken, function(){
-              console.log('revoked api');
+          case 'revokeAccess':
+            mockbox.popout.confirm('revoke',function(){
+              // If continue then signout
+              chrome.identity.removeCachedAuthToken({token:currToken}, function(){
+                  setSignedout();
+                  updateSettingsPanel('revoke');
+                });
             });
           break;
 
@@ -180,10 +189,37 @@ var mockbox;
     window.setTimeout(function(){
       apollo.addClass(splash, 'opaque');
       splash.addEventListener('webkitTransitionEnd', function() {
-        console.log('Transition complete!  This is the callback, no library needed!');
         apollo.addClass(splash, 'hidden');
       });
     }, 1000);
+  }
+
+  function updateSettingsPanel(type){
+    if(chrome.app.window.get('settings')){
+      var settingsWindow = chrome.app.window.get('settings').contentWindow.document,
+          settingsAllow = settingsWindow.getElementById('settings-allow-container'),
+          settingsRevoke = settingsWindow.getElementById('settings-revoke-container');
+
+      if(type == 'revoke'){
+        apollo.removeClass(settingsAllow, 'hidden');
+        apollo.addClass(settingsRevoke, 'hidden');
+      }else if(type == 'allow'){
+        apollo.addClass(settingsAllow, 'hidden');
+        apollo.removeClass(settingsRevoke, 'hidden');
+      }
+    }
+
+  }
+
+  function setSignedout(){
+    var profileContainer = document.getElementById('profile-container'),
+        imageNode = profileContainer.querySelector('.profile-img'),
+        nameNode = profileContainer.querySelector('.profile-name');
+    
+    isAuthenticated = false;
+    _settings.later = true;
+    imageNode.setAttribute('src','images/profile.png');
+    nameNode.innerHTML = 'Signin';
   }
 
   function saveSettings(callback){
@@ -450,7 +486,8 @@ _mock.clicks = (function(){
   buttons = {
 
     // Navigation
-    signinLink:sidebar.querySelector('.profile-name'),
+    profileLink:sidebar.querySelector('.profile-name'),
+    profileImg:sidebar.querySelector('.profile-img'),
     new       :sidebar.querySelector('.new'),
     save      :sidebar.querySelector('.save'),
     mocks     :sidebar.querySelector('.mocks'),
@@ -560,15 +597,15 @@ _mock.clicks = (function(){
 
     // Splash Signin Button
     buttons.signin.addEventListener( 'click', function(){
-      chrome.runtime.sendMessage({message:'signin', callback: 'closeSplash' });
+      chrome.runtime.sendMessage({message:'allowAccess', callback: 'closeSplash' });
     });
 
-    buttons.signinLink.addEventListener( 'click', function(e){
-      if(!mockbox.isAuthenticated()){
-        chrome.runtime.sendMessage({message:'signin', callback: 'closeSplash' });
-      }else{
-        buttons.profile.click();
-      }
+    buttons.profileLink.addEventListener( 'click', function(e){
+      signinPreAuth();
+    });
+
+    buttons.profileImg.addEventListener( 'click', function(e){
+      signinPreAuth();
     });
 
     // Splash Later Button
@@ -642,6 +679,14 @@ _mock.clicks = (function(){
   function openLink(loc){
     // Open external page
     window.open(links[loc], '_blank');
+  }
+
+  function signinPreAuth(){
+    if(!mockbox.isAuthenticated()){
+        chrome.runtime.sendMessage({message:'allowAccess', callback: 'closeSplash' });
+      }else{
+        buttons.profile.click();
+      }
   }
 
   function clickToEditProjectName(){
@@ -742,7 +787,6 @@ _mock.database = (function(){
     };
 
     request.onsuccess = function(e) {
-      console.log('OPEN INDEXED DB');
       indexedDb.db = e.target.result;
     };
 
@@ -827,7 +871,6 @@ _mock.database = (function(){
   }; 
 
   indexedDb.setEditorsFromId = function(id) {
-    console.log(indexedDb.db);
     var db = indexedDb.db;
     var transaction = db.transaction(["editor"]);
     var objectStore = transaction.objectStore("editor");
