@@ -1,9 +1,10 @@
 MockBox v0.9.5.1
 =========
+---------------------------------------
+**v0.9.5.1 - 09/22/14 - 12:35am**
 
-**09/22/14 - 12:35am**
 
-*v0.9.5.1*
+[View Commit](e0fb5146c6bcd4c62c28a6e97a79e216fb2cddf0)
 
 ```
 - Updates to changing themes and changed default to light
@@ -19,5 +20,3 @@ MockBox v0.9.5.1
 - revoke with sign out button
 - problems while signin in and not allowing access
 ```
-
----------------------------------------
