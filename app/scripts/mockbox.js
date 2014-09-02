@@ -492,6 +492,7 @@ _mock.clicks = (function(){
     save      :sidebar.querySelector('.save'),
     mocks     :sidebar.querySelector('.mocks'),
     export    :sidebar.querySelector('.export'),
+    about     :sidebar.querySelector('.about'),
     profile   :sidebar.querySelector('.profile-settings'),
     twitter   :sidebar.querySelector('.twitter'),
     email     :sidebar.querySelector('.email'),
@@ -513,7 +514,7 @@ _mock.clicks = (function(){
   // External Links
   links = {
     twitter:'https://twitter.com/mockboxio',
-    email:'mailto:boxes@mockbox.io?subject=Hello MockBox'
+    email:'mailto:support@mockbox.io?subject=Hello MockBox'
   };
 
   // Main Listeners
@@ -594,6 +595,16 @@ _mock.clicks = (function(){
 
     // Save Button
     buttons.save.addEventListener( 'click', _mock.save );
+
+    // About
+    buttons.about.addEventListener( 'click', function(){
+      _mock.popout.open('about', function(){
+          // init the views js file
+          views.about.init();
+          // Generate the list to display
+          //views.mocks.generateList();
+        });
+    });
 
     // Splash Signin Button
     buttons.signin.addEventListener( 'click', function(){
@@ -1290,6 +1301,21 @@ _mock.windows = (function(){
         bounds: {
           width: 600,
           height: 460
+        }
+      }
+    },
+
+    about :{
+      file:'popout_about.html',
+      exists: false,
+      options:{
+        id:'about',
+        frame: globals.frame,
+        hidden: globals.hidden,
+        resizable:false,
+        bounds: {
+          width: 300,
+          height: 260
         }
       }
     }

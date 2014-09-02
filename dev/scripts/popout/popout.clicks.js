@@ -22,6 +22,10 @@ _pop.clicks = (function(){
         buttons.cancelBtn = document.getElementById("settings-footer").querySelector('.cancel');
       }
 
+      if(_currentId === 'about'){
+        buttons.okBtn = document.getElementById("about-footer").querySelector('.ok');
+      }
+
       addListeners();
 
   }
@@ -72,6 +76,13 @@ _pop.clicks = (function(){
 
       buttons.revokeBtn.addEventListener('click', function(e){
         chrome.runtime.sendMessage({message:'revokeAccess'});
+      });
+    }else
+
+    if(_currentId === 'about'){
+
+      buttons.okBtn.addEventListener('click', function(){
+        chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
       });
     }
     

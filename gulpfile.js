@@ -87,6 +87,11 @@ gulp.task( 'compile_js', function () {
 
   // Minify, Bundle, Obsfucate JavaScript
   gulp.src( 'dev/scripts/views/*.js' )
+    .pipe(order([
+      "view.js",
+      "*.js",
+      "view_end.js"
+    ]))
     //.pipe( uglify() )
     .pipe( concat('views.js') )
     .pipe( gulp.dest( 'app/scripts/' ));

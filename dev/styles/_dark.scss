@@ -1,5 +1,6 @@
 .splash{ background-image: url(/images/splash_dark.png); }
 .app-logo{ background-position-y:0px; }
+.about-logo{background-position-y:0px;}
 
 $base-color: #333;
 $base-color-font: #AAA;
@@ -43,3 +44,5 @@ $accent-dark-color-4 : darken($accent-color, 45%);
 $app-profile-bg: #222; 
 $app-profile-font: #666;
 $app-profile-font-hover:$accent-color;
+
+$app-popout-link-color: $accent-color;

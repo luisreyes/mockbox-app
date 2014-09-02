@@ -11,8 +11,9 @@ body, html {
 .transition{ -webkit-transition: all 0.2s; }
 .absolute{ position:absolute; }
 .bottom{ bottom:0; }
+.center{ text-align:center; }
 .hidden {display:none; }
-.visible{ display:block; }
+.visible{ display:block !important; }
 .opaque{opacity:0 !important;}
 .clear{clear:both;}
 .left-container{float:left;width: 69%;}
@@ -62,6 +63,15 @@ body, html {
   min-width: 23px;
 }
 
+.about-logo{
+  background-image: url(/images/mockbox-logo.svg);
+  width: 250px;
+  height: 47px;
+  background-size: cover;
+  margin: 25px;
+  float: none;
+}
+
 header {
   color: $base-color-font;
   background-color: $base-color-2;
@@ -102,8 +112,8 @@ footer {
   cursor:pointer;
   &:hover{ text-decoration: underline; }
   &.small{ 
-    color:$accent-dark-color-0;
-    font-size:small;
+    color:$app-popout-link-color;
+    font-size:smaller;
   }
 }
 

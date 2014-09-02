@@ -66,6 +66,21 @@ _mock.windows = (function(){
           height: 460
         }
       }
+    },
+
+    about :{
+      file:'popout_about.html',
+      exists: false,
+      options:{
+        id:'about',
+        frame: globals.frame,
+        hidden: globals.hidden,
+        resizable:false,
+        bounds: {
+          width: 300,
+          height: 260
+        }
+      }
     }
 
   };

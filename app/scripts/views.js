@@ -16,6 +16,23 @@ var views;
 }());
 
 
+_v.about = (function(){
+  'use strict';
+
+  var doc;
+
+  function init(){
+    doc = chrome.app.window.get('about').contentWindow.document;
+    doc.getElementById('about-version').innerHTML = 'Current version: ' + chrome.runtime.getManifest().version;
+  }
+
+  return {
+    init: function(){
+      if(!doc) init();
+    }
+  }
+
+}());
 _v.mocks = (function(){
   'use strict';
 
@@ -131,6 +148,7 @@ _v.settings = (function(){
     doc.getElementById('settings-theme-select').value = settings.theme;
     // Set Last Worked on Checkbox
     doc.getElementById('settings-open-check').checked = settings.autoload;
+
     // Check if is authenticated
     if(mockbox.isAuthenticated()){
       apollo.addClass(doc.getElementById('settings-allow-container'), 'hidden');
