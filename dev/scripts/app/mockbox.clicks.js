@@ -224,8 +224,34 @@ _mock.clicks = (function(){
     });
 
     buttons.email.addEventListener( 'click', function(){
+      
+      google.payments.inapp.getPurchases({
+        'success': function(){
+          //debugger;
+          console.log('Purch Success');
+        },
+        'failure': function(){
+          //debugger;
+          console.log('Purch fail');   
+        }
+      });
+
+      google.payments.inapp.getSkuDetails({
+          'parameters': {'env': 'prod'},
+          'success': function(){
+            //debugger;
+            console.log('SKU Success');
+            console.log(arguments);
+          },
+          'failure': function(){
+            //debugger;
+            console.log('SKU fail');
+            console.log(arguments);   
+          }
+        });
+
       // Open external page
-      openLink('email');
+      //openLink('email');
     });
 
     
@@ -270,7 +296,7 @@ _mock.clicks = (function(){
       newValue = mockName.innerHTML;
 
       //Set dirty if it is
-      _mock.utils.isDirty(!(newValue === initValue));  
+      _mock.utils.isDirty(newValue !== initValue);  
       
       // Restore to non edit styles
       mockName.setAttribute('contenteditable','false');

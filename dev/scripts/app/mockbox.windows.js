@@ -81,6 +81,21 @@ _mock.windows = (function(){
           height: 260
         }
       }
+    },
+
+    connection :{
+      file:'popout_connection.html',
+      exists: false,
+      options:{
+        id:'connection',
+        frame: globals.frame,
+        hidden: globals.hidden,
+        resizable:false,
+        bounds: {
+          width: 400,
+          height: 200
+        }
+      }
     }
 
   };

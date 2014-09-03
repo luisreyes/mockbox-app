@@ -1,7 +1,7 @@
 {
   "name": "MockBox",
-  "version": "0.9.5.2",
-  "description": "Prorotype builder",
+  "version": "0.9.5.3",
+  "description": "Prorotype and Deploy",
   "main": "gulpfile.js",
   "dependencies": {
     "gulp": "^3.8.7"

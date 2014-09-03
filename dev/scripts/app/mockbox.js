@@ -126,10 +126,12 @@ var mockbox;
                 currToken = token;
                 // Get profile data
                 _mock.oauth.getProfile();
+                _mock.oauth.getLicense();
                 _settings.later = false;
                 updateSettingsPanel('allow');
               }
             });
+            
           break;
 
           case 'revokeAccess':

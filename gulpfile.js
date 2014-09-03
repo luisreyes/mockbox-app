@@ -7,6 +7,7 @@ cssmin = require( 'gulp-minify-css' ),
 concat = require( 'gulp-concat' ),
 uglify = require( 'gulp-uglify' ),
 jade = require( 'gulp-jade' ),
+//jshint = require( 'gulp-jshint' ),
 header = require( 'gulp-header' ),
 order = require( 'gulp-order' ),
 locals = require( './locals.json' );
@@ -113,4 +114,4 @@ gulp.task( 'build', [ 'compile_jade', 'compile_sass', 'compile_js' ]);
 gulp.task( 'release', [ 'release_jade', 'release_sass', 'release_js' ]);
 
 // Default gulp task
-gulp.task( 'default', [ 'watch' ]);
+gulp.task( 'default', [ 'build' ]);

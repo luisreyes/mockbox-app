@@ -11,7 +11,7 @@ _mock.database = (function(){
   }
 
   function getUID() {
-      return ("000000" + (Math.random()*Math.pow(36,6) << 0).toString(36)).slice(-6)
+      return ("000000" + (Math.random()*Math.pow(36,6) << 0).toString(36)).slice(-6);
   }
 
   indexedDb.open = function() {
@@ -56,7 +56,6 @@ _mock.database = (function(){
       "html": data.html,
       "css": data.css,
       "js": data.js,
-      "layout": data.layout,
       "layout": data.layout,
       "createdBy" : data.author || 'Someone',
       "updatedBy" : data.author || 'Someone',

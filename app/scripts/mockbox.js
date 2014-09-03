@@ -126,10 +126,12 @@ var mockbox;
                 currToken = token;
                 // Get profile data
                 _mock.oauth.getProfile();
+                _mock.oauth.getLicense();
                 _settings.later = false;
                 updateSettingsPanel('allow');
               }
             });
+            
           break;
 
           case 'revokeAccess':
@@ -680,8 +682,34 @@ _mock.clicks = (function(){
     });
 
     buttons.email.addEventListener( 'click', function(){
+      
+      google.payments.inapp.getPurchases({
+        'success': function(){
+          //debugger;
+          console.log('Purch Success');
+        },
+        'failure': function(){
+          //debugger;
+          console.log('Purch fail');   
+        }
+      });
+
+      google.payments.inapp.getSkuDetails({
+          'parameters': {'env': 'prod'},
+          'success': function(){
+            //debugger;
+            console.log('SKU Success');
+            console.log(arguments);
+          },
+          'failure': function(){
+            //debugger;
+            console.log('SKU fail');
+            console.log(arguments);   
+          }
+        });
+
       // Open external page
-      openLink('email');
+      //openLink('email');
     });
 
     
@@ -726,7 +754,7 @@ _mock.clicks = (function(){
       newValue = mockName.innerHTML;
 
       //Set dirty if it is
-      _mock.utils.isDirty(!(newValue === initValue));  
+      _mock.utils.isDirty(newValue !== initValue);  
       
       // Restore to non edit styles
       mockName.setAttribute('contenteditable','false');
@@ -774,7 +802,7 @@ _mock.database = (function(){
   }
 
   function getUID() {
-      return ("000000" + (Math.random()*Math.pow(36,6) << 0).toString(36)).slice(-6)
+      return ("000000" + (Math.random()*Math.pow(36,6) << 0).toString(36)).slice(-6);
   }
 
   indexedDb.open = function() {
@@ -819,7 +847,6 @@ _mock.database = (function(){
       "html": data.html,
       "css": data.css,
       "js": data.js,
-      "layout": data.layout,
       "layout": data.layout,
       "createdBy" : data.author || 'Someone',
       "updatedBy" : data.author || 'Someone',
@@ -961,8 +988,8 @@ _mock.events = (function () {
                 }
             }
         }
-    }
-} ());
+    };
+}());
 _mock.notify = (function(){
 'use strict'; 
 
@@ -985,7 +1012,7 @@ _mock.notify = (function(){
 
   return {
     send: function(o){
-      _notify(o)
+      _notify(o);
     }
   };
 
@@ -993,16 +1020,17 @@ _mock.notify = (function(){
 _mock.oauth = (function(){
   'use strict';
   var profile = {};
+  var userId;
 
   function _getToken(type,callback){
-    
-    chrome.identity.getAuthToken(type, callback);
+    chrome.identity.getAuthToken(type,callback);
   }
 
   function _getProfile(){
     chrome.identity.getProfileUserInfo(function(userInfo){
       //make url request here
       if(userInfo.id){
+        userId = userInfo.id;
         
         var url = 'https://www.googleapis.com/plus/v1/people/'+userInfo.id+'?fields=displayName%2C+name/givenName%2C+image/url&key=AIzaSyCgvqfmrNPXDPB-p1JGUINbqhhKG_awYOY',
             response = {},
@@ -1065,6 +1093,31 @@ _mock.oauth = (function(){
 
     }
   }
+  
+  function _getLicense() {
+    debugger;    
+    //var CWS_LICENSE_API_URL = 'https://www.googleapis.com/chromewebstore/v1.1/userlicenses/';
+    var CWS_LICENSE_API_URL = 'https://www.googleapis.com/appsmarket/v2/licenseNotification/';
+    var req = new XMLHttpRequest();
+
+    chrome.identity.getAuthToken({'interactive':true},function(token){
+      debugger;
+      req.open('GET', CWS_LICENSE_API_URL + chrome.runtime.id);
+      req.setRequestHeader('Authorization', 'Bearer ' + token);
+      
+      req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+          var license = JSON.parse(req.responseText);
+          console.log(license);
+        }
+      }
+      
+      req.send();  
+    });
+
+    
+    
+  }
 
   return {
     getToken:function(t,c){
@@ -1072,8 +1125,11 @@ _mock.oauth = (function(){
     },
     getProfile:function(){
       _getProfile();
+    },
+    getLicense: function(){
+      _getLicense();
     }
-  }
+  };
 
 }());
 _mock.popout = (function(){
@@ -1316,6 +1372,21 @@ _mock.windows = (function(){
         bounds: {
           width: 300,
           height: 260
+        }
+      }
+    },
+
+    connection :{
+      file:'popout_connection.html',
+      exists: false,
+      options:{
+        id:'connection',
+        frame: globals.frame,
+        hidden: globals.hidden,
+        resizable:false,
+        bounds: {
+          width: 400,
+          height: 200
         }
       }
     }

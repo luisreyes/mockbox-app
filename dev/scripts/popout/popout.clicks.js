@@ -26,6 +26,10 @@ _pop.clicks = (function(){
         buttons.okBtn = document.getElementById("about-footer").querySelector('.ok');
       }
 
+      if(_currentId === 'connection'){
+        buttons.okBtn = document.getElementById("connection-footer").querySelector('.ok');
+      }
+
       addListeners();
 
   }
@@ -45,6 +49,12 @@ _pop.clicks = (function(){
 
       buttons.continueBtn.addEventListener('click', function(e){
         chrome.runtime.sendMessage({message:'continuePopout', popoutId:_currentId});
+      });
+    }else
+
+    if(_currentId === 'connection'){
+      buttons.okBtn.addEventListener('click', function(e){
+        chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
       });
     }else
 

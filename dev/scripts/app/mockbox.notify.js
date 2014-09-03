@@ -20,7 +20,7 @@ _mock.notify = (function(){
 
   return {
     send: function(o){
-      _notify(o)
+      _notify(o);
     }
   };
 
