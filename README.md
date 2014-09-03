@@ -1,11 +1,11 @@
-MockBox v0.9.5.1
+MockBox v0.9.5.3
 =========
 
 ---------------------------------------
 **v0.9.5.3 - 09/3/14 - 12:36am**
 
 
-[View Commit]()
+[View Commit](2d0df8ad67a07e367a52cb84813fe56e86d46e4a)
 
 ```
 - Added to Licensing API
