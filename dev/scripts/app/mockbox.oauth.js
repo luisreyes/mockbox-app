@@ -4,7 +4,7 @@ _mock.oauth = (function(){
   var userId;
 
   function _getToken(type,callback){
-    chrome.identity.getAuthToken(type,callback);
+    chrome.identity.getAuthToken(type, callback);
   }
 
   function _getProfile(){

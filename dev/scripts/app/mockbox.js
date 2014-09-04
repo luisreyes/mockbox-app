@@ -122,7 +122,10 @@ var mockbox;
 
           case 'allowAccess':
             _mock.oauth.getToken({'interactive':true}, function(token){
-              if(token){
+              if (chrome.runtime.lastError) {
+                console.log(chrome.runtime.lastError);
+                return;
+              }else if(token){
                 currToken = token;
                 // Get profile data
                 _mock.oauth.getProfile();
@@ -193,7 +196,7 @@ var mockbox;
       splash.addEventListener('webkitTransitionEnd', function() {
         apollo.addClass(splash, 'hidden');
       });
-    }, 1000);
+    }, 900);
   }
 
   function updateSettingsPanel(type){

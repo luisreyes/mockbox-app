@@ -18,7 +18,8 @@
       "scripts": ["background.js"]
     }
   },
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuBWiizvqsXcHSyGDMf31sHozB/+nSq3tqQMBgZC5u4nAInX5vUBuiPi/BlFCrSlqy3OArpC3I77H2LQifpvIrYQtZnC6KpxT/8ce7LHny3rKH38xFYdLnIbEmhZy3TDxtTi9lMD4rohsqehma3aRFhZM6Rq9cGM3LLfcpB1dbR3mRPzG5ZTlanznJPHP8ei/K2S1/20X2Hvk0TowpET5twBnp8fLFP3xl4/o/yNYA8SQMSYrqVFERuInzIVXubSAWsFFiwgBPIcqU6R0pG0HRyiyeXunP3c2x5ebVcmyvo/d9XW7hWPLu2Or2FWEodhDepF23sd6aWsbt5T52zcNBwIDAQAB",
+  "update_url": "https://clients2.google.com/service/update2/crx",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlgV1yA1tt/g1QefsgF2O9xm4YyLWbwwifA6mLbZBV/ArNgb2CeGH4vSqTBflYY3ynd3lFBB9P9o5vLqgmzD3zpormNHQo/XCRjlP8P8Hqbuhu2lY3SJLO+U/a4l2MNwrGLINsB1Ct7owC6EC7E3gZM5JbX/2AVhOynGFls14rUVS2v1vYtTOr0oBKkZkyY7jQP2vBNF1cURwG9w8QkgTc8zvDcESiI50FyGvcRyorCAksIUYQBPhQaM8a8U7JA3/3ltGETFzUDWQ2aatyodWXiQh3njqgQDpczjJBiiQ9L1jqHvl02Edgh/vqM1DLfenx6JHVVsvNHNRm5JR4sXi3wIDAQAB",
   "permissions": [
     "identity",
     "notifications",
@@ -27,7 +28,7 @@
     "https://www.googleapis.com/"
   ],
   "oauth2": {
-    "client_id": "638136025595-81rqmuppev33oq59mtj7tkudjajbu7i4.apps.googleusercontent.com",
+    "client_id": "599622858138-8dmuv1jhe91henjp3as3cm9fvdpf30b0.apps.googleusercontent.com",
     "scopes": [
       "profile",
       "https://www.googleapis.com/auth/drive.appdata",
