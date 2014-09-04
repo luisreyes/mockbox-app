@@ -14,14 +14,13 @@ var mockbox;
       domJs   = document.getElementById('js').querySelector('.code'),
       header = document.getElementById('app-header'),
       splash = document.getElementById('app-splash'),
-      splashSignin = document.getElementById('app-splash-signin'),
+      splashAllow = document.getElementById('app-splash-access'),
       splashLoading = document.getElementById('app-splash-loading'),
       sidebarToggle = document.getElementById('app-sidebar-toggle'),
       domEditors = document.getElementById('app-editors'),
       defaultLayout = '50,50,25',
       _settings = {},
-      isAuthenticated = false,
-      currToken = null,
+      tokens = {},
       sv;
 
   function init(){
@@ -101,13 +100,13 @@ var mockbox;
             // Get token for google account
             _mock.oauth.getToken({'interactive':false},function(token){
               if (chrome.runtime.lastError) {
-                setSignedout('restore');
-                closeSplash();
+                console.log(chrome.runtime.lastError);
               }else{
-                currToken = token;
-                // Get profile data
-                _mock.oauth.getProfile();
+                tokens.google = token;
               }
+
+              closeSplash();
+
             });
           }else{
             closeSplash();
@@ -121,53 +120,51 @@ var mockbox;
          break;
 
           case 'allowAccess':
+           if(data.service === 'google-access'){
             _mock.oauth.getToken({'interactive':true}, function(token){
               if (chrome.runtime.lastError) {
                 console.log(chrome.runtime.lastError);
                 return;
-              }else if(token){
-                currToken = token;
-                // Get profile data
-                _mock.oauth.getProfile();
-                _mock.oauth.getLicense();
-                _settings.later = false;
-                updateSettingsPanel('allow');
+              }else{
+                tokens.google = token;
+                //_mock.oauth.getLicense();
+                //_settings.later = false;
+                if(!data.isSplashScreen){
+                  views.settings.updateAuthorizations();
+                }
               }
+              closeSplash();
             });
+          }else{
+            console.log(data.service+' not yet implemented');
+          }
             
           break;
 
           case 'revokeAccess':
-            mockbox.popout.confirm('revoke',function(){
-              // If continue then signout
-              chrome.identity.removeCachedAuthToken({token:currToken}, function(){
-                  setSignedout();
-                  updateSettingsPanel('revoke');
-                });
-            });
+            if(data.service === 'google-access'){
+              mockbox.popout.confirm('revoke',function(){
+                // If continue then signout
+                chrome.identity.removeCachedAuthToken({token:tokens.google}, function(){
+                    tokens.google = undefined;
+                    views.settings.updateAuthorizations();
+                  });
+              });
+            }else{
+              console.log(data.service+' not yet implemented');
+            }
           break;
 
           case 'later':
             _settings.later = true;
-            apollo.addClass(splashSignin, 'hidden');
+            apollo.addClass(splashAllow, 'hidden');
             apollo.removeClass(splashLoading, 'hidden');
             closeSplash();
             saveSettings();
           break;
 
-          case 'onProfileData':
-            var profileContainer = document.getElementById('profile-container'),
-                imageNode = profileContainer.querySelector('.profile-img'),
-                nameNode = profileContainer.querySelector('.profile-name');
-
-            isAuthenticated = true;
-            imageNode.setAttribute('src',data.profile.image.url);
-            nameNode.innerHTML = data.profile.name.givenName;
-            closeSplash();
-          break;
-
           case 'onFirstRun':
-            apollo.removeClass(splashSignin, 'hidden');
+            apollo.removeClass(splashAllow, 'hidden');
             apollo.addClass(splashLoading, 'hidden');
 
             // Defulat App Settings
@@ -197,34 +194,6 @@ var mockbox;
         apollo.addClass(splash, 'hidden');
       });
     }, 900);
-  }
-
-  function updateSettingsPanel(type){
-    if(chrome.app.window.get('settings')){
-      var settingsWindow = chrome.app.window.get('settings').contentWindow.document,
-          settingsAllow = settingsWindow.getElementById('settings-allow-container'),
-          settingsRevoke = settingsWindow.getElementById('settings-revoke-container');
-
-      if(type == 'revoke'){
-        apollo.removeClass(settingsAllow, 'hidden');
-        apollo.addClass(settingsRevoke, 'hidden');
-      }else if(type == 'allow'){
-        apollo.addClass(settingsAllow, 'hidden');
-        apollo.removeClass(settingsRevoke, 'hidden');
-      }
-    }
-
-  }
-
-  function setSignedout(){
-    var profileContainer = document.getElementById('profile-container'),
-        imageNode = profileContainer.querySelector('.profile-img'),
-        nameNode = profileContainer.querySelector('.profile-name');
-    
-    isAuthenticated = false;
-    _settings.later = true;
-    imageNode.setAttribute('src','images/profile.png');
-    nameNode.innerHTML = 'Signin';
   }
 
   function saveSettings(callback){
@@ -422,8 +391,8 @@ var mockbox;
       init();
 
     },
-    isAuthenticated: function(){
-      return isAuthenticated;
+    tokens: function(){
+      return tokens;
     },
     getSettings: function(){ 
       return _settings;

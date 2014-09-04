@@ -16,8 +16,8 @@ _pop.clicks = (function(){
       };
 
       if(_currentId === 'settings'){
-        buttons.allowBtn = document.getElementById("settings-allow"),
-        buttons.revokeBtn = document.getElementById("settings-revoke"),
+        var services = document.getElementById("settings-access-services");
+        buttons.toggleBtns = services.getElementsByClassName('toggleBtn'),
         buttons.okBtn = document.getElementById("settings-footer").querySelector('.ok'),
         buttons.cancelBtn = document.getElementById("settings-footer").querySelector('.cancel');
       }
@@ -80,13 +80,22 @@ _pop.clicks = (function(){
         chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
       });
 
-      buttons.allowBtn.addEventListener('click', function(e){
-        chrome.runtime.sendMessage({message:'allowAccess'});
-      });
+      for(var i = 0; i < buttons.toggleBtns.length;i++){
+        buttons.toggleBtns[i].addEventListener('click', function(e){
+          var service = e.target.parentElement.parentElement.classList[0];
+          var type = e.target.classList[1];
+          
+          if(type === 'access'){
+            chrome.runtime.sendMessage( { message:'allowAccess', service: service });
+          }else 
 
-      buttons.revokeBtn.addEventListener('click', function(e){
-        chrome.runtime.sendMessage({message:'revokeAccess'});
-      });
+          if(type === 'revoke'){
+            chrome.runtime.sendMessage( { message:'revokeAccess', service: service });
+          }
+
+        });
+      }
+
     }else
 
     if(_currentId === 'about'){

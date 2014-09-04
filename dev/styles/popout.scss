@@ -25,7 +25,7 @@
   .splash-contents{
     text-align: center;
     font-size: medium;
-    width: 400px;
+    width: 450px;
     top: 55%;
     position: relative;
     left: -webkit-calc(50% - 200px);
@@ -37,7 +37,7 @@
         color:inherit;
       }
     }
-    .signin{
+    .allow{
       margin: 20px;
     }
   }
@@ -71,15 +71,10 @@
       margin-left: 10px;
       padding: 5px;
       
-      .input{
-        float:right;
-      }
     }
 
     .field-option-title{
       vertical-align:middle;
-      // position: absolute;
-      // top: -webkit-calc(50% + 20px);
     }
   }
 }

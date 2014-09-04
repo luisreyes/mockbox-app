@@ -42,7 +42,7 @@ _mock.clicks = (function(){
     email     :sidebar.querySelector('.email'),
 
     //Splash
-    signin    :splash.querySelector('.signin'),
+    allow    :splash.querySelector('.allow'),
     later     :splash.querySelector('.maybelater'),
     
     // Header Bar
@@ -151,16 +151,16 @@ _mock.clicks = (function(){
     });
 
     // Splash Signin Button
-    buttons.signin.addEventListener( 'click', function(){
-      chrome.runtime.sendMessage({message:'allowAccess', callback: 'closeSplash' });
+    buttons.allow.addEventListener( 'click', function(){
+      chrome.runtime.sendMessage({message:'allowAccess', isSplashScreen:true, service: 'google-access'});
     });
 
     buttons.profileLink.addEventListener( 'click', function(e){
-      signinPreAuth();
+      signin();
     });
 
     buttons.profileImg.addEventListener( 'click', function(e){
-      signinPreAuth();
+      signin();
     });
 
     // Splash Later Button
@@ -208,6 +208,7 @@ _mock.clicks = (function(){
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
+
         // Open the window and run the function
         _mock.popout.open('settings', function(){
           // init the views js file
@@ -227,11 +228,9 @@ _mock.clicks = (function(){
       
       google.payments.inapp.getPurchases({
         'success': function(){
-          //debugger;
           console.log('Purch Success');
         },
         'failure': function(){
-          //debugger;
           console.log('Purch fail');   
         }
       });
@@ -239,12 +238,10 @@ _mock.clicks = (function(){
       google.payments.inapp.getSkuDetails({
           'parameters': {'env': 'prod'},
           'success': function(){
-            //debugger;
             console.log('SKU Success');
             console.log(arguments);
           },
           'failure': function(){
-            //debugger;
             console.log('SKU fail');
             console.log(arguments);   
           }
@@ -262,13 +259,7 @@ _mock.clicks = (function(){
     window.open(links[loc], '_blank');
   }
 
-  function signinPreAuth(){
-    if(!mockbox.isAuthenticated()){
-        chrome.runtime.sendMessage({message:'allowAccess', callback: 'closeSplash' });
-      }else{
-        buttons.profile.click();
-      }
-  }
+  function signin(){}
 
   function clickToEditProjectName(){
     // Cache initial value to manage dirty flag

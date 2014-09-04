@@ -138,34 +138,62 @@ _v.settings = (function(){
 
   var doc;
 
-  function init(){
+  function _init(){
     doc = chrome.app.window.get('settings').contentWindow.document;
   }
 
   
-  function restoreStates(settings){
+  function _restoreStates(settings){
     // Set Theme
     doc.getElementById('settings-theme-select').value = settings.theme;
     // Set Last Worked on Checkbox
     doc.getElementById('settings-open-check').checked = settings.autoload;
+    // Update buttons
+    _updateAuths();
+  }
 
-    // Check if is authenticated
-    if(mockbox.isAuthenticated()){
-      apollo.addClass(doc.getElementById('settings-allow-container'), 'hidden');
-      apollo.removeClass(doc.getElementById('settings-revoke-container'), 'hidden');
+  function _updateAuths(){
+    // Get all current tokens
+    var tokens = mockbox.getTokens();
+
+    // Cache services container DOM Element
+    var services = doc.getElementById('settings-access-services');
+    
+    // Check for available tokens
+    setState(services.getElementsByClassName('google-access')[0], tokens.google);
+    setState(services.getElementsByClassName('github-access')[0], tokens.github);
+  }
+
+  function setState(service, hasToken){
+    var hideElements,showElements;
+
+    if(hasToken){
+      showElements = service.getElementsByClassName('revoke');
+      hideElements = service.getElementsByClassName('access');
     }else{
-      apollo.removeClass(doc.getElementById('settings-allow-container'), 'hidden');
-      apollo.addClass(doc.getElementById('settings-revoke-container'), 'hidden');
+      showElements = service.getElementsByClassName('access');
+      hideElements = service.getElementsByClassName('revoke');
     }
 
+    var i = 0;
+    for(var i = 0; i <= showElements.length-1; i++){
+      apollo.removeClass(showElements[i], 'hidden');  
+    }
+
+    for(var i = 0; i <= hideElements.length-1; i++){
+      apollo.addClass(hideElements[i], 'hidden');
+    }
   }
 
   return {
     init: function(){
-      if(!doc) init();
+      if(!doc) _init();
     },
     restoreSettingStates: function(settings){
-      restoreStates(settings);
+      _restoreStates(settings);
+    },
+    updateAuthorizations:function(){
+      _updateAuths();
     }
   }
 

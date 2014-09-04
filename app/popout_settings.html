@@ -18,28 +18,31 @@
     <section class="popout-content">
       <section id="settings-options" class="settings-options">
         <section class="field">
-          <section class="field-title">User Settings</section>
-          <section id="settings-allow-container" class="field-option hidden"><span class="left-container"><span>Allow access to your Google account</span>
-              <section class="clear"></section><span class="a small">Why should I allow access?</span></span>
-            <button id="settings-allow" class="input">Allow Access</button>
-            <section class="clear"></section>
-          </section>
-          <section id="settings-revoke-container" class="field-option hidden"><span class="left-container"><span>You are allowing access</span>
-              <section class="clear"></section><span class="a small">View Permissions</span></span>
-            <button id="settings-revoke" class="input">Revoke Access</button>
-            <section class="clear"></section>
+          <section class="field-title">Access to Services </section>
+          <section id="settings-access-services">
+            <section class="google-access field-option"><span class="left-container"><span>Google Account</span>
+                <section class="clear"></section><span class="a small access hidden">Why should I allow access?</span><span class="a small revoke hidden">View Permissions</span></span><span class="right-container">
+                <button class="toggleBtn access hidden">Allow Access</button>
+                <button class="toggleBtn revoke hidden">Revoke Token</button></span>
+              <section class="clear"></section>
+            </section>
+            <section class="github-access field-option"><span class="left-container"><span>Github</span>
+                <section class="clear"></section><span class="a small access hidden">Why should I allow access?</span><span class="a small revoke hidden">View Permissions</span></span><span class="right-container">
+                <button class="toggleBtn access hidden">Allow Access</button>
+                <button class="toggleBtn revoke hidden">Revoke Token</button></span>
+              <section class="clear"></section>
+            </section>
           </section>
         </section>
         <section class="field">
           <section class="field-title">Application Settings</section>
-          <section class="field-option"><span>Autoload last </span>
-            <input id="settings-open-check" type="checkbox" class="input">
-          </section>
-          <section class="field-option"><span>Select a theme</span>
-            <select id="settings-theme-select" class="input">
-              <option>light</option>
-              <option>dark</option>
-            </select>
+          <section class="field-option"><span class="left-container"><span>Autoload last</span></span><span class="right-container"> 
+              <input id="settings-open-check" type="checkbox" class="input"></span></section>
+          <section class="field-option"><span class="left-container"><span>Select a theme</span></span><span class="right-container"> 
+              <select id="settings-theme-select" class="input">
+                <option>light</option>
+                <option>dark</option>
+              </select></span>
             <section class="clear"></section>
           </section>
         </section>

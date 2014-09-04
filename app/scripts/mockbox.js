@@ -14,14 +14,13 @@ var mockbox;
       domJs   = document.getElementById('js').querySelector('.code'),
       header = document.getElementById('app-header'),
       splash = document.getElementById('app-splash'),
-      splashSignin = document.getElementById('app-splash-signin'),
+      splashAllow = document.getElementById('app-splash-access'),
       splashLoading = document.getElementById('app-splash-loading'),
       sidebarToggle = document.getElementById('app-sidebar-toggle'),
       domEditors = document.getElementById('app-editors'),
       defaultLayout = '50,50,25',
       _settings = {},
-      isAuthenticated = false,
-      currToken = null,
+      tokens = {},
       sv;
 
   function init(){
@@ -101,13 +100,13 @@ var mockbox;
             // Get token for google account
             _mock.oauth.getToken({'interactive':false},function(token){
               if (chrome.runtime.lastError) {
-                setSignedout('restore');
-                closeSplash();
+                console.log(chrome.runtime.lastError);
               }else{
-                currToken = token;
-                // Get profile data
-                _mock.oauth.getProfile();
+                tokens.google = token;
               }
+
+              closeSplash();
+
             });
           }else{
             closeSplash();
@@ -121,53 +120,51 @@ var mockbox;
          break;
 
           case 'allowAccess':
+           if(data.service === 'google-access'){
             _mock.oauth.getToken({'interactive':true}, function(token){
               if (chrome.runtime.lastError) {
                 console.log(chrome.runtime.lastError);
                 return;
-              }else if(token){
-                currToken = token;
-                // Get profile data
-                _mock.oauth.getProfile();
-                _mock.oauth.getLicense();
-                _settings.later = false;
-                updateSettingsPanel('allow');
+              }else{
+                tokens.google = token;
+                //_mock.oauth.getLicense();
+                //_settings.later = false;
+                if(!data.isSplashScreen){
+                  views.settings.updateAuthorizations();
+                }
               }
+              closeSplash();
             });
+          }else{
+            console.log(data.service+' not yet implemented');
+          }
             
           break;
 
           case 'revokeAccess':
-            mockbox.popout.confirm('revoke',function(){
-              // If continue then signout
-              chrome.identity.removeCachedAuthToken({token:currToken}, function(){
-                  setSignedout();
-                  updateSettingsPanel('revoke');
-                });
-            });
+            if(data.service === 'google-access'){
+              mockbox.popout.confirm('revoke',function(){
+                // If continue then signout
+                chrome.identity.removeCachedAuthToken({token:tokens.google}, function(){
+                    tokens.google = undefined;
+                    views.settings.updateAuthorizations();
+                  });
+              });
+            }else{
+              console.log(data.service+' not yet implemented');
+            }
           break;
 
           case 'later':
             _settings.later = true;
-            apollo.addClass(splashSignin, 'hidden');
+            apollo.addClass(splashAllow, 'hidden');
             apollo.removeClass(splashLoading, 'hidden');
             closeSplash();
             saveSettings();
           break;
 
-          case 'onProfileData':
-            var profileContainer = document.getElementById('profile-container'),
-                imageNode = profileContainer.querySelector('.profile-img'),
-                nameNode = profileContainer.querySelector('.profile-name');
-
-            isAuthenticated = true;
-            imageNode.setAttribute('src',data.profile.image.url);
-            nameNode.innerHTML = data.profile.name.givenName;
-            closeSplash();
-          break;
-
           case 'onFirstRun':
-            apollo.removeClass(splashSignin, 'hidden');
+            apollo.removeClass(splashAllow, 'hidden');
             apollo.addClass(splashLoading, 'hidden');
 
             // Defulat App Settings
@@ -197,34 +194,6 @@ var mockbox;
         apollo.addClass(splash, 'hidden');
       });
     }, 900);
-  }
-
-  function updateSettingsPanel(type){
-    if(chrome.app.window.get('settings')){
-      var settingsWindow = chrome.app.window.get('settings').contentWindow.document,
-          settingsAllow = settingsWindow.getElementById('settings-allow-container'),
-          settingsRevoke = settingsWindow.getElementById('settings-revoke-container');
-
-      if(type == 'revoke'){
-        apollo.removeClass(settingsAllow, 'hidden');
-        apollo.addClass(settingsRevoke, 'hidden');
-      }else if(type == 'allow'){
-        apollo.addClass(settingsAllow, 'hidden');
-        apollo.removeClass(settingsRevoke, 'hidden');
-      }
-    }
-
-  }
-
-  function setSignedout(){
-    var profileContainer = document.getElementById('profile-container'),
-        imageNode = profileContainer.querySelector('.profile-img'),
-        nameNode = profileContainer.querySelector('.profile-name');
-    
-    isAuthenticated = false;
-    _settings.later = true;
-    imageNode.setAttribute('src','images/profile.png');
-    nameNode.innerHTML = 'Signin';
   }
 
   function saveSettings(callback){
@@ -422,8 +391,8 @@ var mockbox;
       init();
 
     },
-    isAuthenticated: function(){
-      return isAuthenticated;
+    tokens: function(){
+      return tokens;
     },
     getSettings: function(){ 
       return _settings;
@@ -503,7 +472,7 @@ _mock.clicks = (function(){
     email     :sidebar.querySelector('.email'),
 
     //Splash
-    signin    :splash.querySelector('.signin'),
+    allow    :splash.querySelector('.allow'),
     later     :splash.querySelector('.maybelater'),
     
     // Header Bar
@@ -612,16 +581,16 @@ _mock.clicks = (function(){
     });
 
     // Splash Signin Button
-    buttons.signin.addEventListener( 'click', function(){
-      chrome.runtime.sendMessage({message:'allowAccess', callback: 'closeSplash' });
+    buttons.allow.addEventListener( 'click', function(){
+      chrome.runtime.sendMessage({message:'allowAccess', isSplashScreen:true, service: 'google-access'});
     });
 
     buttons.profileLink.addEventListener( 'click', function(e){
-      signinPreAuth();
+      signin();
     });
 
     buttons.profileImg.addEventListener( 'click', function(e){
-      signinPreAuth();
+      signin();
     });
 
     // Splash Later Button
@@ -669,6 +638,7 @@ _mock.clicks = (function(){
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
+
         // Open the window and run the function
         _mock.popout.open('settings', function(){
           // init the views js file
@@ -688,11 +658,9 @@ _mock.clicks = (function(){
       
       google.payments.inapp.getPurchases({
         'success': function(){
-          //debugger;
           console.log('Purch Success');
         },
         'failure': function(){
-          //debugger;
           console.log('Purch fail');   
         }
       });
@@ -700,12 +668,10 @@ _mock.clicks = (function(){
       google.payments.inapp.getSkuDetails({
           'parameters': {'env': 'prod'},
           'success': function(){
-            //debugger;
             console.log('SKU Success');
             console.log(arguments);
           },
           'failure': function(){
-            //debugger;
             console.log('SKU fail');
             console.log(arguments);   
           }
@@ -723,13 +689,7 @@ _mock.clicks = (function(){
     window.open(links[loc], '_blank');
   }
 
-  function signinPreAuth(){
-    if(!mockbox.isAuthenticated()){
-        chrome.runtime.sendMessage({message:'allowAccess', callback: 'closeSplash' });
-      }else{
-        buttons.profile.click();
-      }
-  }
+  function signin(){}
 
   function clickToEditProjectName(){
     // Cache initial value to manage dirty flag
@@ -1028,83 +988,12 @@ _mock.oauth = (function(){
   function _getToken(type,callback){
     chrome.identity.getAuthToken(type, callback);
   }
-
-  function _getProfile(){
-    chrome.identity.getProfileUserInfo(function(userInfo){
-      //make url request here
-      if(userInfo.id){
-        userId = userInfo.id;
-        
-        var url = 'https://www.googleapis.com/plus/v1/people/'+userInfo.id+'?fields=displayName%2C+name/givenName%2C+image/url&key=AIzaSyCgvqfmrNPXDPB-p1JGUINbqhhKG_awYOY',
-            response = {},
-            xhr = new XMLHttpRequest();
-        
-        xhr.open("GET", url, true);
-        
-        xhr.onload = function (e) {
-        
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-           
-              response = JSON.parse(xhr.responseText);
-              profile = response;
-              loadImgBlob(response.image.url);
-           
-            } else {
-              console.error(xhr.statusText);
-            }
-          }
-        };
-
-        xhr.onerror = function (e) {
-          console.error(xhr.statusText);
-        };
-        
-        xhr.send();
-
-      }
-    });
-
-    function loadImgBlob(url){
-     
-      var response = {},
-          xhr = new XMLHttpRequest();
-        
-        xhr.open("GET", url, true);
-        
-        xhr.responseType = 'blob';
-        
-        xhr.onload = function (e) {
-        
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-
-              profile.image.url = window.URL.createObjectURL( xhr.response );
-              chrome.runtime.sendMessage({message:'onProfileData', profile:profile});
-           
-            } else {
-              console.error(xhr.statusText);
-            }
-          }
-        };
-
-        xhr.onerror = function (e) {
-          console.error(xhr.statusText);
-        };
-        
-        xhr.send();
-
-    }
-  }
   
   function _getLicense() {
-    debugger;    
-    //var CWS_LICENSE_API_URL = 'https://www.googleapis.com/chromewebstore/v1.1/userlicenses/';
-    var CWS_LICENSE_API_URL = 'https://www.googleapis.com/appsmarket/v2/licenseNotification/';
+    var CWS_LICENSE_API_URL = 'https://www.googleapis.com/chromewebstore/v1.1/userlicenses/';
     var req = new XMLHttpRequest();
 
     chrome.identity.getAuthToken({'interactive':true},function(token){
-      debugger;
       req.open('GET', CWS_LICENSE_API_URL + chrome.runtime.id);
       req.setRequestHeader('Authorization', 'Bearer ' + token);
       
@@ -1126,9 +1015,6 @@ _mock.oauth = (function(){
     getToken:function(t,c){
       _getToken(t,c);
     },
-    getProfile:function(){
-      _getProfile();
-    },
     getLicense: function(){
       _getLicense();
     }
@@ -1141,17 +1027,23 @@ _mock.popout = (function(){
   popoutWrapper = document.getElementById('app-popout'),
   popoutOverlay = popoutWrapper.querySelector('.overlay'),
   _confirmCallback = null,
-  currentId = '';
+  currentId = '',
+  openCount = 0;
 
   function _open(id, callback){
     currentId = id;
+    openCount++;
     apollo.addClass(popoutOverlay, 'visible');
     _mock.windows.show(id,callback);
   }
 
   function _close(id, callback){
     currentId = '';
-    apollo.removeClass(popoutOverlay, 'visible');
+    openCount--;
+    // Helps not remove the overlay when multiple windows open
+    if(openCount === 0){
+      apollo.removeClass(popoutOverlay, 'visible');
+    }
     _mock.windows.hide(id);
   }
 
@@ -1204,7 +1096,7 @@ _mock.storage = (function(){
 
   function _restoreSettings(){
     chrome.storage.sync.get('settings', function(result){
-      if(!result.settings){
+      if(!result.settings || result.settings.later){
         chrome.runtime.sendMessage({message:'onFirstRun'});
       }else{
         chrome.runtime.sendMessage({message:'restoreSettings', settings:result.settings});
@@ -1497,8 +1389,8 @@ _mock.windows = (function(){
     notify:function(o){
       _mock.notify.send(o);
     },
-    isAuthenticated: function(){
-      return _mock.isAuthenticated();
+    getTokens: function(){
+      return _mock.tokens();
     },
     isDirty:_mock.utils.isDirty
   };

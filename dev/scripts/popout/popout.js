@@ -9,13 +9,13 @@ var popout;
   var confirmTitle={
     continue: 'You have unsaved changes',
     delete: 'You are trying to delete this mock',
-    revoke:'Revoke Access?'
+    revoke:'Revoke Access Token?'
   }
 
   var confirmMessage = {
     continue: 'Are you sure you want to continue?',
     delete: 'Are you sure you want to delete it?',
-    revoke:'Are you sure you want to revoke all access?'
+    revoke:'Are you sure you want to revoke the access token?'
   }
 
   function init(){

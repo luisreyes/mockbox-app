@@ -17,6 +17,7 @@ body, html {
 .opaque{opacity:0 !important;}
 .clear{clear:both;}
 .left-container{float:left;width: 69%;}
+.right-container{float:right;}
 
 *:focus{outline:none;}
 ::selection { background: $accent-color; color:#EEE; }

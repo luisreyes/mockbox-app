@@ -4,17 +4,23 @@ _mock.popout = (function(){
   popoutWrapper = document.getElementById('app-popout'),
   popoutOverlay = popoutWrapper.querySelector('.overlay'),
   _confirmCallback = null,
-  currentId = '';
+  currentId = '',
+  openCount = 0;
 
   function _open(id, callback){
     currentId = id;
+    openCount++;
     apollo.addClass(popoutOverlay, 'visible');
     _mock.windows.show(id,callback);
   }
 
   function _close(id, callback){
     currentId = '';
-    apollo.removeClass(popoutOverlay, 'visible');
+    openCount--;
+    // Helps not remove the overlay when multiple windows open
+    if(openCount === 0){
+      apollo.removeClass(popoutOverlay, 'visible');
+    }
     _mock.windows.hide(id);
   }
 

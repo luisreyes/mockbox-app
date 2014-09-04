@@ -9,30 +9,45 @@ block content
   section#settings-options.settings-options
     
     section.field
-      section.field-title User Settings
-      section#settings-allow-container.field-option.hidden
-        span.left-container
-          span Allow access to your Google account
+      section.field-title Access to Services 
+      section#settings-access-services
+        
+        section.google-access.field-option
+          span.left-container
+            span Google Account
+            section.clear
+            span.a.small.access.hidden Why should I allow access?
+            span.a.small.revoke.hidden View Permissions
+          span.right-container
+            button.toggleBtn.access.hidden Allow Access
+            button.toggleBtn.revoke.hidden Revoke Token
           section.clear
-          span.a.small Why should I allow access?
-        button.input#settings-allow Allow Access
-        section.clear
-      section#settings-revoke-container.field-option.hidden
-        span.left-container
-          span You are allowing access
+
+        section.github-access.field-option
+          span.left-container
+            span Github
+            section.clear
+            span.a.small.access.hidden Why should I allow access?
+            span.a.small.revoke.hidden View Permissions
+          span.right-container
+            button.toggleBtn.access.hidden Allow Access
+            button.toggleBtn.revoke.hidden Revoke Token
           section.clear
-          span.a.small View Permissions
-        button.input#settings-revoke Revoke Access
-        section.clear
         
     section.field
       section.field-title Application Settings
+      
       section.field-option
-        span Autoload last 
-        input.input#settings-open-check(type="checkbox")
+        span.left-container
+          span Autoload last
+        span.right-container 
+          input.input#settings-open-check(type="checkbox")
+      
       section.field-option
-        span Select a theme
-        select.input#settings-theme-select
+        span.left-container
+          span Select a theme
+        span.right-container 
+          select.input#settings-theme-select
             option light
             option dark
         section.clear
