@@ -2,6 +2,18 @@ MockBox v0.9.5.3
 =========
 
 ---------------------------------------
+**v0.9.6 - 09/5/14 - 11:47am**
+
+
+[View Commit]()
+
+```
+- oAuth2 Clean up
+- Added About Window
+- Restructure 'Application Setting'
+- Refactoring for organization and performance
+```
+---------------------------------------
 **v0.9.5.3 - 09/3/14 - 12:36am**
 
 

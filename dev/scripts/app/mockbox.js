@@ -64,19 +64,24 @@ var mockbox;
             });            
          break;
 
-         case 'loadItem': 
+         case 'onLoadItem': 
           // Restore working project from db by id
             _mock.database.restoreEditorsFromId(data.gui);
          break;
 
-         case 'deleteItem': 
+         case 'onDeleteItem': 
           // Delete the item by the passed id
             _mock.database.delete(data.gui);
          break;
 
-         case 'continuePopout': 
-          // Call methods to continue i.e "Yes I would ike to loose changes and close the application"
-            _mock.popout.confirmCallback();
+         case 'onConfirm': 
+         if(data.isAccept){
+            // Call methods to continue i.e "Yes I would ike to loose changes and close the application"
+            _mock.popout.confirmAcceptCallback();
+          }else{
+            // Call methods to cancel i.e "Yes I would ike to loose changes and close the application"
+            _mock.popout.confirmDeclineCallback();
+          }
           // Close the popout
             _mock.popout.close(data.popoutId);
          break;
@@ -96,22 +101,18 @@ var mockbox;
           // Apply settings     
             setSettings();
 
-          if(!_settings.later){
-            // Get token for google account
-            _mock.oauth.getToken({'interactive':false},function(token){
-              if (chrome.runtime.lastError) {
-                console.log(chrome.runtime.lastError);
-              }else{
-                tokens.google = token;
-              }
+          // Get token for google account
+          _mock.oauth.getToken({'interactive':false},function(token){
+            if (chrome.runtime.lastError) {
+              console.log(chrome.runtime.lastError);
+            }else{
+              tokens.google = token;
+            }
 
-              closeSplash();
-
-            });
-          }else{
             closeSplash();
-          }
 
+          });
+          
           // Open last if lastGui is avaliable
           if(_settings.lastGui && _settings.autoload){
             _mock.database.restoreEditorsFromId(_settings.lastGui);
@@ -122,17 +123,23 @@ var mockbox;
           case 'allowAccess':
            if(data.service === 'google-access'){
             _mock.oauth.getToken({'interactive':true}, function(token){
+              
+              // Error
               if (chrome.runtime.lastError) {
                 console.log(chrome.runtime.lastError);
-                return;
+
+              // No Error
               }else{
                 tokens.google = token;
                 //_mock.oauth.getLicense();
-                //_settings.later = false;
-                if(!data.isSplashScreen){
-                  views.settings.updateAuthorizations();
-                }
+                _settings.isInited = true;
               }
+
+              // Whether error or not
+              if(!data.isSplashScreen){
+                views.settings.updateAuthorizations();
+              }
+              saveSettings();
               closeSplash();
             });
           }else{
@@ -144,19 +151,23 @@ var mockbox;
           case 'revokeAccess':
             if(data.service === 'google-access'){
               mockbox.popout.confirm('revoke',function(){
-                // If continue then signout
+                // If confirm accept
                 chrome.identity.removeCachedAuthToken({token:tokens.google}, function(){
                     tokens.google = undefined;
                     views.settings.updateAuthorizations();
                   });
+              }, function(){
+                // If confirm decline
+                views.settings.updateAuthorizations();
               });
             }else{
               console.log(data.service+' not yet implemented');
+              views.settings.updateAuthorizations();
             }
           break;
 
           case 'later':
-            _settings.later = true;
+            _settings.isInited = true;
             apollo.addClass(splashAllow, 'hidden');
             apollo.removeClass(splashLoading, 'hidden');
             closeSplash();
@@ -171,9 +182,16 @@ var mockbox;
             _settings.theme = 'light';
             _settings.lastGui = null;
             _settings.autoload = true;
-            _settings.later = false;
-          
+
             saveSettings();
+          break;
+
+          case 'onDirty':
+            if(data.isDirty){
+              _mock.clicks.buttons.removeClass('save','inactive');
+            }else{
+              _mock.clicks.buttons.addClass('save','inactive');
+            }
           break;
 
           default: return;
@@ -313,11 +331,11 @@ var mockbox;
     updateIframe();
     _mock.utils.isDirty(true);
     if(areAllEmpty()){
-      _mock.clicks.buttons.removeClass('save','inactive');
+      //_mock.clicks.buttons.removeClass('save','inactive');
       _mock.clicks.buttons.removeClass('export','inactive');
     }else{
 
-      _mock.clicks.buttons.addClass('save','inactive');
+      //_mock.clicks.buttons.addClass('save','inactive');
       _mock.clicks.buttons.addClass('export','inactive');
     }
 
@@ -334,7 +352,6 @@ var mockbox;
           html: editors.html.getValue(),
           js  : editors.js.getValue(),
           css : editors.css.getValue(),
-          //later: _settings.later,
           layout: [
             size0.substr(0,size0.length-1),
             size1.substr(0,size1.length-1),
@@ -411,9 +428,10 @@ var mockbox;
       exportPackage();
     },
     save: function(){
-      if(areAllEmpty()){
+      //if(areAllEmpty()){
         _mock.database.save(getSaveData());
-      }
+        //_mock.clicks.buttons.addClass('save','inactive');
+      //}
     },
     reset:function(){
       if(mockbox.isDirty()){

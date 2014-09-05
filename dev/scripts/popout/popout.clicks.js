@@ -11,14 +11,14 @@ _pop.clicks = (function(){
       buttons.closeBtn = document.getElementById("app-popout-controls").querySelector('.window-close');
       
       if(_currentId === 'confirm'){
-        buttons.cancelBtn = document.getElementById("confirm-buttons").querySelector('.cancel'),
-        buttons.continueBtn = document.getElementById("confirm-buttons").querySelector('.continue')
+        buttons.cancelBtn = document.getElementById("confirm-buttons").querySelector('.cancel');
+        buttons.continueBtn = document.getElementById("confirm-buttons").querySelector('.continue');
       };
 
       if(_currentId === 'settings'){
         var services = document.getElementById("settings-access-services");
-        buttons.toggleBtns = services.getElementsByClassName('toggleBtn'),
-        buttons.okBtn = document.getElementById("settings-footer").querySelector('.ok'),
+        buttons.switches = services.getElementsByTagName('label');
+        buttons.okBtn = document.getElementById("settings-footer").querySelector('.ok');
         buttons.cancelBtn = document.getElementById("settings-footer").querySelector('.cancel');
       }
 
@@ -44,11 +44,11 @@ _pop.clicks = (function(){
 
     if(_currentId === 'confirm'){
       buttons.cancelBtn.addEventListener('click', function(e){
-        chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
+        chrome.runtime.sendMessage({message:'onConfirm', popoutId:_currentId, isAccept:false});
       });
 
       buttons.continueBtn.addEventListener('click', function(e){
-        chrome.runtime.sendMessage({message:'continuePopout', popoutId:_currentId});
+        chrome.runtime.sendMessage({message:'onConfirm', popoutId:_currentId, isAccept:true});
       });
     }else
 
@@ -80,17 +80,18 @@ _pop.clicks = (function(){
         chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
       });
 
-      for(var i = 0; i < buttons.toggleBtns.length;i++){
-        buttons.toggleBtns[i].addEventListener('click', function(e){
-          var service = e.target.parentElement.parentElement.classList[0];
-          var type = e.target.classList[1];
+      for(var i = 0; i < buttons.switches.length;i++){
+        buttons.switches[i].addEventListener('click', function(e){
+          var service = e.target.parentElement.parentElement.parentElement.classList[0];
           
-          if(type === 'access'){
-            chrome.runtime.sendMessage( { message:'allowAccess', service: service });
-          }else 
-
-          if(type === 'revoke'){
-            chrome.runtime.sendMessage( { message:'revokeAccess', service: service });
+          if(e.target.tagName === 'INPUT'){
+            var on = e.target.checked;
+            
+            if(on){
+              chrome.runtime.sendMessage( { message:'allowAccess', service: service });
+            }else{
+              chrome.runtime.sendMessage( { message:'revokeAccess', service: service });
+            }
           }
 
         });

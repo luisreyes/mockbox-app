@@ -14,22 +14,17 @@
     <section id="app-window-frame" class="window-bar"><span id="app-popout-controls" class="window-controls"><span class="window-close icon icon_close"></span></span>
       <div class="popout-drag"></div>
     </section>
-    <header class="popout-header"><span class="popout-title-icon"><span class="icon_cog"></span></span><span class="popout-title"><span>Settings</span></span></header>
+    <header class="popout-header"><span class="popout-title-icon"><span class="icon_cog"></span></span><span class="popout-title"><span>Application Settings</span></span></header>
     <section class="popout-content">
       <section id="settings-options" class="settings-options">
         <section class="field">
           <section class="field-title">Access to Services </section>
           <section id="settings-access-services">
             <section class="google-access field-option"><span class="left-container"><span>Google Account</span>
-                <section class="clear"></section><span class="a small access hidden">Why should I allow access?</span><span class="a small revoke hidden">View Permissions</span></span><span class="right-container">
-                <button class="toggleBtn access hidden">Allow Access</button>
-                <button class="toggleBtn revoke hidden">Revoke Token</button></span>
-              <section class="clear"></section>
-            </section>
-            <section class="github-access field-option"><span class="left-container"><span>Github</span>
-                <section class="clear"></section><span class="a small access hidden">Why should I allow access?</span><span class="a small revoke hidden">View Permissions</span></span><span class="right-container">
-                <button class="toggleBtn access hidden">Allow Access</button>
-                <button class="toggleBtn revoke hidden">Revoke Token</button></span>
+                <section class="clear"></section><span title="Because I say so!" class="a small access hidden">Why should I allow access?</span><span class="a small revoke hidden">View Permissions</span></span><span class="right-container">
+                <label class="switch">
+                  <input type="checkbox" class="switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                </label></span>
               <section class="clear"></section>
             </section>
           </section>
@@ -37,7 +32,9 @@
         <section class="field">
           <section class="field-title">Application Settings</section>
           <section class="field-option"><span class="left-container"><span>Autoload last</span></span><span class="right-container"> 
-              <input id="settings-open-check" type="checkbox" class="input"></span></section>
+              <input id="settings-open-check" type="checkbox" class="input"></span>
+            <section class="clear"></section>
+          </section>
           <section class="field-option"><span class="left-container"><span>Select a theme</span></span><span class="right-container"> 
               <select id="settings-theme-select" class="input">
                 <option>light</option>

@@ -1,7 +1,7 @@
 extends mockbox_popout.jade
 
 block title
-  span Settings
+  span Application Settings
 block titleIcon
   span.icon_cog
 
@@ -16,22 +16,13 @@ block content
           span.left-container
             span Google Account
             section.clear
-            span.a.small.access.hidden Why should I allow access?
+            span.a.small.access.hidden(title="Because I say so!") Why should I allow access?
             span.a.small.revoke.hidden View Permissions
           span.right-container
-            button.toggleBtn.access.hidden Allow Access
-            button.toggleBtn.revoke.hidden Revoke Token
-          section.clear
-
-        section.github-access.field-option
-          span.left-container
-            span Github
-            section.clear
-            span.a.small.access.hidden Why should I allow access?
-            span.a.small.revoke.hidden View Permissions
-          span.right-container
-            button.toggleBtn.access.hidden Allow Access
-            button.toggleBtn.revoke.hidden Revoke Token
+            label.switch
+              input(type="checkbox").switch-input
+              span(data-on="On" data-off="Off").switch-label
+              span.switch-handle.transition
           section.clear
         
     section.field
@@ -42,7 +33,8 @@ block content
           span Autoload last
         span.right-container 
           input.input#settings-open-check(type="checkbox")
-      
+        section.clear
+          
       section.field-option
         span.left-container
           span Select a theme

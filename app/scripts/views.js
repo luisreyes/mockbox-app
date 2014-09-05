@@ -67,7 +67,7 @@ _v.mocks = (function(){
           liLoad.setAttribute('data-reference-id',_availableIds[i].gui);
           liDelete.setAttribute('data-reference-id',_availableIds[i].gui);
           liTitle.innerHTML = _availableIds[i].name;
-          liSubtitle.innerHTML = 'by ' + _availableIds[i].createdBy +' on '+ mockbox.utils.toDate(_availableIds[i].createdOn);
+          liSubtitle.innerHTML = 'Created on '+ mockbox.utils.toDate(_availableIds[i].createdOn);
 
           liLoad.addEventListener('click', function(){
             load(this.getAttribute('data-reference-id'));
@@ -98,7 +98,7 @@ _v.mocks = (function(){
     }  
 
     function loadMethods(){
-      chrome.runtime.sendMessage({message:'loadItem', gui:gui});
+      chrome.runtime.sendMessage({message:'onLoadItem', gui:gui});
       mockbox.reset();
       mockbox.popout.close('mocks');
     }
@@ -106,7 +106,7 @@ _v.mocks = (function(){
 
   function remove(gui){
     mockbox.popout.confirm('delete',function(){
-      chrome.runtime.sendMessage({message:'deleteItem', gui:gui});
+      chrome.runtime.sendMessage({message:'onDeleteItem', gui:gui});
       itemCount--;
 
       // Visual of Deleting
@@ -170,9 +170,11 @@ _v.settings = (function(){
     if(hasToken){
       showElements = service.getElementsByClassName('revoke');
       hideElements = service.getElementsByClassName('access');
+      service.getElementsByTagName('input')[0].checked = true;
     }else{
       showElements = service.getElementsByClassName('access');
       hideElements = service.getElementsByClassName('revoke');
+      service.getElementsByTagName('input')[0].checked = false;
     }
 
     var i = 0;

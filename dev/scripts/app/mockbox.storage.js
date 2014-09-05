@@ -10,10 +10,19 @@ _mock.storage = (function(){
 
   function _restoreSettings(){
     chrome.storage.sync.get('settings', function(result){
-      if(!result.settings || result.settings.later){
-        chrome.runtime.sendMessage({message:'onFirstRun'});
+      if(result.settings){
+        var hasSettings = result.settings ? true : false;
+      }
+      
+
+      if(hasSettings){
+        if(result.settings.isInited){
+          chrome.runtime.sendMessage({message:'restoreSettings', settings:result.settings});
+        }else{
+          chrome.runtime.sendMessage({message:'onFirstRun'});
+        }
       }else{
-        chrome.runtime.sendMessage({message:'restoreSettings', settings:result.settings});
+        chrome.runtime.sendMessage({message:'onFirstRun'});
       }
     });
   }

@@ -135,10 +135,26 @@ _mock.clicks = (function(){
     // Sidebar Buttons Action
 
     // New Button
-    buttons.new.addEventListener( 'click', _mock.reset );
+    buttons.new.addEventListener( 'click', function(e){
+      // Verify the click happens opn the LI in the sidebar navigation
+      var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
+
+      // If it has a class 'inactive' ignore the click
+      if(!apollo.hasClass(element, 'inactive')){
+        _mock.reset();
+      }
+    });
 
     // Save Button
-    buttons.save.addEventListener( 'click', _mock.save );
+    buttons.save.addEventListener( 'click', function(e){
+      // Verify the click happens opn the LI in the sidebar navigation
+      var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
+      
+      // If it has a class 'inactive' ignore the click
+      if(!apollo.hasClass(element, 'inactive')){
+        _mock.save();
+      }
+    });
 
     // About
     buttons.about.addEventListener( 'click', function(){

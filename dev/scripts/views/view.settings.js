@@ -35,9 +35,11 @@ _v.settings = (function(){
     if(hasToken){
       showElements = service.getElementsByClassName('revoke');
       hideElements = service.getElementsByClassName('access');
+      service.getElementsByTagName('input')[0].checked = true;
     }else{
       showElements = service.getElementsByClassName('access');
       hideElements = service.getElementsByClassName('revoke');
+      service.getElementsByTagName('input')[0].checked = false;
     }
 
     var i = 0;

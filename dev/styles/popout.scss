@@ -25,10 +25,13 @@
   .splash-contents{
     text-align: center;
     font-size: medium;
-    width: 450px;
-    top: 55%;
+    width: 470px;
+    top: 53%;
     position: relative;
-    left: -webkit-calc(50% - 200px);
+    left: -webkit-calc(50% - 235px);
+    border-top:1px solid #CCC;
+    border-bottom:1px solid #CCC;
+    padding: 20px 0 5px;
 
     .maybelater{
       font-size:small;
@@ -69,8 +72,7 @@
 
     .field-option{
       margin-left: 10px;
-      padding: 5px;
-      
+      padding: 5px 10px;
     }
 
     .field-option-title{

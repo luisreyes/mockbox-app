@@ -3,7 +3,8 @@ _mock.popout = (function(){
   var 
   popoutWrapper = document.getElementById('app-popout'),
   popoutOverlay = popoutWrapper.querySelector('.overlay'),
-  _confirmCallback = null,
+  _confirmAcceptCallback = null,
+  _confirmDeclineCallback = null,
   currentId = '',
   openCount = 0;
 
@@ -24,18 +25,17 @@ _mock.popout = (function(){
     _mock.windows.hide(id);
   }
 
-  function callConfirmCallback(){
-    _confirmCallback();
-  }
-
-  function _confirm(type, callback){
+  function _confirm(type, acceptCallback, declineCallback){
     currentId = 'confirm';
     
     _mock.popout.open('confirm', function(){
       chrome.runtime.sendMessage({message:'confirmType', type:type});
       apollo.addClass(popoutOverlay, 'visible');
-      if(callback){
-        _confirmCallback = callback;
+      if(acceptCallback){
+        _confirmAcceptCallback = acceptCallback;
+      }
+      if(declineCallback){
+        _confirmDeclineCallback = declineCallback;
       }
     });
 
@@ -52,11 +52,14 @@ _mock.popout = (function(){
     getCurrentId: function(){
       return currentId;
     },
-    confirm: function(type, callback){
-      _confirm(type,callback);
+    confirm: function(type, acceptCallback, declineCallback){
+      _confirm(type,acceptCallback,declineCallback);
     }, 
-    confirmCallback: function(){
-      callConfirmCallback();
+    confirmAcceptCallback: function(){
+      _confirmAcceptCallback();
+    },
+    confirmDeclineCallback: function(){
+      _confirmDeclineCallback();
     }
   };
 

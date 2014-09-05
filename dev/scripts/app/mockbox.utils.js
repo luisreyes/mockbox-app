@@ -24,6 +24,10 @@ _mock.utils = (function(){
       }
   }
 
+  function _isDirtyDispatcher(){
+      chrome.runtime.sendMessage({message:'onDirty', isDirty:_isDirty });
+  }
+
   function _Collect(baseObj, updateObj) {
     // Updates the base object with the new object
     var obj = baseObj; {
@@ -47,6 +51,7 @@ _mock.utils = (function(){
     isDirty:function(){
       if(arguments.length){
         _isDirty = arguments[0];
+        _isDirtyDispatcher();
       }else{
         return _isDirty;
       }
