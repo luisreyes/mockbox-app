@@ -30,6 +30,11 @@ _pop.clicks = (function(){
         buttons.okBtn = document.getElementById("connection-footer").querySelector('.ok');
       }
 
+      if(_currentId === 'export'){
+        var sidebar = document.getElementById("export-sidebar");
+        buttons.driveBtn = sidebar.querySelector('.drive');
+      }
+
       addListeners();
 
   }
@@ -39,7 +44,7 @@ _pop.clicks = (function(){
     // Popout Frame Buttons Action
 
     buttons.closeBtn.addEventListener('click', function(e){
-      chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
+      chrome.runtime.sendMessage({message:'onClosePopout', popoutId:_currentId});
     });
 
     if(_currentId === 'confirm'){
@@ -54,7 +59,7 @@ _pop.clicks = (function(){
 
     if(_currentId === 'connection'){
       buttons.okBtn.addEventListener('click', function(e){
-        chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
+        chrome.runtime.sendMessage({message:'onClosePopout', popoutId:_currentId});
       });
     }else
 
@@ -73,11 +78,11 @@ _pop.clicks = (function(){
         };
 
         chrome.runtime.sendMessage(data);
-        chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
+        chrome.runtime.sendMessage({message:'onClosePopout', popoutId:_currentId});
       });
 
       buttons.cancelBtn.addEventListener('click', function(e){
-        chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
+        chrome.runtime.sendMessage({message:'onClosePopout', popoutId:_currentId});
       });
 
       for(var i = 0; i < buttons.switches.length;i++){
@@ -102,8 +107,16 @@ _pop.clicks = (function(){
     if(_currentId === 'about'){
 
       buttons.okBtn.addEventListener('click', function(){
-        chrome.runtime.sendMessage({message:'closePopout', popoutId:_currentId});
+        chrome.runtime.sendMessage({message:'onClosePopout', popoutId:_currentId});
       });
+    }
+
+    if(_currentId === 'export'){
+      
+      buttons.driveBtn.addEventListener('click', function(){
+        chrome.runtime.sendMessage({ message:'onExport', type:'drive' });        
+      });
+
     }
     
   }

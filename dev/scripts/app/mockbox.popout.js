@@ -56,10 +56,16 @@ _mock.popout = (function(){
       _confirm(type,acceptCallback,declineCallback);
     }, 
     confirmAcceptCallback: function(){
-      _confirmAcceptCallback();
+      if(_confirmAcceptCallback){
+        _confirmAcceptCallback();
+      }
+      return;
     },
     confirmDeclineCallback: function(){
-      _confirmDeclineCallback();
+        if(_confirmDeclineCallback){
+        _confirmDeclineCallback();
+      }
+      return;
     }
   };
 

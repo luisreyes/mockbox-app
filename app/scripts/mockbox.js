@@ -51,39 +51,12 @@ var mockbox;
     chrome.runtime.onMessage.addListener(function(data) {
       switch(data.message){
          
-         case 'closePopout': 
-          // Close the popout with the passed id
-            _mock.popout.close(data.popoutId);
-         break;
-
          case 'closeApp':
           // Save to storage
             saveSettings(function(){
               // Loop and close all windows
                 _mock.windows.closeAll();
             });            
-         break;
-
-         case 'onLoadItem': 
-          // Restore working project from db by id
-            _mock.database.restoreEditorsFromId(data.gui);
-         break;
-
-         case 'onDeleteItem': 
-          // Delete the item by the passed id
-            _mock.database.delete(data.gui);
-         break;
-
-         case 'onConfirm': 
-         if(data.isAccept){
-            // Call methods to continue i.e "Yes I would ike to loose changes and close the application"
-            _mock.popout.confirmAcceptCallback();
-          }else{
-            // Call methods to cancel i.e "Yes I would ike to loose changes and close the application"
-            _mock.popout.confirmDeclineCallback();
-          }
-          // Close the popout
-            _mock.popout.close(data.popoutId);
          break;
 
          case 'saveSettings':
@@ -185,15 +158,6 @@ var mockbox;
 
             saveSettings();
           break;
-
-          case 'onDirty':
-            if(data.isDirty){
-              _mock.clicks.buttons.removeClass('save','inactive');
-            }else{
-              _mock.clicks.buttons.addClass('save','inactive');
-            }
-          break;
-
           default: return;
       }
     });
@@ -373,6 +337,7 @@ var mockbox;
     
     var content = zip.generate({type:"blob"});
     
+    
     //Save to system
     chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName:'mockbox.prototype.zip'}, function(writableFileEntry) {
       writableFileEntry.createWriter(function(writer) {
@@ -424,8 +389,11 @@ var mockbox;
         return currentGui;
       }
     },
+    getEditorData: function(){
+      return {html:editors.html.getValue(), css:editors.css.getValue(), js:editors.js.getValue() }
+    },
     export: function(){
-      exportPackage();
+      return exportPackage();
     },
     save: function(){
       //if(areAllEmpty()){
@@ -949,6 +917,99 @@ _mock.database = (function(){
   };
 
 }());
+_mock.drive = (function(){
+"use strict";
+
+  var folderIds;
+
+  function _createFolders(data, callback){
+    // Cache Ids to put files in later
+    folderIds = {};
+    
+    // Generate the Main folder for the export package
+    _upload({title:'main', type:'application/vnd.google-apps.folder'}, function(result){ 
+      
+      console.log('MAIN Folder Created');
+      // Cache the Main folders Id
+      folderIds.main = result.id;
+      
+      // Generate the Styles folder
+      data.css && _upload({title:'styles', type:'application/vnd.google-apps.folder', parent:'main'}, function(result){ 
+        console.log('STYLES Folder Created');
+        // Cache the Styles folders Id
+        folderIds.styles = result.id;
+      });
+      
+      // Generate the Scripts folder
+      data.js && _upload({title:'scripts', type:'application/vnd.google-apps.folder', parent:'main'}, function(result){ 
+        console.log('SCRIPTS Folder Created');
+        // Cache the Scripts folders Id
+        folderIds.scripts = result.id;
+      });
+    });
+
+  }
+
+  function _upload(data, callback){
+
+    var file = {
+      metadata:{
+        "title": data.title,
+        "mimeType": data.type || "application/octet-stream",
+        "description": "Created on MockBox for Google Chrome <http://mockbox.io>"
+      },
+      data: data.value
+    }
+
+    if(data.parent) file.metadata.parents = [{"id":folderIds[data.parent]}];
+
+    var req = new XMLHttpRequest();
+    var guid = Math.random().toString().substr(2);
+    var boundary = '-------'+guid;
+    var delimiter = "\r\n--" + boundary + "\r\n";
+    var close_delim = "\r\n--" + boundary + "--";
+
+    var multipartRequestBody =
+        delimiter +
+        'Content-Type: application/json\r\n\r\n' +
+        JSON.stringify(file.metadata);
+
+    if(file.data){    
+      multipartRequestBody +=
+        delimiter +
+        'Content-Type: ' + file.metadata.mimeType + '\r\n' +
+        '\r\n' +
+        file.data;
+    }
+    
+    multipartRequestBody += close_delim;
+    
+    chrome.identity.getAuthToken({'interactive':false},function(token){
+      
+      req.open('POST', 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart');
+      req.setRequestHeader('Authorization', 'Bearer ' + token);
+      req.setRequestHeader('Content-Type', 'multipart/related; boundary='+boundary);
+
+      req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+          var res = JSON.parse(req.responseText);
+          callback && callback(res);
+        }
+      }
+
+      req.send(multipartRequestBody);  
+    });
+  }
+  return {
+    upload: function(file, callback){
+      _upload(file, callback);
+    },
+    generateFolders: function(data, callback){
+      _createFolders(data, callback);
+    }
+  };
+
+}());
 _mock.events = (function () {
     'use strict';
     //Private Methods and Vars
@@ -1113,15 +1174,80 @@ _mock.popout = (function(){
       _confirm(type,acceptCallback,declineCallback);
     }, 
     confirmAcceptCallback: function(){
-      _confirmAcceptCallback();
+      if(_confirmAcceptCallback){
+        _confirmAcceptCallback();
+      }
+      return;
     },
     confirmDeclineCallback: function(){
-      _confirmDeclineCallback();
+        if(_confirmDeclineCallback){
+        _confirmDeclineCallback();
+      }
+      return;
     }
   };
 
 }());
-/*! Local Storage - Used for temp data
+_mock.receiver = (function(){
+  'use strict';
+
+  chrome.runtime.onMessage.addListener(function(data) {
+    switch(data.message){
+      
+      case 'onClosePopout': 
+        // Close the popout with the passed id
+        _mock.popout.close(data.popoutId);
+        break;
+
+      case 'onLoadItem': 
+        // Restore working project from db by id
+        _mock.database.restoreEditorsFromId(data.gui);
+        break;
+
+      case 'onDeleteItem': 
+        // Delete the item by the passed id
+        _mock.database.delete(data.gui);
+        break;
+
+      case 'onConfirm': 
+        if(data.isAccept){
+          // Call methods to continue i.e "Yes I would ike to loose changes and close the application"
+          _mock.popout.confirmAcceptCallback();
+        }else{
+          // Call methods to cancel i.e "Yes I would ike to loose changes and close the application"
+          _mock.popout.confirmDeclineCallback();
+        }
+        // Close the popout
+        _mock.popout.close(data.popoutId);
+        break;
+
+      case 'onDirty':
+        if(data.isDirty){
+          _mock.clicks.buttons.removeClass('save','inactive');
+        }else{
+          _mock.clicks.buttons.addClass('save','inactive');
+        }
+        break;
+      
+      case 'onExport':
+       var editors = _mock.getEditorData();
+       debugger;
+        if(data.type === 'drive'){
+          _mock.drive.generateFolders(editors, function(){
+            // Export only if the editor has data.
+            editors.html && _mock.drive.upload({title:'index.html',type:'text/html',value: editors.html});
+            editors.css && _mock.drive.upload({title:'styles.css',type:'text/css',value:editors.css, parent:'styles'});
+            editors.js && _mock.drive.upload({title:'scripts.js',type:'application/javascript',value:editors.js, parent:'scripts'});
+          });
+        }
+       break;
+
+      default: return;
+    }
+  });
+
+}());
+/*! Sync Storage - Used for settings data
 /*  ----------------------------------
 /*  Saves data and retores on load.
 /*  This is not the database, for permanent
@@ -1423,13 +1549,10 @@ _mock.windows = (function(){
 
   //Expose
   mockbox = {
-    load:function(gui){
-      _mock.database.restoreEditorsFromId(gui);
-    },
     getSettings: function(){
       return _mock.getSettings();
     },
-    getAll:function(callback){
+    getAllMocks:function(callback){
       return _mock.database.getAll(callback);
     },
     popout:_mock.popout,

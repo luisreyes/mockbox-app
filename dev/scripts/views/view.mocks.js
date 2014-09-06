@@ -8,7 +8,7 @@ _v.mocks = (function(){
   }
 
   function setAvailableIds(){
-    mockbox.getAll(function(result){
+    mockbox.getAllMocks(function(result){
       listContainer = doc.getElementById('mocks-list');
       emptyList = doc.getElementById('mocks-list-empty');
       itemCount = result.length;

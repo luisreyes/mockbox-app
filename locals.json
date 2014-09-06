@@ -18,6 +18,7 @@
     },
     
     "scripts":[ 
+      "scripts/lib.js",
       "scripts/popout.js"
     ]
   }

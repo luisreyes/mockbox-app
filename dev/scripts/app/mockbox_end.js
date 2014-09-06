@@ -2,13 +2,10 @@
 
   //Expose
   mockbox = {
-    load:function(gui){
-      _mock.database.restoreEditorsFromId(gui);
-    },
     getSettings: function(){
       return _mock.getSettings();
     },
-    getAll:function(callback){
+    getAllMocks:function(callback){
       return _mock.database.getAll(callback);
     },
     popout:_mock.popout,

@@ -33,6 +33,23 @@ _v.about = (function(){
   }
 
 }());
+_v.export = (function(){
+  'use strict';
+
+  var doc;
+
+  function init(){
+    doc = chrome.app.window.get('export').contentWindow.document;
+    
+  }
+
+  return {
+    init: function(){
+      if(!doc) init();
+    }
+  }
+
+}());
 _v.mocks = (function(){
   'use strict';
 
@@ -43,7 +60,7 @@ _v.mocks = (function(){
   }
 
   function setAvailableIds(){
-    mockbox.getAll(function(result){
+    mockbox.getAllMocks(function(result){
       listContainer = doc.getElementById('mocks-list');
       emptyList = doc.getElementById('mocks-list-empty');
       itemCount = result.length;

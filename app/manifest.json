@@ -24,13 +24,13 @@
     "identity",
     "notifications",
     {"fileSystem": ["write", "retainEntries", "directory"]},
-    "storage"
+    "storage",
+    "https://www.googleapis.com/"
   ],
   "oauth2": {
     "client_id": "599622858138-0pnf0pheaoe3ltssbjor765l7cb95eam.apps.googleusercontent.com",
     "scopes": [
-      "https://www.googleapis.com/auth/drive.appdata",
-      "https://www.googleapis.com/auth/drive.file",
+      "https://www.googleapis.com/auth/drive",
       "https://www.googleapis.com/auth/chromewebstore.readonly"
 
     ]

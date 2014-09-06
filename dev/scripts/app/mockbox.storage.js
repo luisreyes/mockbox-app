@@ -1,4 +1,4 @@
-/*! Local Storage - Used for temp data
+/*! Sync Storage - Used for settings data
 /*  ----------------------------------
 /*  Saves data and retores on load.
 /*  This is not the database, for permanent

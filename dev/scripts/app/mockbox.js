@@ -51,39 +51,12 @@ var mockbox;
     chrome.runtime.onMessage.addListener(function(data) {
       switch(data.message){
          
-         case 'closePopout': 
-          // Close the popout with the passed id
-            _mock.popout.close(data.popoutId);
-         break;
-
          case 'closeApp':
           // Save to storage
             saveSettings(function(){
               // Loop and close all windows
                 _mock.windows.closeAll();
             });            
-         break;
-
-         case 'onLoadItem': 
-          // Restore working project from db by id
-            _mock.database.restoreEditorsFromId(data.gui);
-         break;
-
-         case 'onDeleteItem': 
-          // Delete the item by the passed id
-            _mock.database.delete(data.gui);
-         break;
-
-         case 'onConfirm': 
-         if(data.isAccept){
-            // Call methods to continue i.e "Yes I would ike to loose changes and close the application"
-            _mock.popout.confirmAcceptCallback();
-          }else{
-            // Call methods to cancel i.e "Yes I would ike to loose changes and close the application"
-            _mock.popout.confirmDeclineCallback();
-          }
-          // Close the popout
-            _mock.popout.close(data.popoutId);
          break;
 
          case 'saveSettings':
@@ -185,15 +158,6 @@ var mockbox;
 
             saveSettings();
           break;
-
-          case 'onDirty':
-            if(data.isDirty){
-              _mock.clicks.buttons.removeClass('save','inactive');
-            }else{
-              _mock.clicks.buttons.addClass('save','inactive');
-            }
-          break;
-
           default: return;
       }
     });
@@ -373,6 +337,7 @@ var mockbox;
     
     var content = zip.generate({type:"blob"});
     
+    
     //Save to system
     chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName:'mockbox.prototype.zip'}, function(writableFileEntry) {
       writableFileEntry.createWriter(function(writer) {
@@ -424,8 +389,11 @@ var mockbox;
         return currentGui;
       }
     },
+    getEditorData: function(){
+      return {html:editors.html.getValue(), css:editors.css.getValue(), js:editors.js.getValue() }
+    },
     export: function(){
-      exportPackage();
+      return exportPackage();
     },
     save: function(){
       //if(areAllEmpty()){
