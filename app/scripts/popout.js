@@ -8,7 +8,7 @@ var popout;
 'use strict';
   var confirmTitle={
     continue: 'You have unsaved changes',
-    delete: 'You are trying to delete this mock',
+    delete: 'You are trying to delete this prototype',
     revoke:'Revoke Access Token?'
   }
 

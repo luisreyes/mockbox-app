@@ -5,7 +5,7 @@
     getSettings: function(){
       return _mock.getSettings();
     },
-    getAllMocks:function(callback){
+    getAllPrototypes:function(callback){
       return _mock.database.getAll(callback);
     },
     popout:_mock.popout,

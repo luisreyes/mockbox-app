@@ -1,16 +1,16 @@
-_v.mocks = (function(){
+_v.load = (function(){
   'use strict';
 
   var doc, _availableIds, listContainer, emptyList, itemCount;
 
   function init(){
-    doc = chrome.app.window.get('mocks').contentWindow.document;
+    doc = chrome.app.window.get('load').contentWindow.document;
   }
 
   function setAvailableIds(){
-    mockbox.getAllMocks(function(result){
-      listContainer = doc.getElementById('mocks-list');
-      emptyList = doc.getElementById('mocks-list-empty');
+    mockbox.getAllPrototypes(function(result){
+      listContainer = doc.getElementById('prototype-list');
+      emptyList = doc.getElementById('prototype-list-empty');
       itemCount = result.length;
       
       if(itemCount){
@@ -64,8 +64,10 @@ _v.mocks = (function(){
 
     function loadMethods(){
       chrome.runtime.sendMessage({message:'onLoadItem', gui:gui});
+      // Clear Dirty Flag to bypass reset dirty check
+      mockbox.isDirty(false);
       mockbox.reset();
-      mockbox.popout.close('mocks');
+      mockbox.popout.close('load');
     }
   }
 
@@ -77,6 +79,10 @@ _v.mocks = (function(){
       // Visual of Deleting
       var item = doc.getElementById(gui);
       apollo.addClass(item,'deleted');
+
+      item.addEventListener('webkitTransitionEnd', function() {
+        item.parentNode.removeChild(item)
+      });
       
       if(!itemCount){
         apollo.addClass(listContainer, 'hidden');

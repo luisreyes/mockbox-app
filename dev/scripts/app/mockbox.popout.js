@@ -11,6 +11,7 @@ _mock.popout = (function(){
   function _open(id, callback){
     currentId = id;
     openCount++;
+    
     apollo.addClass(popoutOverlay, 'visible');
     _mock.windows.show(id,callback);
   }
@@ -18,6 +19,7 @@ _mock.popout = (function(){
   function _close(id, callback){
     currentId = '';
     openCount--;
+    
     // Helps not remove the overlay when multiple windows open
     if(openCount === 0){
       apollo.removeClass(popoutOverlay, 'visible');

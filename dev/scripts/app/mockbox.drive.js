@@ -19,7 +19,6 @@ _mock.drive = (function(){
       // Cache the Main folders Id
       folderIds.main = result.id;
 
-      //debugger;
       // cache to amount of folders required
       for (var type in data.editors) {
         if (data.editors.hasOwnProperty(type)) {

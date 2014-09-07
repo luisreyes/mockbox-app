@@ -358,7 +358,7 @@ var mockbox;
 
   function _reset(){
     currentGui = null;
-    document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New Mock';
+    document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New Prototype';
     var l = defaultLayout.split(',');
     sv.setLayout(l[0],l[1],l[2]);
     clearEditors();

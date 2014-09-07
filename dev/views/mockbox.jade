@@ -43,29 +43,37 @@ html
     // Menu Sidebar
     
     section#app-sidebar.sidebar
+
+      //- PRFOILE
       section#profile-container.profile
         img.profile-img(src="images/profile.png")
         span.profile-name
           span.a Sign in
         span.profile-settings.transition
             span.icon.icon_cog
+      
       section.content
         ul
+
+          //- NEW
           li.new.transition 
             span.icon.icon_document
             span NEW
 
+          //- SAVE
           li.save.transition 
             span.icon.icon_drive_alt
             span SAVE
 
+          //- EXPORT
           li.export.transition 
             span.icon.icon_folder_download
             span EXPORT
           
-          li.mocks.transition 
+          //- LOAD
+          li.load.transition 
             span.icon.icon_grid-2x2
-            span MOCKS
+            span LOAD
         
         ul.absolute.bottom
           
@@ -89,7 +97,7 @@ html
 
     header#app-header.header.transition.open
       span#app-sidebar-toggle.sidebar-toggle.icon(data-icon="a")
-      span.project-name.transition New Mock
+      span.project-name.transition New Prototype
       span.icon.icon_check
       span.app-logo
 

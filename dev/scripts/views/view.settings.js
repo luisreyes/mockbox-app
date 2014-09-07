@@ -26,7 +26,6 @@ _v.settings = (function(){
     
     // Check for available tokens
     setState(services.getElementsByClassName('google-access')[0], tokens.google);
-    setState(services.getElementsByClassName('github-access')[0], tokens.github);
   }
 
   function setState(service, hasToken){
@@ -53,8 +52,8 @@ _v.settings = (function(){
   }
 
   return {
-    init: function(){
-      if(!doc) _init();
+    init: function(callback){
+      !doc && _init(callback);
     },
     restoreSettingStates: function(settings){
       _restoreStates(settings);

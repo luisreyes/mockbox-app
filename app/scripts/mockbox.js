@@ -358,7 +358,7 @@ var mockbox;
 
   function _reset(){
     currentGui = null;
-    document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New Mock';
+    document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New Prototype';
     var l = defaultLayout.split(',');
     sv.setLayout(l[0],l[1],l[2]);
     clearEditors();
@@ -434,7 +434,7 @@ _mock.clicks = (function(){
   splash = document.getElementById('app-splash'),
 
   // Project Name on Main Header
-  mockName = header.querySelector('.project-name'),
+  prototypeName = header.querySelector('.project-name'),
   
   // Popout element on Main Window
   popoutWrapper = document.getElementById('app-popout'),
@@ -450,7 +450,7 @@ _mock.clicks = (function(){
     profileImg:sidebar.querySelector('.profile-img'),
     new       :sidebar.querySelector('.new'),
     save      :sidebar.querySelector('.save'),
-    mocks     :sidebar.querySelector('.mocks'),
+    load      :sidebar.querySelector('.load'),
     export    :sidebar.querySelector('.export'),
     about     :sidebar.querySelector('.about'),
     profile   :sidebar.querySelector('.profile-settings'),
@@ -540,7 +540,7 @@ _mock.clicks = (function(){
     
     // Project Name Accept
     buttons.check.addEventListener( 'click', function(){
-     mockName.blur();
+     prototypeName.blur();
     });
 
 
@@ -578,7 +578,7 @@ _mock.clicks = (function(){
           // init the views js file
           views.about.init();
           // Generate the list to display
-          //views.mocks.generateList();
+          //views.load.generateList();
         });
     });
 
@@ -600,7 +600,7 @@ _mock.clicks = (function(){
       chrome.runtime.sendMessage({message:'later' });
     });
 
-    buttons.mocks.addEventListener( 'click', function(e){
+    buttons.load.addEventListener( 'click', function(e){
       
       // Verify the click happens opn the LI in the sidebar navigation
       var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
@@ -608,11 +608,11 @@ _mock.clicks = (function(){
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
         // Open the window and run the function
-        _mock.popout.open('mocks', function(){
+        _mock.popout.open('load', function(){
           // init the views js file
-          views.mocks.init();
+          views.load.init();
           // Generate the list to display
-          views.mocks.generateList();
+          views.load.generateList();
         });
       }
     });
@@ -695,38 +695,38 @@ _mock.clicks = (function(){
 
   function clickToEditProjectName(){
     // Cache initial value to manage dirty flag
-    var initValue = mockName.innerHTML, newValue;
+    var initValue = prototypeName.innerHTML, newValue;
     // On click of the field
-    mockName.addEventListener('click', function(){
+    prototypeName.addEventListener('click', function(){
       
       // Add tabindex for 'focus' management
-      mockName.setAttribute('tabindex','-1');
+      prototypeName.setAttribute('tabindex','-1');
       
       //Set attribute to edit the content
-      mockName.setAttribute('contenteditable','true');
+      prototypeName.setAttribute('contenteditable','true');
       
       // Set classes for editing styles
-      apollo.addClass(mockName,'editing');
+      apollo.addClass(prototypeName,'editing');
       // Display the check to accept changes
-      apollo.addClass(mockName.nextSibling,'visible');
+      apollo.addClass(prototypeName.nextSibling,'visible');
       
     });
 
     // On 'blur' of the field
-    mockName.addEventListener('blur', function(){
+    prototypeName.addEventListener('blur', function(){
       
       // Cache new value for comparison and dirty flag management
-      newValue = mockName.innerHTML;
+      newValue = prototypeName.innerHTML;
 
       //Set dirty if it is
       _mock.utils.isDirty(newValue !== initValue);  
       
       // Restore to non edit styles
-      mockName.setAttribute('contenteditable','false');
-      apollo.removeClass(mockName,'editing');
+      prototypeName.setAttribute('contenteditable','false');
+      apollo.removeClass(prototypeName,'editing');
       
       // Hide 'check'
-      apollo.removeClass(mockName.nextSibling,'visible');
+      apollo.removeClass(prototypeName.nextSibling,'visible');
     
     });
   }
@@ -938,7 +938,6 @@ _mock.drive = (function(){
       // Cache the Main folders Id
       folderIds.main = result.id;
 
-      //debugger;
       // cache to amount of folders required
       for (var type in data.editors) {
         if (data.editors.hasOwnProperty(type)) {
@@ -1153,6 +1152,7 @@ _mock.popout = (function(){
   function _open(id, callback){
     currentId = id;
     openCount++;
+    
     apollo.addClass(popoutOverlay, 'visible');
     _mock.windows.show(id,callback);
   }
@@ -1160,6 +1160,7 @@ _mock.popout = (function(){
   function _close(id, callback){
     currentId = '';
     openCount--;
+    
     // Helps not remove the overlay when multiple windows open
     if(openCount === 0){
       apollo.removeClass(popoutOverlay, 'visible');
@@ -1272,7 +1273,6 @@ _mock.receiver = (function(){
           }else{
             // Create Individual folders in drive
             _mock.drive.generateFolders(exportData, function(){
-              debugger;
               // Export only if the editor has data.
               exportData.editors.html && _mock.drive.upload({title:'index.html',type:'text/html', value: btoa(exportData.editors.html), parent:'main'});
               exportData.editors.css && _mock.drive.upload({title:'styles.css',type:'text/css', value: btoa(exportData.editors.css), parent:'styles'});
@@ -1454,11 +1454,11 @@ _mock.windows = (function(){
       }
     },
 
-    mocks :{
-      file:'popout_mocks.html',
+    load :{
+      file:'popout_load.html',
       exists: false,
       options:{
-        id:'mocks',
+        id:'load',
         frame: globals.frame,
         hidden: globals.hidden,
         resizable:false,
@@ -1618,7 +1618,7 @@ _mock.windows = (function(){
     getSettings: function(){
       return _mock.getSettings();
     },
-    getAllMocks:function(callback){
+    getAllPrototypes:function(callback){
       return _mock.database.getAll(callback);
     },
     popout:_mock.popout,

@@ -58,7 +58,6 @@ _mock.receiver = (function(){
           }else{
             // Create Individual folders in drive
             _mock.drive.generateFolders(exportData, function(){
-              debugger;
               // Export only if the editor has data.
               exportData.editors.html && _mock.drive.upload({title:'index.html',type:'text/html', value: btoa(exportData.editors.html), parent:'main'});
               exportData.editors.css && _mock.drive.upload({title:'styles.css',type:'text/css', value: btoa(exportData.editors.css), parent:'styles'});

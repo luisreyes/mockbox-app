@@ -1,0 +1,24 @@
+extends mockbox_popout.jade
+
+block title
+  span Load Prototypes
+block titleIcon
+  span.icon_grid-2x2
+
+block content
+  section
+    ul#prototype-list.load-list.transition.hidden
+    section#prototype-list-empty.load-list-empty You don't have anything to load
+  
+  section#list-item-template.hidden
+    li.list-item.transition
+      table
+        tr
+          td.list-item-load.transition
+            span.list-item-title
+            br
+            span.list-item-subtitle
+          td.list-item-delete.transition
+            section
+              span.icon.icon_trash
+

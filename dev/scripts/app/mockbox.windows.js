@@ -23,11 +23,11 @@ _mock.windows = (function(){
       }
     },
 
-    mocks :{
-      file:'popout_mocks.html',
+    load :{
+      file:'popout_load.html',
       exists: false,
       options:{
-        id:'mocks',
+        id:'load',
         frame: globals.frame,
         hidden: globals.hidden,
         resizable:false,
