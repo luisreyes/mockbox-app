@@ -101,6 +101,9 @@ footer{
 
   .cancel{float:left;}
   
-  .ok{ float:right; }
-  .continue{ float:right; }
+  .ok, 
+  .continue{ 
+    float:right;
+  }
+  
 }
