@@ -40,16 +40,35 @@ _mock.receiver = (function(){
         break;
       
       case 'onExport':
-       var editors = _mock.getEditorData();
-       debugger;
+        var exportData = {
+          projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
+          editors: _mock.getEditorData()
+        };
+       
         if(data.type === 'drive'){
-          _mock.drive.generateFolders(editors, function(){
-            // Export only if the editor has data.
-            editors.html && _mock.drive.upload({title:'index.html',type:'text/html',value: editors.html});
-            editors.css && _mock.drive.upload({title:'styles.css',type:'text/css',value:editors.css, parent:'styles'});
-            editors.js && _mock.drive.upload({title:'scripts.js',type:'application/javascript',value:editors.js, parent:'scripts'});
-          });
+          
+          if(data.packaged){
+            // Get zip file from utils
+            var zip = _mock.utils.getExportPackage(exportData.editors);
+            // Upload zip file to drive
+            _mock.drive.upload({title:'MockBox-'+exportData.projectName+'.zip',type:zip.type,value: zip}, function(){
+              console.log('DONE');  
+            });
+          
+          }else{
+            // Create Individual folders in drive
+            _mock.drive.generateFolders(exportData, function(){
+              debugger;
+              // Export only if the editor has data.
+              exportData.editors.html && _mock.drive.upload({title:'index.html',type:'text/html', value: btoa(exportData.editors.html), parent:'main'});
+              exportData.editors.css && _mock.drive.upload({title:'styles.css',type:'text/css', value: btoa(exportData.editors.css), parent:'styles'});
+              exportData.editors.js && _mock.drive.upload({title:'scripts.js',type:'application/javascript', value: btoa(exportData.editors.js), parent:'scripts'});
+            });
+          
+          }
         }
+
+        
        break;
 
       default: return;

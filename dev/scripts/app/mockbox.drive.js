@@ -2,33 +2,56 @@ _mock.drive = (function(){
 "use strict";
 
   var folderIds;
+  var mainCallback;
+  var foldersToMake;
 
   function _createFolders(data, callback){
     // Cache Ids to put files in later
     folderIds = {};
+    foldersToMake = 0;
+    // Cache main project folder callback
+    callback && (mainCallback = callback);
     
     // Generate the Main folder for the export package
-    _upload({title:'main', type:'application/vnd.google-apps.folder'}, function(result){ 
+    _upload({title:'MockBox - ' + data.projectName, type:'application/vnd.google-apps.folder'}, function(result){ 
       
       console.log('MAIN Folder Created');
       // Cache the Main folders Id
       folderIds.main = result.id;
-      
+
+      //debugger;
+      // cache to amount of folders required
+      for (var type in data.editors) {
+        if (data.editors.hasOwnProperty(type)) {
+          data.editors[type] && (foldersToMake++);
+        }
+      }
+
       // Generate the Styles folder
-      data.css && _upload({title:'styles', type:'application/vnd.google-apps.folder', parent:'main'}, function(result){ 
+      data.editors.css && _upload({title:'styles', type:'application/vnd.google-apps.folder', parent:'main'}, function(result){ 
         console.log('STYLES Folder Created');
         // Cache the Styles folders Id
         folderIds.styles = result.id;
+        mainCallback && ifDoneCallback();
       });
       
       // Generate the Scripts folder
-      data.js && _upload({title:'scripts', type:'application/vnd.google-apps.folder', parent:'main'}, function(result){ 
+      data.editors.js && _upload({title:'scripts', type:'application/vnd.google-apps.folder', parent:'main'}, function(result){ 
         console.log('SCRIPTS Folder Created');
         // Cache the Scripts folders Id
         folderIds.scripts = result.id;
+        mainCallback && ifDoneCallback();
       });
+
     });
 
+  }
+
+  function ifDoneCallback(){
+    // Check the length of created folders
+    if(Object.keys(folderIds).length === foldersToMake){
+      mainCallback();
+    }
   }
 
   function _upload(data, callback){
@@ -59,6 +82,7 @@ _mock.drive = (function(){
       multipartRequestBody +=
         delimiter +
         'Content-Type: ' + file.metadata.mimeType + '\r\n' +
+        'Content-Transfer-Encoding: base64\r\n' +
         '\r\n' +
         file.data;
     }

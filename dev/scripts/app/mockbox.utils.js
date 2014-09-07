@@ -28,7 +28,7 @@ _mock.utils = (function(){
       chrome.runtime.sendMessage({message:'onDirty', isDirty:_isDirty });
   }
 
-  function _Collect(baseObj, updateObj) {
+  function _collect(baseObj, updateObj) {
     // Updates the base object with the new object
     var obj = baseObj; {
         for (var prop in updateObj) {
@@ -40,7 +40,27 @@ _mock.utils = (function(){
         }
     }
     return obj;
-}
+  }
+
+  function _getExportZip(data){
+    var zip = new JSZip();
+
+    if(data.html){
+      zip.file('index.html', data.html);
+      zip.file('index.html').asBinary();
+    }
+
+    if(data.css){
+      zip.file('styles/styles.css', data.css);
+      zip.file('styles/styles.css').asBinary();
+    }
+    if(data.js){
+      zip.file('scripts/scripts.js', data.js);
+      zip.file('scripts/scripts.js').asBinary();
+    }
+
+    return zip.generate();
+  }
 
   
 
@@ -48,6 +68,9 @@ _mock.utils = (function(){
     toDate: function(epoch){
       return toDate(epoch);
     }, 
+    getExportPackage: function(data){
+      return _getExportZip(data);
+    },
     isDirty:function(){
       if(arguments.length){
         _isDirty = arguments[0];
@@ -57,7 +80,7 @@ _mock.utils = (function(){
       }
     },
     Collect: function(baseObj, updateObj){
-      return _Collect(baseObj, updateObj);
+      return _collect(baseObj, updateObj);
     }
     
   }

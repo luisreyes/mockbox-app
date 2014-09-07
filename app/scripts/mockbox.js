@@ -921,33 +921,56 @@ _mock.drive = (function(){
 "use strict";
 
   var folderIds;
+  var mainCallback;
+  var foldersToMake;
 
   function _createFolders(data, callback){
     // Cache Ids to put files in later
     folderIds = {};
+    foldersToMake = 0;
+    // Cache main project folder callback
+    callback && (mainCallback = callback);
     
     // Generate the Main folder for the export package
-    _upload({title:'main', type:'application/vnd.google-apps.folder'}, function(result){ 
+    _upload({title:'MockBox - ' + data.projectName, type:'application/vnd.google-apps.folder'}, function(result){ 
       
       console.log('MAIN Folder Created');
       // Cache the Main folders Id
       folderIds.main = result.id;
-      
+
+      //debugger;
+      // cache to amount of folders required
+      for (var type in data.editors) {
+        if (data.editors.hasOwnProperty(type)) {
+          data.editors[type] && (foldersToMake++);
+        }
+      }
+
       // Generate the Styles folder
-      data.css && _upload({title:'styles', type:'application/vnd.google-apps.folder', parent:'main'}, function(result){ 
+      data.editors.css && _upload({title:'styles', type:'application/vnd.google-apps.folder', parent:'main'}, function(result){ 
         console.log('STYLES Folder Created');
         // Cache the Styles folders Id
         folderIds.styles = result.id;
+        mainCallback && ifDoneCallback();
       });
       
       // Generate the Scripts folder
-      data.js && _upload({title:'scripts', type:'application/vnd.google-apps.folder', parent:'main'}, function(result){ 
+      data.editors.js && _upload({title:'scripts', type:'application/vnd.google-apps.folder', parent:'main'}, function(result){ 
         console.log('SCRIPTS Folder Created');
         // Cache the Scripts folders Id
         folderIds.scripts = result.id;
+        mainCallback && ifDoneCallback();
       });
+
     });
 
+  }
+
+  function ifDoneCallback(){
+    // Check the length of created folders
+    if(Object.keys(folderIds).length === foldersToMake){
+      mainCallback();
+    }
   }
 
   function _upload(data, callback){
@@ -978,6 +1001,7 @@ _mock.drive = (function(){
       multipartRequestBody +=
         delimiter +
         'Content-Type: ' + file.metadata.mimeType + '\r\n' +
+        'Content-Transfer-Encoding: base64\r\n' +
         '\r\n' +
         file.data;
     }
@@ -1230,16 +1254,35 @@ _mock.receiver = (function(){
         break;
       
       case 'onExport':
-       var editors = _mock.getEditorData();
-       debugger;
+        var exportData = {
+          projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
+          editors: _mock.getEditorData()
+        };
+       
         if(data.type === 'drive'){
-          _mock.drive.generateFolders(editors, function(){
-            // Export only if the editor has data.
-            editors.html && _mock.drive.upload({title:'index.html',type:'text/html',value: editors.html});
-            editors.css && _mock.drive.upload({title:'styles.css',type:'text/css',value:editors.css, parent:'styles'});
-            editors.js && _mock.drive.upload({title:'scripts.js',type:'application/javascript',value:editors.js, parent:'scripts'});
-          });
+          
+          if(data.packaged){
+            // Get zip file from utils
+            var zip = _mock.utils.getExportPackage(exportData.editors);
+            // Upload zip file to drive
+            _mock.drive.upload({title:'MockBox-'+exportData.projectName+'.zip',type:zip.type,value: zip}, function(){
+              console.log('DONE');  
+            });
+          
+          }else{
+            // Create Individual folders in drive
+            _mock.drive.generateFolders(exportData, function(){
+              debugger;
+              // Export only if the editor has data.
+              exportData.editors.html && _mock.drive.upload({title:'index.html',type:'text/html', value: btoa(exportData.editors.html), parent:'main'});
+              exportData.editors.css && _mock.drive.upload({title:'styles.css',type:'text/css', value: btoa(exportData.editors.css), parent:'styles'});
+              exportData.editors.js && _mock.drive.upload({title:'scripts.js',type:'application/javascript', value: btoa(exportData.editors.js), parent:'scripts'});
+            });
+          
+          }
         }
+
+        
        break;
 
       default: return;
@@ -1328,7 +1371,7 @@ _mock.utils = (function(){
       chrome.runtime.sendMessage({message:'onDirty', isDirty:_isDirty });
   }
 
-  function _Collect(baseObj, updateObj) {
+  function _collect(baseObj, updateObj) {
     // Updates the base object with the new object
     var obj = baseObj; {
         for (var prop in updateObj) {
@@ -1340,7 +1383,27 @@ _mock.utils = (function(){
         }
     }
     return obj;
-}
+  }
+
+  function _getExportZip(data){
+    var zip = new JSZip();
+
+    if(data.html){
+      zip.file('index.html', data.html);
+      zip.file('index.html').asBinary();
+    }
+
+    if(data.css){
+      zip.file('styles/styles.css', data.css);
+      zip.file('styles/styles.css').asBinary();
+    }
+    if(data.js){
+      zip.file('scripts/scripts.js', data.js);
+      zip.file('scripts/scripts.js').asBinary();
+    }
+
+    return zip.generate();
+  }
 
   
 
@@ -1348,6 +1411,9 @@ _mock.utils = (function(){
     toDate: function(epoch){
       return toDate(epoch);
     }, 
+    getExportPackage: function(data){
+      return _getExportZip(data);
+    },
     isDirty:function(){
       if(arguments.length){
         _isDirty = arguments[0];
@@ -1357,7 +1423,7 @@ _mock.utils = (function(){
       }
     },
     Collect: function(baseObj, updateObj){
-      return _Collect(baseObj, updateObj);
+      return _collect(baseObj, updateObj);
     }
     
   }

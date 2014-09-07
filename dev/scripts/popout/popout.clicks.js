@@ -114,7 +114,7 @@ _pop.clicks = (function(){
     if(_currentId === 'export'){
       
       buttons.driveBtn.addEventListener('click', function(){
-        chrome.runtime.sendMessage({ message:'onExport', type:'drive' });        
+        chrome.runtime.sendMessage({ message:'onExport', type:'drive', packaged:true});        
       });
 
     }
