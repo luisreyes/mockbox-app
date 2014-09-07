@@ -280,6 +280,7 @@ _mock.clicks = (function(){
   function clickToEditProjectName(){
     // Cache initial value to manage dirty flag
     var initValue = prototypeName.innerHTML, newValue;
+   
     // On click of the field
     prototypeName.addEventListener('click', function(){
       
@@ -293,6 +294,8 @@ _mock.clicks = (function(){
       apollo.addClass(prototypeName,'editing');
       // Display the check to accept changes
       apollo.addClass(prototypeName.nextSibling,'visible');
+
+      this.addEventListener('keypress', onKeypress);
       
     });
 
@@ -311,8 +314,15 @@ _mock.clicks = (function(){
       
       // Hide 'check'
       apollo.removeClass(prototypeName.nextSibling,'visible');
-    
+
+      this.removeEventListener('keypress', onKeypress);
     });
+  }
+
+  function onKeypress(e){
+    if(e.keyCode === 13){
+      e.target.blur();
+    }
   }
 
   return {
