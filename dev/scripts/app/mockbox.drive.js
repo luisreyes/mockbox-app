@@ -62,15 +62,15 @@ _mock.drive = (function(){
         "description": "Created on MockBox for Google Chrome <http://mockbox.io>"
       },
       data: data.value
-    }
+    };
 
     if(data.parent) file.metadata.parents = [{"id":folderIds[data.parent]}];
 
-    var req = new XMLHttpRequest();
-    var guid = Math.random().toString().substr(2);
-    var boundary = '-------'+guid;
-    var delimiter = "\r\n--" + boundary + "\r\n";
-    var close_delim = "\r\n--" + boundary + "--";
+    var req = new XMLHttpRequest(),
+        guid = Math.random().toString().substr(2),
+        boundary = '-------'+guid,
+        delimiter = "\r\n--" + boundary + "\r\n",
+        close_delim = "\r\n--" + boundary + "--";
 
     var multipartRequestBody =
         delimiter +
@@ -99,7 +99,7 @@ _mock.drive = (function(){
           var res = JSON.parse(req.responseText);
           callback && callback(res);
         }
-      }
+      };
 
       req.send(multipartRequestBody);  
     });

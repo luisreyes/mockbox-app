@@ -20,7 +20,7 @@ _mock.oauth = (function(){
           var license = JSON.parse(req.responseText);
           console.log(license);
         }
-      }
+      };
       
       req.send();  
     });

@@ -34,14 +34,9 @@ _v.load = (function(){
           liTitle.innerHTML = _availableIds[i].name;
           liSubtitle.innerHTML = 'Created on '+ mockbox.utils.toDate(_availableIds[i].createdOn);
 
-          liLoad.addEventListener('click', function(){
-            load(this.getAttribute('data-reference-id'));
-          });
+          liLoad.addEventListener('click', onLoadClick);
 
-          liDelete.addEventListener('click', function(){
-            remove(this.getAttribute('data-reference-id'));
-          });
-          
+          liDelete.addEventListener('click', onDeleteClick);
           
           listContainer.appendChild(li);
         }
@@ -51,6 +46,14 @@ _v.load = (function(){
         }
     });
     
+  }
+
+  function onLoadClick(e){
+    load(e.target.getAttribute('data-reference-id'));
+  }
+
+  function onDeleteClick(e){
+    remove(e.target.getAttribute('data-reference-id'));
   }
 
   function load(gui){
@@ -81,7 +84,7 @@ _v.load = (function(){
       apollo.addClass(item,'deleted');
 
       item.addEventListener('webkitTransitionEnd', function() {
-        item.parentNode.removeChild(item)
+        item.parentNode.removeChild(item);
       });
       
       if(!itemCount){
@@ -96,11 +99,11 @@ _v.load = (function(){
 
   return {
     init: function(){
-      if(!doc) init();
+      !doc && init();
     },
     generateList: function(){
       setAvailableIds();
     }
-  }
+  };
 
 }());

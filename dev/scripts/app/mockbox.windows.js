@@ -2,12 +2,12 @@ _mock.windows = (function(){
 'use strict'; 
   var ids = ['main'];
 
-  var globals ={
+  var globals = {
     frame:'none',
     hidden:false
-  }
+  };
+
   var model = {
-    
     confirm :{
       file:'popout_confirm.html',
       exists: false,
@@ -133,10 +133,12 @@ _mock.windows = (function(){
     var theme = mockbox.getSettings().theme,
         mainBounds = chrome.app.window.get('main').getBounds(),
         winBounds = win.getBounds();
+    
     win.setBounds({
       left: Math.round((mainBounds.left+mainBounds.width/2) - (winBounds.width/2)),
       top: Math.round((mainBounds.top+mainBounds.height/2) - (winBounds.height/2))
-    })
+    });
+    
     win.contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + theme + '.css');
   }
 

@@ -6,17 +6,17 @@ var popout;
 
 (function(){ var _pop = (function(){
 'use strict';
-  var confirmTitle={
+  var confirmTitle = {
     continue: 'You have unsaved changes',
     delete: 'You are trying to delete this prototype',
     revoke:'Revoke Access Token?'
-  }
+  };
 
   var confirmMessage = {
     continue: 'Are you sure you want to continue?',
     delete: 'Are you sure you want to delete it?',
     revoke:'Are you sure you want to revoke the access token?'
-  }
+  };
 
   function init(){
     _pop.clicks.init();

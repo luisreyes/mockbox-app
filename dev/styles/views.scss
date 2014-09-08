@@ -1,0 +1,44 @@
+
+.settings-options,
+.export-options{
+  .field{
+
+    border-bottom:1px solid $base-color-1;
+    margin: 0px 10px 0;
+    padding-top: 5px;
+    
+    .field-title{
+      font-weight: 600;
+      padding:5px;
+    }
+
+    .field-option{
+      margin-left: 10px;
+      padding: 5px 10px;
+    }
+
+    .field-option-title{
+      vertical-align:middle;
+    }
+
+    &.inactive{
+      -webkit-filter: #{"grayscale(1) brightness(1) blur(1px)"};
+      opacity: .5;
+      cursor: default;
+    }
+  }
+
+  .purchase-required{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+    
+    & + .field {
+      -webkit-filter: #{"grayscale(0.5) brightness(1) blur(1px)"};
+      opacity: .5;
+      cursor: default
+
+    }
+  }
+}

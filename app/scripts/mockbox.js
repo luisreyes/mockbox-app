@@ -390,7 +390,7 @@ var mockbox;
       }
     },
     getEditorData: function(){
-      return {html:editors.html.getValue(), css:editors.css.getValue(), js:editors.js.getValue() }
+      return { html:editors.html.getValue(), css:editors.css.getValue(), js:editors.js.getValue() };
     },
     export: function(){
       return exportPackage();
@@ -627,8 +627,8 @@ _mock.clicks = (function(){
       if(!apollo.hasClass(element, 'inactive')){
         // Open the window and run the function
         _mock.popout.open('export', function(){
-          // Methods to run on window load
-          // TODO
+         // init the views js file
+          views.export.init();
         });
       }
     });
@@ -991,15 +991,15 @@ _mock.drive = (function(){
         "description": "Created on MockBox for Google Chrome <http://mockbox.io>"
       },
       data: data.value
-    }
+    };
 
     if(data.parent) file.metadata.parents = [{"id":folderIds[data.parent]}];
 
-    var req = new XMLHttpRequest();
-    var guid = Math.random().toString().substr(2);
-    var boundary = '-------'+guid;
-    var delimiter = "\r\n--" + boundary + "\r\n";
-    var close_delim = "\r\n--" + boundary + "--";
+    var req = new XMLHttpRequest(),
+        guid = Math.random().toString().substr(2),
+        boundary = '-------'+guid,
+        delimiter = "\r\n--" + boundary + "\r\n",
+        close_delim = "\r\n--" + boundary + "--";
 
     var multipartRequestBody =
         delimiter +
@@ -1028,7 +1028,7 @@ _mock.drive = (function(){
           var res = JSON.parse(req.responseText);
           callback && callback(res);
         }
-      }
+      };
 
       req.send(multipartRequestBody);  
     });
@@ -1130,7 +1130,7 @@ _mock.oauth = (function(){
           var license = JSON.parse(req.responseText);
           console.log(license);
         }
-      }
+      };
       
       req.send();  
     });
@@ -1312,11 +1312,12 @@ _mock.storage = (function(){
 
   function _restoreSettings(){
     chrome.storage.sync.get('settings', function(result){
-      if(result.settings){
-        var hasSettings = result.settings ? true : false;
-      }
-      
+      var hasSettings;
 
+      if(result.settings){
+        hasSettings = result.settings ? true : false;
+      }
+     
       if(hasSettings){
         if(result.settings.isInited){
           chrome.runtime.sendMessage({message:'restoreSettings', settings:result.settings});
@@ -1367,7 +1368,7 @@ _mock.utils = (function(){
 
   Element.prototype.remove = function() {
       this.parentElement.removeChild(this);
-  }
+  };
   
   NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
       for(var i = 0, len = this.length; i < len; i++) {
@@ -1375,7 +1376,7 @@ _mock.utils = (function(){
               this[i].parentElement.removeChild(this[i]);
           }
       }
-  }
+  };
 
   function _isDirtyDispatcher(){
       chrome.runtime.sendMessage({message:'onDirty', isDirty:_isDirty });
@@ -1436,19 +1437,19 @@ _mock.utils = (function(){
       return _collect(baseObj, updateObj);
     }
     
-  }
+  };
 
 }());
 _mock.windows = (function(){
 'use strict'; 
   var ids = ['main'];
 
-  var globals ={
+  var globals = {
     frame:'none',
     hidden:false
-  }
+  };
+
   var model = {
-    
     confirm :{
       file:'popout_confirm.html',
       exists: false,
@@ -1574,10 +1575,12 @@ _mock.windows = (function(){
     var theme = mockbox.getSettings().theme,
         mainBounds = chrome.app.window.get('main').getBounds(),
         winBounds = win.getBounds();
+    
     win.setBounds({
       left: Math.round((mainBounds.left+mainBounds.width/2) - (winBounds.width/2)),
       top: Math.round((mainBounds.top+mainBounds.height/2) - (winBounds.height/2))
-    })
+    });
+    
     win.contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + theme + '.css');
   }
 

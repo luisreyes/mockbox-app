@@ -5,9 +5,9 @@ gulp = require( 'gulp' ),
 sass = require( 'gulp-sass' ),
 cssmin = require( 'gulp-minify-css' ),
 concat = require( 'gulp-concat' ),
-uglify = require( 'gulp-uglify' ),
 jade = require( 'gulp-jade' ),
-//jshint = require( 'gulp-jshint' ),
+jshint = require( 'gulp-jshint' ),
+stylish = require('jshint-stylish'),
 header = require( 'gulp-header' ),
 order = require( 'gulp-order' ),
 locals = require( './locals.json' );
@@ -62,49 +62,51 @@ gulp.task( 'compile_sass', function () {
 
 gulp.task( 'compile_js', function () {
 
-  // Minify, Bundle, Obsfucate JavaScript
+  // Minify, Bundle JavaScript
   gulp.src( 'dev/scripts/app/*.js' )
     .pipe(order([
       "mockbox.js",
       "*.js",
       "mockbox_end.js"
     ]))
-    //.pipe( uglify() )
     .pipe( concat('mockbox.js') )
     .pipe( gulp.dest( 'app/scripts/' ));
 
 
-  // Minify, Bundle, Obsfucate JavaScript
+  // Minify, Bundle JavaScript
   gulp.src( 'dev/scripts/popout/*.js' )
     .pipe(order([
       "popout.js",
       "*.js",
       "popout_end.js"
     ]))
-    //.pipe( uglify() )
     .pipe( concat('popout.js') )
     .pipe( gulp.dest( 'app/scripts/' ));
 
 
-  // Minify, Bundle, Obsfucate JavaScript
+  // Minify, Bundle JavaScript
   gulp.src( 'dev/scripts/views/*.js' )
     .pipe(order([
       "view.js",
       "*.js",
       "view_end.js"
     ]))
-    //.pipe( uglify() )
     .pipe( concat('views.js') )
     .pipe( gulp.dest( 'app/scripts/' ));
 
-  // Minify, Bundle, Obsfucate JavaScript
+  // Minify, Bundle JavaScript
   gulp.src( 'dev/scripts/lib/**/*.js' )
-    //.pipe( uglify() )
     .pipe( concat('lib.js') )
     .pipe( gulp.dest( 'app/scripts/' ));
 
 });
 
+
+gulp.task('lint', function(){
+  gulp.src('app/scripts/*.js')
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish))
+});
 
 /******************************************************************
  *                       Gulp Main Methods                        *

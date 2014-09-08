@@ -211,8 +211,8 @@ _mock.clicks = (function(){
       if(!apollo.hasClass(element, 'inactive')){
         // Open the window and run the function
         _mock.popout.open('export', function(){
-          // Methods to run on window load
-          // TODO
+         // init the views js file
+          views.export.init();
         });
       }
     });

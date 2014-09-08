@@ -7,8 +7,8 @@ block titleIcon
 
 block content
   section.view-export
-    section#export-sidebar.sidebar
-      ul      
+    section#export-options.sidebar
+      ul    
         
         li.mockbox.transition 
           section.item
@@ -43,7 +43,84 @@ block content
             span.icon.icon_globe-2
           span FTP
         
-        li.zip.transition 
+        li.local.transition 
           section.item
             span.icon.icon_folder
-          span ZIP
+          span LOCAL
+
+    section#export-panels.export-options.panels
+      ul
+        li.mockbox
+          section.field
+            section.field-title MockBox.io
+            section.field-option
+              span.left-container
+                span Export as packaged zip file
+                section.clear
+              span.right-container
+                label.switch
+                  input(type="checkbox").switch-input
+                  span(data-on="On" data-off="Off").switch-label
+                  span.switch-handle.transition
+              section.clear
+
+        li.drive.hidden
+          section.field
+            section.field-title Google Drive Export
+            section.field-option
+              span.left-container
+                span Export as packaged zip file
+                section.clear
+              span.right-container
+                label.switch
+                  input(type="checkbox").switch-input
+                  span(data-on="On" data-off="Off").switch-label
+                  span.switch-handle.transition
+              section.clear
+
+        li.dropbox.hidden
+          section.field
+            section.field-title Dropbox Export
+            section.field-option
+              span.left-container
+                span Export as packaged zip file
+                section.clear
+              span.right-container
+                label.switch
+                  input(type="checkbox").switch-input
+                  span(data-on="On" data-off="Off").switch-label
+                  span.switch-handle.transition
+              section.clear
+
+        li.ftp.hidden
+          section.purchase-required
+          section.field
+            section.field-title FTP Export
+            section.field-option
+              span.left-container
+                span Export as packaged zip file
+                section.clear
+              span.right-container
+                label.switch
+                  input(type="checkbox").switch-input
+                  span(data-on="On" data-off="Off").switch-label
+                  span.switch-handle.transition
+              section.clear
+
+        li.local.hidden
+          section.field
+            section.field-title Local Drive Export
+            section.field-option
+              span.left-container
+                span Export as packaged zip file
+                section.clear
+              span.right-container
+                label.switch
+                  input(type="checkbox").switch-input
+                  span(data-on="On" data-off="Off").switch-label
+                  span.switch-handle.transition
+              section.clear
+
+    footer#export-options-footer
+      button.cancel cancel
+      button.ok export

@@ -42,11 +42,11 @@ _v.settings = (function(){
     }
 
     var i = 0;
-    for(var i = 0; i <= showElements.length-1; i++){
+    for(i; i < showElements.length; i++){
       apollo.removeClass(showElements[i], 'hidden');  
     }
 
-    for(var i = 0; i <= hideElements.length-1; i++){
+    for(i; i < hideElements.length; i++){
       apollo.addClass(hideElements[i], 'hidden');
     }
   }
@@ -61,6 +61,6 @@ _v.settings = (function(){
     updateAuthorizations:function(){
       _updateAuths();
     }
-  }
+  };
 
 }());

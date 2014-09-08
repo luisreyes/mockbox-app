@@ -390,7 +390,7 @@ var mockbox;
       }
     },
     getEditorData: function(){
-      return {html:editors.html.getValue(), css:editors.css.getValue(), js:editors.js.getValue() }
+      return { html:editors.html.getValue(), css:editors.css.getValue(), js:editors.js.getValue() };
     },
     export: function(){
       return exportPackage();

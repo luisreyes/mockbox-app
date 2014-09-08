@@ -14,7 +14,7 @@ _mock.utils = (function(){
 
   Element.prototype.remove = function() {
       this.parentElement.removeChild(this);
-  }
+  };
   
   NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
       for(var i = 0, len = this.length; i < len; i++) {
@@ -22,7 +22,7 @@ _mock.utils = (function(){
               this[i].parentElement.removeChild(this[i]);
           }
       }
-  }
+  };
 
   function _isDirtyDispatcher(){
       chrome.runtime.sendMessage({message:'onDirty', isDirty:_isDirty });
@@ -83,6 +83,6 @@ _mock.utils = (function(){
       return _collect(baseObj, updateObj);
     }
     
-  }
+  };
 
 }());

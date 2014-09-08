@@ -17,8 +17,8 @@
     <header class="popout-header"><span class="popout-title-icon"><span class="icon_folder_download"></span></span><span class="popout-title"><span>Export</span></span></header>
     <section class="popout-content">
       <section class="view-export">
-        <section id="export-sidebar" class="sidebar">
-          <ul>     
+        <section id="export-options" class="sidebar">
+          <ul>   
             <li class="mockbox transition"> 
               <section class="item"><span class="icon icon_mockbox">
                   <svg x="0" y="0" width="85" height="85" viewBox="0 0 85 85" enable-background="new 0 0 85 85">
@@ -51,11 +51,80 @@
             <li class="ftp transition"> 
               <section class="item"><span class="icon icon_globe-2"></span></section><span>FTP</span>
             </li>
-            <li class="zip transition"> 
-              <section class="item"><span class="icon icon_folder"></span></section><span>ZIP</span>
+            <li class="local transition"> 
+              <section class="item"><span class="icon icon_folder"></span></section><span>LOCAL</span>
             </li>
           </ul>
         </section>
+        <section id="export-panels" class="export-options panels">
+          <ul>
+            <li class="mockbox">
+              <section class="field">
+                <section class="field-title">MockBox.io</section>
+                <section class="field-option"><span class="left-container"><span>Export as packaged zip file</span>
+                    <section class="clear"></section></span><span class="right-container">
+                    <label class="switch">
+                      <input type="checkbox" class="switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                    </label></span>
+                  <section class="clear"></section>
+                </section>
+              </section>
+            </li>
+            <li class="drive hidden">
+              <section class="field">
+                <section class="field-title">Google Drive Export</section>
+                <section class="field-option"><span class="left-container"><span>Export as packaged zip file</span>
+                    <section class="clear"></section></span><span class="right-container">
+                    <label class="switch">
+                      <input type="checkbox" class="switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                    </label></span>
+                  <section class="clear"></section>
+                </section>
+              </section>
+            </li>
+            <li class="dropbox hidden">
+              <section class="field">
+                <section class="field-title">Dropbox Export</section>
+                <section class="field-option"><span class="left-container"><span>Export as packaged zip file</span>
+                    <section class="clear"></section></span><span class="right-container">
+                    <label class="switch">
+                      <input type="checkbox" class="switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                    </label></span>
+                  <section class="clear"></section>
+                </section>
+              </section>
+            </li>
+            <li class="ftp hidden">
+              <section class="purchase-required"></section>
+              <section class="field">
+                <section class="field-title">FTP Export</section>
+                <section class="field-option"><span class="left-container"><span>Export as packaged zip file</span>
+                    <section class="clear"></section></span><span class="right-container">
+                    <label class="switch">
+                      <input type="checkbox" class="switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                    </label></span>
+                  <section class="clear"></section>
+                </section>
+              </section>
+            </li>
+            <li class="local hidden">
+              <section class="field">
+                <section class="field-title">Local Drive Export</section>
+                <section class="field-option"><span class="left-container"><span>Export as packaged zip file</span>
+                    <section class="clear"></section></span><span class="right-container">
+                    <label class="switch">
+                      <input type="checkbox" class="switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                    </label></span>
+                  <section class="clear"></section>
+                </section>
+              </section>
+            </li>
+          </ul>
+        </section>
+        <footer id="export-options-footer">
+          <button class="cancel">cancel</button>
+          <button class="ok">export</button>
+        </footer>
       </section>
     </section>
     <!-- Scripts-->

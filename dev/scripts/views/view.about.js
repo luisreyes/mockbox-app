@@ -10,8 +10,8 @@ _v.about = (function(){
 
   return {
     init: function(){
-      if(!doc) init();
+      !doc && init();
     }
-  }
+  };
 
 }());

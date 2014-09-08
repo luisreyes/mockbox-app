@@ -10,11 +10,12 @@ _mock.storage = (function(){
 
   function _restoreSettings(){
     chrome.storage.sync.get('settings', function(result){
-      if(result.settings){
-        var hasSettings = result.settings ? true : false;
-      }
-      
+      var hasSettings;
 
+      if(result.settings){
+        hasSettings = result.settings ? true : false;
+      }
+     
       if(hasSettings){
         if(result.settings.isInited){
           chrome.runtime.sendMessage({message:'restoreSettings', settings:result.settings});
