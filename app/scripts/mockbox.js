@@ -21,6 +21,8 @@ var mockbox;
       defaultLayout = '50,50,25',
       _settings = {},
       tokens = {},
+      sidebarToggleClasses = ['closed', 'open', 'open-half' ],
+      currentSidebarToggleClassIndex,
       sv;
 
   function init(){
@@ -42,9 +44,16 @@ var mockbox;
     initEditors();
     
     sidebarToggle.addEventListener('click', function(){
-    
-      apollo.toggleClass(domEditors, 'open');
-      apollo.toggleClass(header, 'open');
+      
+      var currClass = sidebarToggleClasses[currentSidebarToggleClassIndex];
+      
+      if(currentSidebarToggleClassIndex === sidebarToggleClasses.length-1){ 
+        currentSidebarToggleClassIndex = 0;
+      }else{
+        currentSidebarToggleClassIndex++;
+      }      
+
+      setSidebarState(currentSidebarToggleClassIndex);
     
     });
 
@@ -154,7 +163,10 @@ var mockbox;
             // Defulat App Settings
             _settings.theme = 'light';
             _settings.lastGui = null;
+            _settings.sidebarState = 1;
             _settings.autoload = true;
+
+            currentSidebarToggleClassIndex = _settings.sidebarState;
 
             saveSettings();
           break;
@@ -169,6 +181,14 @@ var mockbox;
     _mock.clicks.init();
   }
 
+  function setSidebarState(stateIndex){
+    apollo.removeClass(domEditors, ['open','closed', 'open-half']);
+    apollo.removeClass(header, ['open','closed', 'open-half']);
+
+    apollo.addClass(domEditors, sidebarToggleClasses[stateIndex]);
+    apollo.addClass(header, sidebarToggleClasses[stateIndex]);
+  }
+
   function closeSplash(){
     window.setTimeout(function(){
       apollo.addClass(splash, 'opaque');
@@ -181,6 +201,8 @@ var mockbox;
   function saveSettings(callback){
     // Add currentGui to the settings model
     _settings.lastGui = currentGui;
+    // Set the sidebar state
+    _settings.sidebarState = currentSidebarToggleClassIndex;
     // Save the settings
     _mock.storage.preferences.save(_settings, callback);
   }
@@ -191,7 +213,10 @@ var mockbox;
     
     //Set Editos Theme
     setGlobalEditorOption('theme', theme);
-    
+    // Set sidebar state
+    currentSidebarToggleClassIndex = _settings.sidebarState;
+    setSidebarState(currentSidebarToggleClassIndex);
+
     // Change css file
     chrome.app.window.get('main').contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + _settings.theme + '.css');
 
@@ -467,8 +492,6 @@ _mock.clicks = (function(){
     export    :sidebar.querySelector('.export'),
     about     :sidebar.querySelector('.about'),
     profile   :sidebar.querySelector('.profile-settings'),
-    twitter   :sidebar.querySelector('.twitter'),
-    email     :sidebar.querySelector('.email'),
 
     //Splash
     allow    :splash.querySelector('.allow'),
@@ -482,13 +505,9 @@ _mock.clicks = (function(){
     appMax    :windowControls.querySelector('.window-max'),
     appClose  :windowControls.querySelector('.window-close')
 
-  },
-
-  // External Links
-  links = {
-    twitter:'https://twitter.com/mockboxio',
-    email:'mailto:support@mockbox.io?subject=Hello MockBox'
   };
+
+  
 
   // Main Listeners
   function addListeners(){
@@ -663,45 +682,7 @@ _mock.clicks = (function(){
         });
       }
     });
-    
-    buttons.twitter.addEventListener( 'click', function(){
-      // Open external page
-      openLink('twitter');
-    });
 
-    buttons.email.addEventListener( 'click', function(){
-      
-      google.payments.inapp.getPurchases({
-        'success': function(){
-          console.log('Purch Success');
-        },
-        'failure': function(){
-          console.log('Purch fail');   
-        }
-      });
-
-      google.payments.inapp.getSkuDetails({
-          'parameters': {'env': 'prod'},
-          'success': function(){
-            console.log('SKU Success');
-            console.log(arguments);
-          },
-          'failure': function(){
-            console.log('SKU fail');
-            console.log(arguments);   
-          }
-        });
-
-      // Open external page
-      //openLink('email');
-    });
-
-    
-  }
-
-  function openLink(loc){
-    // Open external page
-    window.open(links[loc], '_blank');
   }
 
   function signin(){}
@@ -982,7 +963,7 @@ _mock.drive = (function(){
     mainCallback = callback;
     
     // Generate the "main" folder
-    _upload({title:'MockBox - ' + data.projectName, type:'application/vnd.google-apps.folder',model:data.editors.html}, function(result, folder){ 
+    _upload({title:'MockBox-' + data.projectName, type:'application/vnd.google-apps.folder',model:data.editors.html}, function(result, folder){ 
       
       // Cache the folder id for later reference
       folderIds[folder.title] = result.id;
@@ -1137,6 +1118,60 @@ _mock.events = (function () {
             }
         }
     };
+}());
+_mock.local = (function(){
+"use strict";
+  
+  function _getZip(data){
+    var zip = new JSZip();
+      zip.file("index.html", data.editors.html.value);
+      data.editors.js.value && zip.file("scripts/scripts.js", data.editors.js.value);
+      data.editors.css.value && zip.file("styles/styles.css", data.editors.css.value);
+      return zip.generate({type:"blob"});
+  }
+
+  function _saveFile(options){
+    var data = {
+      filename: options.filename,
+      filedata: options.filedata
+    };
+
+    chrome.fileSystem.chooseEntry({ type:'saveFile', suggestedName: data.filename }, function(entry, fileEntry){
+      
+      entry.createWriter(function(fileWriter) {
+
+        fileWriter.onwriteend = function(e) {
+          console.log('Write completed.');
+        };
+
+        fileWriter.onerror = function(e) {
+          console.log('Write failed: ' + e.toString());
+        };
+
+        fileWriter.write(data.filedata);
+
+      });
+    });
+  }
+
+  function _saveZip(data){
+    _saveFile({
+      filename:'MockBox-' + data.projectName + '.zip',
+      filedata: _getZip(data)
+    });
+  }
+ 
+  return {
+    saveZip:function(data){
+      _saveZip(data);
+    },
+    saveFile:function(data){
+      debugger;
+      _saveFile(data);
+    }
+
+  };
+
 }());
 _mock.notify = (function(){
 'use strict'; 
@@ -1326,7 +1361,7 @@ _mock.receiver = (function(){
           projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
           editors: _mock.getEditorsModel()
         };
-       
+        
         if(data.model.type === 'drive'){
           if(data.model.packaged){
             
@@ -1341,13 +1376,32 @@ _mock.receiver = (function(){
 
             // Create Individual folders in drive
             _mock.drive.generateFolders(exportData, function(){
-              debugger;
               // Export only if the editor has data.
               exportData.editors.html.value && _mock.drive.upload({title:'index.html',type:'text/html', value: btoa(exportData.editors.html.value), parent:'main'});
               exportData.editors.css.value && _mock.drive.upload({title:'styles.css',type:'text/css', value: btoa(exportData.editors.css.value), parent:'styles'});
               exportData.editors.js.value && _mock.drive.upload({title:'scripts.js',type:'application/javascript', value: btoa(exportData.editors.js.value), parent:'scripts'});
             });
           
+          }
+        }else
+        if(data.model.type === 'local'){
+          debugger;
+          if(data.model.packaged){
+            _mock.local.saveZip(exportData);
+          }else{
+
+            for(var type in exportData.editors){
+              if(exportData.editors.hasOwnProperty(type)){
+                var blob = new Blob([exportData.editors[type].value], {type:'text/'+type});
+                
+                _mock.local.saveFile({
+                  filename: exportData.editors[type].title + '.' + type,
+                  filedata: blob
+                });
+
+              }
+            }
+
           }
         }
 
@@ -1456,7 +1510,6 @@ _mock.utils = (function(){
   }
 
   function _getExportZip(data){
-    debugger;
     var zip = new JSZip();
 
     if(data.html.value){

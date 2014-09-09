@@ -21,6 +21,8 @@ var mockbox;
       defaultLayout = '50,50,25',
       _settings = {},
       tokens = {},
+      sidebarToggleClasses = ['closed', 'open', 'open-half' ],
+      currentSidebarToggleClassIndex,
       sv;
 
   function init(){
@@ -42,9 +44,16 @@ var mockbox;
     initEditors();
     
     sidebarToggle.addEventListener('click', function(){
-    
-      apollo.toggleClass(domEditors, 'open');
-      apollo.toggleClass(header, 'open');
+      
+      var currClass = sidebarToggleClasses[currentSidebarToggleClassIndex];
+      
+      if(currentSidebarToggleClassIndex === sidebarToggleClasses.length-1){ 
+        currentSidebarToggleClassIndex = 0;
+      }else{
+        currentSidebarToggleClassIndex++;
+      }      
+
+      setSidebarState(currentSidebarToggleClassIndex);
     
     });
 
@@ -154,7 +163,10 @@ var mockbox;
             // Defulat App Settings
             _settings.theme = 'light';
             _settings.lastGui = null;
+            _settings.sidebarState = 1;
             _settings.autoload = true;
+
+            currentSidebarToggleClassIndex = _settings.sidebarState;
 
             saveSettings();
           break;
@@ -169,6 +181,14 @@ var mockbox;
     _mock.clicks.init();
   }
 
+  function setSidebarState(stateIndex){
+    apollo.removeClass(domEditors, ['open','closed', 'open-half']);
+    apollo.removeClass(header, ['open','closed', 'open-half']);
+
+    apollo.addClass(domEditors, sidebarToggleClasses[stateIndex]);
+    apollo.addClass(header, sidebarToggleClasses[stateIndex]);
+  }
+
   function closeSplash(){
     window.setTimeout(function(){
       apollo.addClass(splash, 'opaque');
@@ -181,6 +201,8 @@ var mockbox;
   function saveSettings(callback){
     // Add currentGui to the settings model
     _settings.lastGui = currentGui;
+    // Set the sidebar state
+    _settings.sidebarState = currentSidebarToggleClassIndex;
     // Save the settings
     _mock.storage.preferences.save(_settings, callback);
   }
@@ -191,7 +213,10 @@ var mockbox;
     
     //Set Editos Theme
     setGlobalEditorOption('theme', theme);
-    
+    // Set sidebar state
+    currentSidebarToggleClassIndex = _settings.sidebarState;
+    setSidebarState(currentSidebarToggleClassIndex);
+
     // Change css file
     chrome.app.window.get('main').contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + _settings.theme + '.css');
 

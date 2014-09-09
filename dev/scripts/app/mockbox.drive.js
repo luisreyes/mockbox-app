@@ -40,7 +40,7 @@ _mock.drive = (function(){
     mainCallback = callback;
     
     // Generate the "main" folder
-    _upload({title:'MockBox - ' + data.projectName, type:'application/vnd.google-apps.folder',model:data.editors.html}, function(result, folder){ 
+    _upload({title:'MockBox-' + data.projectName, type:'application/vnd.google-apps.folder',model:data.editors.html}, function(result, folder){ 
       
       // Cache the folder id for later reference
       folderIds[folder.title] = result.id;

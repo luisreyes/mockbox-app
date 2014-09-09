@@ -45,12 +45,10 @@ html
     section#app-sidebar.sidebar
 
       //- PRFOILE
-      section#profile-container.profile
+      section#profile-container.profile.hidden
         img.profile-img(src="images/profile.png")
         span.profile-name
           span.a Sign in
-        span.profile-settings.transition
-            span.icon.icon_cog
       
       section.content
         ul
@@ -77,21 +75,15 @@ html
           
         ul.absolute.bottom
           
-          li.twitter.transition 
-            section.item
-              span.icon.social_twitter
-              span @MockBoxIO
-
-          li.email.transition 
-            section.item
-              span.icon.icon_mail
-              span SUPPORT
-
           li.about.transition 
             section.item
               span.icon.icon_question
               span ABOUT
 
+          li.profile-settings.transition 
+            section.item
+              span.icon.icon_cog
+              span SETTINGS
 
     // Header
 

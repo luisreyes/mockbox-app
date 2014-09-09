@@ -38,8 +38,6 @@ _mock.clicks = (function(){
     export    :sidebar.querySelector('.export'),
     about     :sidebar.querySelector('.about'),
     profile   :sidebar.querySelector('.profile-settings'),
-    twitter   :sidebar.querySelector('.twitter'),
-    email     :sidebar.querySelector('.email'),
 
     //Splash
     allow    :splash.querySelector('.allow'),
@@ -53,13 +51,9 @@ _mock.clicks = (function(){
     appMax    :windowControls.querySelector('.window-max'),
     appClose  :windowControls.querySelector('.window-close')
 
-  },
-
-  // External Links
-  links = {
-    twitter:'https://twitter.com/mockboxio',
-    email:'mailto:support@mockbox.io?subject=Hello MockBox'
   };
+
+  
 
   // Main Listeners
   function addListeners(){
@@ -234,45 +228,7 @@ _mock.clicks = (function(){
         });
       }
     });
-    
-    buttons.twitter.addEventListener( 'click', function(){
-      // Open external page
-      openLink('twitter');
-    });
 
-    buttons.email.addEventListener( 'click', function(){
-      
-      google.payments.inapp.getPurchases({
-        'success': function(){
-          console.log('Purch Success');
-        },
-        'failure': function(){
-          console.log('Purch fail');   
-        }
-      });
-
-      google.payments.inapp.getSkuDetails({
-          'parameters': {'env': 'prod'},
-          'success': function(){
-            console.log('SKU Success');
-            console.log(arguments);
-          },
-          'failure': function(){
-            console.log('SKU fail');
-            console.log(arguments);   
-          }
-        });
-
-      // Open external page
-      //openLink('email');
-    });
-
-    
-  }
-
-  function openLink(loc){
-    // Open external page
-    window.open(links[loc], '_blank');
   }
 
   function signin(){}

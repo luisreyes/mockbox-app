@@ -44,7 +44,7 @@ _mock.receiver = (function(){
           projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
           editors: _mock.getEditorsModel()
         };
-       
+        
         if(data.model.type === 'drive'){
           if(data.model.packaged){
             
@@ -59,13 +59,32 @@ _mock.receiver = (function(){
 
             // Create Individual folders in drive
             _mock.drive.generateFolders(exportData, function(){
-              debugger;
               // Export only if the editor has data.
               exportData.editors.html.value && _mock.drive.upload({title:'index.html',type:'text/html', value: btoa(exportData.editors.html.value), parent:'main'});
               exportData.editors.css.value && _mock.drive.upload({title:'styles.css',type:'text/css', value: btoa(exportData.editors.css.value), parent:'styles'});
               exportData.editors.js.value && _mock.drive.upload({title:'scripts.js',type:'application/javascript', value: btoa(exportData.editors.js.value), parent:'scripts'});
             });
           
+          }
+        }else
+        if(data.model.type === 'local'){
+          debugger;
+          if(data.model.packaged){
+            _mock.local.saveZip(exportData);
+          }else{
+
+            for(var type in exportData.editors){
+              if(exportData.editors.hasOwnProperty(type)){
+                var blob = new Blob([exportData.editors[type].value], {type:'text/'+type});
+                
+                _mock.local.saveFile({
+                  filename: exportData.editors[type].title + '.' + type,
+                  filedata: blob
+                });
+
+              }
+            }
+
           }
         }
 

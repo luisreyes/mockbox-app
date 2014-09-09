@@ -1,0 +1,16 @@
+.footer-links{
+  
+  float: left;
+  margin: 0 10px;
+  
+  .icon{
+    margin-right:10px;
+    cursor:pointer;
+
+    color:$accent-dark-color-1;
+
+    &:hover{
+      color:$accent-dark-color-0;
+    }
+  }
+}

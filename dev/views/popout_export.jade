@@ -10,7 +10,7 @@ block content
     section#export-options.sidebar
       ul    
         
-        li.mockbox.transition 
+        li.mockbox.transition.hidden 
           section.item
             span.icon.icon_mockbox
               svg(x="0" y="0" width="85" height="85" viewBox="0 0 85 85" enable-background="new 0 0 85 85")
@@ -22,7 +22,12 @@ block content
             span.icon.social_googledrive
           span DRIVE
 
-        li.dropbox.transition 
+        li.local.transition 
+          section.item
+            span.icon.icon_folder
+          span LOCAL
+
+        li.dropbox.transition.hidden 
           section.item
             span.icon.icon_dropbox
               svg(x="0px" y="0px" width="85px" height="79.059px" viewBox="0 0 85 79.059" enable-background="new 0 0 85 79.059")
@@ -43,11 +48,6 @@ block content
             span.icon.icon_globe-2
           span FTP
         
-        li.local.transition 
-          section.item
-            span.icon.icon_folder
-          span LOCAL
-
     section#export-panels.export-options.panels
       ul
         li.mockbox
@@ -59,7 +59,7 @@ block content
                 section.clear
               span.right-container
                 label.switch
-                  input(type="checkbox").switch-input
+                  input(type="checkbox").zip.switch-input
                   span(data-on="On" data-off="Off").switch-label
                   span.switch-handle.transition
               section.clear
@@ -87,7 +87,7 @@ block content
                 section.clear
               span.right-container
                 label.switch
-                  input(type="checkbox").switch-input
+                  input(type="checkbox").zip.switch-input
                   span(data-on="On" data-off="Off").switch-label
                   span.switch-handle.transition
               section.clear
@@ -112,7 +112,7 @@ block content
                 section.clear
               span.right-container
                 label.switch
-                  input(type="checkbox").switch-input
+                  input(type="checkbox").zip.switch-input
                   span(data-on="On" data-off="Off").switch-label
                   span.switch-handle.transition
               section.clear
@@ -126,7 +126,7 @@ block content
                 section.clear
               span.right-container
                 label.switch
-                  input(type="checkbox").switch-input
+                  input(type="checkbox").zip.switch-input
                   span(data-on="On" data-off="Off").switch-label
                   span.switch-handle.transition
               section.clear

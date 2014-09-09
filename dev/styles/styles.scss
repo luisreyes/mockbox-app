@@ -94,6 +94,10 @@ header {
   &.open { 
     width:-webkit-calc( 100% - #{ $sidebar-width } );  
   }
+
+  &.open-half { 
+    width:-webkit-calc( 100% - #{ $sidebar-width-half } );  
+  }
 }
 
 footer {

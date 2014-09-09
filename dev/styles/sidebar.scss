@@ -14,8 +14,9 @@
   width: $sidebar-width;
   position: absolute;
   z-index: 0;
+  border-top: 1px solid $accent-dark-color-1;
 
-  &.open{ width:$sidebar-width; }
+  //&.open{ width:$sidebar-width; }
 
   ul{
     list-style: none;

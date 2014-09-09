@@ -19,7 +19,7 @@
       <section class="view-export">
         <section id="export-options" class="sidebar">
           <ul>   
-            <li class="mockbox transition"> 
+            <li class="mockbox transition hidden"> 
               <section class="item"><span class="icon icon_mockbox">
                   <svg x="0" y="0" width="85" height="85" viewBox="0 0 85 85" enable-background="new 0 0 85 85">
                     <path d="M32 52L0 58v16C0 80 6 85 13 85h62C81 85 85 80 85 73V41L42 73 32 52zM74 0H13C6 0 0 5 0 12v33l46-33 5 21L85 26V12C85 5 81 0 74 0z"></path>
@@ -28,7 +28,10 @@
             <li class="drive transition"> 
               <section class="item"><span class="icon social_googledrive"></span></section><span>DRIVE</span>
             </li>
-            <li class="dropbox transition"> 
+            <li class="local transition"> 
+              <section class="item"><span class="icon icon_folder"></span></section><span>LOCAL</span>
+            </li>
+            <li class="dropbox transition hidden"> 
               <section class="item"><span class="icon icon_dropbox">
                   <svg x="0px" y="0px" width="85px" height="79.059px" viewBox="0 0 85 79.059" enable-background="new 0 0 85 79.059">
                     <g transform="translate(63.5239,133.5215)">
@@ -51,9 +54,6 @@
             <li class="ftp transition"> 
               <section class="item"><span class="icon icon_globe-2"></span></section><span>FTP</span>
             </li>
-            <li class="local transition"> 
-              <section class="item"><span class="icon icon_folder"></span></section><span>LOCAL</span>
-            </li>
           </ul>
         </section>
         <section id="export-panels" class="export-options panels">
@@ -64,7 +64,7 @@
                 <section class="field-option"><span class="left-container"><span>Export as packaged zip file</span>
                     <section class="clear"></section></span><span class="right-container">
                     <label class="switch">
-                      <input type="checkbox" class="switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                      <input type="checkbox" class="zip switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
                     </label></span>
                   <section class="clear"></section>
                 </section>
@@ -88,7 +88,7 @@
                 <section class="field-option"><span class="left-container"><span>Export as packaged zip file</span>
                     <section class="clear"></section></span><span class="right-container">
                     <label class="switch">
-                      <input type="checkbox" class="switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                      <input type="checkbox" class="zip switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
                     </label></span>
                   <section class="clear"></section>
                 </section>
@@ -109,7 +109,7 @@
                 <section class="field-option"><span class="left-container"><span>Export as packaged zip file</span>
                     <section class="clear"></section></span><span class="right-container">
                     <label class="switch">
-                      <input type="checkbox" class="switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                      <input type="checkbox" class="zip switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
                     </label></span>
                   <section class="clear"></section>
                 </section>
@@ -121,7 +121,7 @@
                 <section class="field-option"><span class="left-container"><span>Export as packaged zip file</span>
                     <section class="clear"></section></span><span class="right-container">
                     <label class="switch">
-                      <input type="checkbox" class="switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                      <input type="checkbox" class="zip switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
                     </label></span>
                   <section class="clear"></section>
                 </section>

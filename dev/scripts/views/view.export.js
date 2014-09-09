@@ -31,7 +31,7 @@ _v.export = (function(){
     
     addListener();
     
-    setPanel({target:buttons.sidebar.mockbox});
+    setPanel({target:buttons.sidebar.local});
   }
 
   function addListener(){
@@ -50,6 +50,11 @@ _v.export = (function(){
     switch(selectedClass){
       
       case 'drive':
+        model.type = selectedClass;
+        model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
+      break;
+
+      case 'local':
         model.type = selectedClass;
         model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
       break;

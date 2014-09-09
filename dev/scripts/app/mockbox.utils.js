@@ -43,7 +43,6 @@ _mock.utils = (function(){
   }
 
   function _getExportZip(data){
-    debugger;
     var zip = new JSZip();
 
     if(data.html.value){
