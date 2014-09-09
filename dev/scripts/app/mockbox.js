@@ -389,8 +389,21 @@ var mockbox;
         return currentGui;
       }
     },
-    getEditorData: function(){
-      return { html:editors.html.getValue(), css:editors.css.getValue(), js:editors.js.getValue() };
+    getEditorsModel: function(){
+      return { 
+        html:{
+          value:editors.html.getValue(),
+          title:'main'
+        }, 
+        css:{
+          value:editors.css.getValue(),
+          title:'styles' 
+        },
+        js:{
+          value:editors.js.getValue(),
+          title:'scripts' 
+        }
+      };
     },
     export: function(){
       return exportPackage();

@@ -146,6 +146,7 @@ button, select {
   min-width: 70px;
   height: 35px;
   cursor:pointer;
+  padding: 0 10px;
   
   &:hover {
     background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, $accent-dark-color-0), color-stop(1, $accent-dark-color-1) );
@@ -174,7 +175,8 @@ button, select {
     opacity: .5;
     cursor: default;
   }
+
+  .icon{
+    padding: 0 5px 0 2px;
+  }
 }
-
-
-

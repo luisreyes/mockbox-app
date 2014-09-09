@@ -43,20 +43,22 @@ _mock.utils = (function(){
   }
 
   function _getExportZip(data){
+    debugger;
     var zip = new JSZip();
 
-    if(data.html){
-      zip.file('index.html', data.html);
+    if(data.html.value){
+      zip.file('index.html', data.html.value);
       zip.file('index.html').asBinary();
     }
 
-    if(data.css){
-      zip.file('styles/styles.css', data.css);
-      zip.file('styles/styles.css').asBinary();
+    if(data.css.value){
+      zip.file(data.css.title + '/styles.css', data.css.value);
+      zip.file(data.css.title + '/styles.css').asBinary();
     }
-    if(data.js){
-      zip.file('scripts/scripts.js', data.js);
-      zip.file('scripts/scripts.js').asBinary();
+    
+    if(data.js.value){
+      zip.file(data.js.title + '/scripts.js', data.js.value);
+      zip.file(data.js.title + '/scripts.js').asBinary();
     }
 
     return zip.generate();

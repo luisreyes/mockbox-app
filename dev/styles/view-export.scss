@@ -7,7 +7,9 @@
     .selected{
       background:$base-color-2;
       color:$base-color-font;
-      padding-left:12px;
+      padding-left:10px;
+      border-radius: 3px 0 0 3px;
+      margin: 0px 0 0px 10px;
 
       path{ fill:  $base-color-font; }
       &:hover{

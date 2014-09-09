@@ -1,6 +1,17 @@
-MockBox v0.9.6
+MockBox v0.9.7
 =========
 
+---------------------------------------
+**v0.9.7 - 09/9/14 - 1:37am**
+
+
+[View Commit]()
+
+```
+- Fix Issues with exporting compressed and uncompressed project to Google Drive
+- Fix "cancel" button on export window
+- Setup getExportData for n number of folders and files (looking forward to preprocessing files)
+```
 ---------------------------------------
 **v0.9.6 - 09/5/14 - 11:47am**
 

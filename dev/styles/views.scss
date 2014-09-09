@@ -31,14 +31,33 @@
   .purchase-required{
     position: absolute;
     height: 100%;
-    width: 100%;
+    width: -webkit-calc(100% - 165px);
     z-index: 10;
-    
+
+    top: 110px;
+    text-align: center;
+    font-size: large;
+
+
     & + .field {
       -webkit-filter: #{"grayscale(0.5) brightness(1) blur(1px)"};
       opacity: .5;
       cursor: default
 
     }
+    
+    .purchase-message{
+      width: 180px;
+      margin: 0 auto;
+      padding:20px;
+
+      .icon{ 
+        font-size: 60px;
+        color: #eaad2a;
+        text-shadow: 0 1px 2px #666;
+        margin-bottom: 10px;
+      }
+    }
+
   }
 }

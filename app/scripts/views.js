@@ -42,6 +42,7 @@ _v.export = (function(){
       panelsWrapper,
       panels,
       selectedClass,
+      selectedPanel,
       buttons = {};
   
   function init(){
@@ -59,7 +60,8 @@ _v.export = (function(){
         ftp     :sidebarOptions.querySelector('.ftp'),
         local   :sidebarOptions.querySelector('.local')
       },
-      export  :doc.getElementById('export-options-footer').querySelector('.ok')
+      export  :doc.getElementById('export-options-footer').querySelector('.ok'),
+      cancel  :doc.getElementById('export-options-footer').querySelector('.cancel')
     };
     
     addListener();
@@ -73,11 +75,29 @@ _v.export = (function(){
     }
 
     buttons.export.addEventListener('click', onExportClick);
+    buttons.cancel.addEventListener('click', onCancelClick);
   }
 
   function onExportClick(e){
-    console.log(selectedClass);
 
+    var model = {};
+
+    switch(selectedClass){
+      
+      case 'drive':
+        model.type = selectedClass;
+        model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
+      break;
+
+      default: return;
+    }
+
+    chrome.runtime.sendMessage({message:'onExport', model:model });
+
+  }
+
+  function onCancelClick(e){
+    chrome.runtime.sendMessage({message:'onClosePopout', popoutId:'export' });
   }
 
   function setPanel(e){
@@ -94,6 +114,9 @@ _v.export = (function(){
     // Loop and set class hidden to unselected and remove class hidden from slected
     for(var i = 0; i < panels.length; i++){
       if(panels[i].classList[0] === selectedClass){
+        // Cache selected element
+        selectedPanel = panels[i];
+        // Display selected panel
         apollo.removeClass(panels[i], 'hidden');
       }else{
         apollo.addClass(panels[i], 'hidden');  

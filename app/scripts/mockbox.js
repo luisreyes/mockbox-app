@@ -389,8 +389,21 @@ var mockbox;
         return currentGui;
       }
     },
-    getEditorData: function(){
-      return { html:editors.html.getValue(), css:editors.css.getValue(), js:editors.js.getValue() };
+    getEditorsModel: function(){
+      return { 
+        html:{
+          value:editors.html.getValue(),
+          title:'main'
+        }, 
+        css:{
+          value:editors.css.getValue(),
+          title:'styles' 
+        },
+        js:{
+          value:editors.js.getValue(),
+          title:'scripts' 
+        }
+      };
     },
     export: function(){
       return exportPackage();
@@ -930,60 +943,104 @@ _mock.database = (function(){
 _mock.drive = (function(){
 "use strict";
 
-  var folderIds;
-  var mainCallback;
-  var foldersToMake;
+  var folderIds, mainCallback, countFoldersCreated, countFoldersToCreate;
 
-  function _createFolders(data, callback){
-    // Cache Ids to put files in later
-    folderIds = {};
-    foldersToMake = 0;
-    // Cache main project folder callback
-    callback && (mainCallback = callback);
+  // Get count for folders to be create and set the value on "countFoldersToCreate"
+  function _setCountToCreate(data){
     
-    // Generate the Main folder for the export package
-    _upload({title:'MockBox - ' + data.projectName, type:'application/vnd.google-apps.folder'}, function(result){ 
-      
-      console.log('MAIN Folder Created');
-      // Cache the Main folders Id
-      folderIds.main = result.id;
-
-      // cache to amount of folders required
-      for (var type in data.editors) {
-        if (data.editors.hasOwnProperty(type)) {
-          data.editors[type] && (foldersToMake++);
+    // Initialize the count
+    countFoldersToCreate = 0;
+    
+    // Loop through all editors
+    for (var type in data.editors) {
+    
+      // Check the property exists in the editors object do not include the HTML since it goes in 
+      // the main folder and the main folder is always created
+      if ((type !== 'html') && data.editors.hasOwnProperty(type)) {
+    
+        // Check the property has a value
+        if(data.editors[type].value){
+          // Increment count
+          countFoldersToCreate++;
+    
         }
       }
-
-      // Generate the Styles folder
-      data.editors.css && _upload({title:'styles', type:'application/vnd.google-apps.folder', parent:'main'}, function(result){ 
-        console.log('STYLES Folder Created');
-        // Cache the Styles folders Id
-        folderIds.styles = result.id;
-        mainCallback && ifDoneCallback();
-      });
-      
-      // Generate the Scripts folder
-      data.editors.js && _upload({title:'scripts', type:'application/vnd.google-apps.folder', parent:'main'}, function(result){ 
-        console.log('SCRIPTS Folder Created');
-        // Cache the Scripts folders Id
-        folderIds.scripts = result.id;
-        mainCallback && ifDoneCallback();
-      });
-
-    });
-
+    }
   }
 
-  function ifDoneCallback(){
-    // Check the length of created folders
-    if(Object.keys(folderIds).length === foldersToMake){
+  function _createFolders(data, callback){
+    // Set count to var "countFoldersToCreate"
+    _setCountToCreate(data);
+    
+    // Initialize folders ids object
+    folderIds = {};
+    
+    // Initialize folder created count
+    countFoldersCreated = 0;
+
+    // Cache main project folder callback
+    mainCallback = callback;
+    
+    // Generate the "main" folder
+    _upload({title:'MockBox - ' + data.projectName, type:'application/vnd.google-apps.folder',model:data.editors.html}, function(result, folder){ 
+      
+      // Cache the folder id for later reference
+      folderIds[folder.title] = result.id;
+      
+      // Check if it the only needed folder
+      if(countFoldersToCreate === countFoldersCreated){
+        
+        // Call main callback function
+        mainCallback();
+        return;
+
+      }else{
+        
+        // Additional folders needed... go create them
+        _createInnerFolders(data);
+
+      }      
+    });
+  }
+
+  function _createInnerFolders(data){
+    
+    // Loop through all editors
+    for (var type in data.editors) {
+    
+      // Check the property exists in the editors object
+      if ((type !== 'html') && data.editors.hasOwnProperty(type)) {
+    
+        // Check the value is valid or truthy
+        if(data.editors[type].value){
+          
+          // Create next folder
+          _upload({title:data.editors[type].title, type:'application/vnd.google-apps.folder', parent:'main', model:data.editors[type]}, onFolderCreate);
+
+        }
+      }
+    }
+  }
+
+  function onFolderCreate(result, data){
+
+    // Increment created counter
+    countFoldersCreated++;
+
+    // Cache the folders id for file creation reference
+    folderIds[data.title] = result.id
+    
+    // Check all folders have been created
+    if(countFoldersCreated === countFoldersToCreate){
+
+      // Call main callback
       mainCallback();
+      
     }
   }
 
   function _upload(data, callback){
-
+    var model = data.model;
     var file = {
       metadata:{
         "title": data.title,
@@ -992,7 +1049,7 @@ _mock.drive = (function(){
       },
       data: data.value
     };
-
+    
     if(data.parent) file.metadata.parents = [{"id":folderIds[data.parent]}];
 
     var req = new XMLHttpRequest(),
@@ -1026,7 +1083,7 @@ _mock.drive = (function(){
       req.onreadystatechange = function() {
         if (req.readyState == 4) {
           var res = JSON.parse(req.responseText);
-          callback && callback(res);
+          callback && callback(res,model);
         }
       };
 
@@ -1267,26 +1324,28 @@ _mock.receiver = (function(){
       case 'onExport':
         var exportData = {
           projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
-          editors: _mock.getEditorData()
+          editors: _mock.getEditorsModel()
         };
        
-        if(data.type === 'drive'){
-          
-          if(data.packaged){
+        if(data.model.type === 'drive'){
+          if(data.model.packaged){
+            
             // Get zip file from utils
             var zip = _mock.utils.getExportPackage(exportData.editors);
             // Upload zip file to drive
             _mock.drive.upload({title:'MockBox-'+exportData.projectName+'.zip',type:zip.type,value: zip}, function(){
-              console.log('DONE');  
+              console.log('Zip Uploaded');  
             });
           
           }else{
+
             // Create Individual folders in drive
             _mock.drive.generateFolders(exportData, function(){
+              debugger;
               // Export only if the editor has data.
-              exportData.editors.html && _mock.drive.upload({title:'index.html',type:'text/html', value: btoa(exportData.editors.html), parent:'main'});
-              exportData.editors.css && _mock.drive.upload({title:'styles.css',type:'text/css', value: btoa(exportData.editors.css), parent:'styles'});
-              exportData.editors.js && _mock.drive.upload({title:'scripts.js',type:'application/javascript', value: btoa(exportData.editors.js), parent:'scripts'});
+              exportData.editors.html.value && _mock.drive.upload({title:'index.html',type:'text/html', value: btoa(exportData.editors.html.value), parent:'main'});
+              exportData.editors.css.value && _mock.drive.upload({title:'styles.css',type:'text/css', value: btoa(exportData.editors.css.value), parent:'styles'});
+              exportData.editors.js.value && _mock.drive.upload({title:'scripts.js',type:'application/javascript', value: btoa(exportData.editors.js.value), parent:'scripts'});
             });
           
           }
@@ -1397,20 +1456,22 @@ _mock.utils = (function(){
   }
 
   function _getExportZip(data){
+    debugger;
     var zip = new JSZip();
 
-    if(data.html){
-      zip.file('index.html', data.html);
+    if(data.html.value){
+      zip.file('index.html', data.html.value);
       zip.file('index.html').asBinary();
     }
 
-    if(data.css){
-      zip.file('styles/styles.css', data.css);
-      zip.file('styles/styles.css').asBinary();
+    if(data.css.value){
+      zip.file(data.css.title + '/styles.css', data.css.value);
+      zip.file(data.css.title + '/styles.css').asBinary();
     }
-    if(data.js){
-      zip.file('scripts/scripts.js', data.js);
-      zip.file('scripts/scripts.js').asBinary();
+    
+    if(data.js.value){
+      zip.file(data.js.title + '/scripts.js', data.js.value);
+      zip.file(data.js.title + '/scripts.js').asBinary();
     }
 
     return zip.generate();
