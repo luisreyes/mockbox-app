@@ -23,18 +23,18 @@
 
     &.inactive{
       -webkit-filter: #{"grayscale(1) brightness(1) blur(1px)"};
-      opacity: .5;
+      opacity: .2;
       cursor: default;
     }
   }
 
   .purchase-required{
     position: absolute;
-    height: 100%;
-    width: -webkit-calc(100% - 165px);
+    height: 352px;
+    width: -webkit-calc(100% - 153px);
     z-index: 10;
 
-    top: 110px;
+    top: 50px;
     text-align: center;
     font-size: large;
 
@@ -47,9 +47,10 @@
     }
     
     .purchase-message{
-      width: 180px;
-      margin: 0 auto;
+      width: 230px;
+      margin: 42px auto 0;
       padding:20px;
+
 
       .icon{ 
         font-size: 60px;
@@ -57,6 +58,10 @@
         text-shadow: 0 1px 2px #666;
         margin-bottom: 10px;
       }
+    }
+
+    .purchase-buttons{
+      margin:0;
     }
 
   }

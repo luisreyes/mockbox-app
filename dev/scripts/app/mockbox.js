@@ -229,15 +229,15 @@ var mockbox;
   // Initialize Editors
   function initEditors(){
 
-    var mixedMode = {
-      name: "htmlmixed",
-      scriptTypes: [{matches: /\/x-handlebars-template|\/x-mustache|\/x-jade/i,
-                     mode: null},
-                    {matches: /(text|application)\/(x-)?vb(a|script)/i,
-                     mode: "vbscript"}]};
+    // var mixedMode = {
+    //   name: "htmlmixed",
+    //   scriptTypes: [{matches: /\/x-handlebars-template|\/x-mustache|\/x-jade/i,
+    //                  mode: null},
+    //                 {matches: /(text|application)\/(x-)?vb(a|script)/i,
+    //                  mode: "vbscript"}]};
 
     // Initialize Main Code Editors
-    editors.html  = new CodeMirror(domHtml,  { mode: mixedMode });
+    editors.html  = new CodeMirror(domHtml,  { mode: 'htmlmixed' });
     editors.js    = new CodeMirror(domJs,    { mode: 'javascript' });
     editors.css   = new CodeMirror(domCss,   { mode: 'css' });
 

@@ -7,7 +7,7 @@
 }
 
 .sidebar{
-  background-color: $accent-dark-color-0;
+  background-color: darken($accent-dark-color-0, 2%);
   color:$accent-color;
   font-weight: bold;
   height: -webkit-calc(100% - 20px);
@@ -25,6 +25,7 @@
     width:100%;
 
     li{
+      background-color: $accent-dark-color-0;
       border-bottom: 1px solid $accent-dark-color-1;
       padding: 10px;
       cursor: pointer;
@@ -62,7 +63,7 @@
 
   .bottom{
     li{
-      border-top: 1px solid $accent-dark-color-0;
+      border-top: 1px solid $accent-dark-color-1;
       border-bottom: none;
     }
   }

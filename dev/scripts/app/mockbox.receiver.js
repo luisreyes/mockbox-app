@@ -42,7 +42,8 @@ _mock.receiver = (function(){
       case 'onExport':
         var exportData = {
           projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
-          editors: _mock.getEditorsModel()
+          editors: _mock.getEditorsModel(),
+          projectFolderName: 'MockBox-' + document.getElementById('app-header').querySelector('.project-name').innerHTML
         };
         
         if(data.model.type === 'drive'){
@@ -51,7 +52,7 @@ _mock.receiver = (function(){
             // Get zip file from utils
             var zip = _mock.utils.getExportPackage(exportData.editors);
             // Upload zip file to drive
-            _mock.drive.upload({title:'MockBox-'+exportData.projectName+'.zip',type:zip.type,value: zip}, function(){
+            _mock.drive.upload({title: exportData.projectFolderName+'.zip',type:zip.type,value: zip}, function(){
               console.log('Zip Uploaded');  
             });
           
@@ -68,23 +69,26 @@ _mock.receiver = (function(){
           }
         }else
         if(data.model.type === 'local'){
-          debugger;
           if(data.model.packaged){
             _mock.local.saveZip(exportData);
           }else{
-
+            // Var to cache the files data
+            var files = {};
+            
+            // Generate all blob files from the editors
             for(var type in exportData.editors){
               if(exportData.editors.hasOwnProperty(type)){
+                // Create Blob
                 var blob = new Blob([exportData.editors[type].value], {type:'text/'+type});
-                
-                _mock.local.saveFile({
-                  filename: exportData.editors[type].title + '.' + type,
-                  filedata: blob
-                });
-
+                // New file blob
+                files[type] = {
+                  filename:exportData.editors[type].title === 'main' ? 'index'+ '.' + type : exportData.editors[type].title + '.' + type,
+                  filedata:blob
+                };
               }
             }
-
+            // Save all files to local
+            _mock.local.saveFiles({ files: files, folderName: exportData.projectFolderName });
           }
         }
 

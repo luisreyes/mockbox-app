@@ -3,7 +3,8 @@
   
   .sidebar{
     width: 150px;
-
+    border-top:none;
+    
     .selected{
       background:$base-color-2;
       color:$base-color-font;

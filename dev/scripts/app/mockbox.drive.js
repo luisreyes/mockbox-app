@@ -132,7 +132,7 @@ _mock.drive = (function(){
     
     multipartRequestBody += close_delim;
     
-    chrome.identity.getAuthToken({'interactive':false},function(token){
+    chrome.identity.getAuthToken({'interactive':true},function(token){
       
       req.open('POST', 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart');
       req.setRequestHeader('Authorization', 'Bearer ' + token);

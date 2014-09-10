@@ -229,15 +229,15 @@ var mockbox;
   // Initialize Editors
   function initEditors(){
 
-    var mixedMode = {
-      name: "htmlmixed",
-      scriptTypes: [{matches: /\/x-handlebars-template|\/x-mustache|\/x-jade/i,
-                     mode: null},
-                    {matches: /(text|application)\/(x-)?vb(a|script)/i,
-                     mode: "vbscript"}]};
+    // var mixedMode = {
+    //   name: "htmlmixed",
+    //   scriptTypes: [{matches: /\/x-handlebars-template|\/x-mustache|\/x-jade/i,
+    //                  mode: null},
+    //                 {matches: /(text|application)\/(x-)?vb(a|script)/i,
+    //                  mode: "vbscript"}]};
 
     // Initialize Main Code Editors
-    editors.html  = new CodeMirror(domHtml,  { mode: mixedMode });
+    editors.html  = new CodeMirror(domHtml,  { mode: 'htmlmixed' });
     editors.js    = new CodeMirror(domJs,    { mode: 'javascript' });
     editors.css   = new CodeMirror(domCss,   { mode: 'css' });
 
@@ -1055,7 +1055,7 @@ _mock.drive = (function(){
     
     multipartRequestBody += close_delim;
     
-    chrome.identity.getAuthToken({'interactive':false},function(token){
+    chrome.identity.getAuthToken({'interactive':true},function(token){
       
       req.open('POST', 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart');
       req.setRequestHeader('Authorization', 'Bearer ' + token);
@@ -1137,7 +1137,7 @@ _mock.local = (function(){
     };
 
     chrome.fileSystem.chooseEntry({ type:'saveFile', suggestedName: data.filename }, function(entry, fileEntry){
-      
+      // check isWritableEntry
       entry.createWriter(function(fileWriter) {
 
         fileWriter.onwriteend = function(e) {
@@ -1153,6 +1153,65 @@ _mock.local = (function(){
       });
     });
   }
+  
+  var _files, _rootName;
+  var _root = {};
+  function _saveMultipleFiles(data){
+    _files = data.files;
+    _rootName = data.folderName;
+    chrome.fileSystem.chooseEntry({ type:'openDirectory'}, function(entry){
+      _root = entry;
+      // check isWritableEntry
+      var req_fs = window.requestFileSystem || window.webkitRequestFileSystem || window.mozRequestFileSystem;
+      req_fs(window.TEMPORARY, 1024*1024, function(fs){
+        
+        _root.getDirectory(_rootName,{create:true}, function(entry){
+          debugger;
+          if(_files.html.filedata.size) {
+            entry.getFile(_files.html.filename, {create:true}, onGetFile, onGetError);  
+          }
+
+          if(_files.css.filedata.size) {
+            entry.getDirectory('styles',{create:true}, function(entry){
+              entry.getFile(_files.css.filename, {create:true}, onGetFile, onGetError);  
+            }, onGetError);
+          }
+          
+          if(_files.js.filedata.size) {
+            entry.getDirectory('scripts',{create:true}, function(entry){
+              entry.getFile(_files.js.filename, {create:true}, onGetFile, onGetError);
+            }, onGetError);
+          }
+                         
+        }, onGetError);
+        
+
+      });
+    });
+  }
+
+  function onGetFile(fileEntry){
+    fileEntry.createWriter(function(fileWriter) {
+
+      fileWriter.onwriteend = function(e) {
+        console.log('Write completed.');
+      };
+
+      fileWriter.onerror = function(e) {
+        console.log('Write failed: ' + e.toString());
+      };
+
+      var type = fileEntry.name.substr(fileEntry.name.lastIndexOf('.') + 1);
+      fileWriter.write(_files[type].filedata);
+
+    },function(){ 
+      return fileEntry;
+    });
+  }
+
+  function onGetError(e){
+    console.log(e); 
+  }
 
   function _saveZip(data){
     _saveFile({
@@ -1166,8 +1225,10 @@ _mock.local = (function(){
       _saveZip(data);
     },
     saveFile:function(data){
-      debugger;
       _saveFile(data);
+    },
+    saveFiles: function(files){
+      _saveMultipleFiles(files);
     }
 
   };
@@ -1359,7 +1420,8 @@ _mock.receiver = (function(){
       case 'onExport':
         var exportData = {
           projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
-          editors: _mock.getEditorsModel()
+          editors: _mock.getEditorsModel(),
+          projectFolderName: 'MockBox-' + document.getElementById('app-header').querySelector('.project-name').innerHTML
         };
         
         if(data.model.type === 'drive'){
@@ -1368,7 +1430,7 @@ _mock.receiver = (function(){
             // Get zip file from utils
             var zip = _mock.utils.getExportPackage(exportData.editors);
             // Upload zip file to drive
-            _mock.drive.upload({title:'MockBox-'+exportData.projectName+'.zip',type:zip.type,value: zip}, function(){
+            _mock.drive.upload({title: exportData.projectFolderName+'.zip',type:zip.type,value: zip}, function(){
               console.log('Zip Uploaded');  
             });
           
@@ -1385,23 +1447,26 @@ _mock.receiver = (function(){
           }
         }else
         if(data.model.type === 'local'){
-          debugger;
           if(data.model.packaged){
             _mock.local.saveZip(exportData);
           }else{
-
+            // Var to cache the files data
+            var files = {};
+            
+            // Generate all blob files from the editors
             for(var type in exportData.editors){
               if(exportData.editors.hasOwnProperty(type)){
+                // Create Blob
                 var blob = new Blob([exportData.editors[type].value], {type:'text/'+type});
-                
-                _mock.local.saveFile({
-                  filename: exportData.editors[type].title + '.' + type,
-                  filedata: blob
-                });
-
+                // New file blob
+                files[type] = {
+                  filename:exportData.editors[type].title === 'main' ? 'index'+ '.' + type : exportData.editors[type].title + '.' + type,
+                  filedata:blob
+                };
               }
             }
-
+            // Save all files to local
+            _mock.local.saveFiles({ files: files, folderName: exportData.projectFolderName });
           }
         }
 
