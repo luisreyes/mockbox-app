@@ -1,0 +1,58 @@
+.notification{
+  position: absolute;
+  bottom:0;
+  right:0;
+  z-index: 1030;
+  font-weight: 600;
+  width: 0;
+  opacity:0;
+
+  &.showing{
+    width: -webkit-calc(100% - 170px);
+    opacity:1;
+  }
+  .notification-icon{
+    margin-right: 5px;
+    font-size: 20px;
+    position: relative;
+    top: 1px;
+  }
+  .notification-message{ 
+    white-space: nowrap; 
+    position: relative;
+    top: -3px;
+  }
+
+  .notification-wrapper{
+    
+    width: 100%;
+    padding: 5px;
+    margin: 10px 0px;
+    box-shadow: 0 0 5px $base-color-shadow;
+    float: right;
+    
+    &.error{
+      background-color:#E4B7B7;
+      border:1px solid #D37B7B;
+      color:#994343;
+    }
+
+    &.success{
+      background-color:#B6D0BA;
+      border:1px solid #24772B;
+      color:#24772B;
+    }
+
+    &.warning{
+      background-color:#E4D091;
+      border:1px solid #AD591D;
+      color:#AD591D;
+    }
+
+    &.info{
+      background-color:#AED2E8;
+      border:1px solid #34659D;
+      color:#34659D;
+    }
+  }
+}

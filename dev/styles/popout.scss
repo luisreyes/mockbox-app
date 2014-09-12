@@ -21,6 +21,7 @@
     background-position: 50% 40%;
     background-repeat: no-repeat;
     opacity: 1;
+    border-top: 1px solid $base-color-0;
   }
   .splash-contents{
     text-align: center;
@@ -55,6 +56,10 @@
   margin-top: 30px;
   overflow: auto;
   max-height: 400px;
+
+  .sidebar{
+    height: -webkit-calc(100% - 50px);
+  }
 
 }
 

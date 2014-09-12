@@ -1,0 +1,19 @@
+body{
+
+  &.mac{
+    .window-bar {
+      .window-controls {
+        .window-close { float:left; }
+      }
+      .window-drag{ float:right; }
+      .popout-drag{ float:right; }
+    }
+  }
+
+  &.linux{
+    .window-bar {
+      .window-drag{ float:right; }
+      .popout-drag{ float:right; }
+    }
+  }
+}

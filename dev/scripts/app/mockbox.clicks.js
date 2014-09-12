@@ -155,8 +155,6 @@ _mock.clicks = (function(){
       _mock.popout.open('about', function(){
           // init the views js file
           views.about.init();
-          // Generate the list to display
-          //views.load.generateList();
         });
     });
 

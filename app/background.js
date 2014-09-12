@@ -3,8 +3,8 @@ chrome.app.runtime.onLaunched.addListener(function() {
   chrome.app.window.create('mockbox.html', {
     'id': 'main',
     'frame':'none',
-    'minWidth':320,
-    'minHeight':568,
+    'minWidth':600,
+    'minHeight':570,
     'bounds': {
       'width': 1024,
       'height': 768

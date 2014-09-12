@@ -16,12 +16,18 @@ html
     section.app-frame.frame-left
       
     section#app-window-frame.window-bar
-      span#app-window-controls.window-controls
+      span#app-window-controls.window-controls.hidden
         span.window-min.icon_minus-06
         span.window-max.icon_plus
         span.window-close.icon.icon_close
       div.window-drag
 
+
+    // Notification
+    section#app-notification.transition-slow.notification
+      section.notification-wrapper.error
+        span.notification-icon
+        span.notification-message
 
     // Popout
     
@@ -54,40 +60,40 @@ html
         ul
 
           //- NEW
-          li.new.transition 
-            span.icon.icon_document
+          li.new.transition
+            span(title="NEW").icon.icon_document
             span NEW
 
           //- SAVE
           li.save.transition 
-            span.icon.icon_drive_alt
+            span(title="SAVE").icon.icon_drive_alt
             span SAVE
 
           //- LOAD
           li.load.transition 
-            span.icon.icon_grid-2x2
+            span(title="LOAD").icon.icon_grid-2x2
             span LOAD
 
           //- EXPORT
           li.export.transition 
-            span.icon.icon_folder_download
+            span(title="EXPORT").icon.icon_folder_download
             span EXPORT
           
         ul.absolute.bottom
           
           li.about.transition 
             section.item
-              span.icon.icon_question
+              span(title="ABOUT").icon.icon_question
               span ABOUT
 
           li.profile-settings.transition 
             section.item
-              span.icon.icon_cog
+              span(title="SETTINGS").icon.icon_cog
               span SETTINGS
 
     // Header
 
-    header#app-header.header.transition.open
+    header#app-header.header.transition.open.hidden
       span#app-sidebar-toggle.sidebar-toggle.icon(data-icon="a")
       span.app-logo
       span.project-name.transition New Prototype

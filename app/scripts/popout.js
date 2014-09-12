@@ -19,6 +19,11 @@ var popout;
   };
 
   function init(){
+
+    chrome.runtime.getPlatformInfo(function(p){
+      apollo.addClass(document.body, p.os);
+    });
+
     _pop.clicks.init();
 
     chrome.runtime.onMessage.addListener(function(data) {
@@ -45,7 +50,6 @@ _pop.clicks = (function(){
 
   function init(){
       _currentId = chrome.app.window.current().id;
-      
       buttons.closeBtn = document.getElementById("app-popout-controls").querySelector('.window-close');
       
       if(_currentId === 'confirm'){
@@ -62,10 +66,6 @@ _pop.clicks = (function(){
 
       if(_currentId === 'about'){
         buttons.okBtn = document.getElementById("about-footer").querySelector('.ok');
-      }
-
-      if(_currentId === 'connection'){
-        buttons.okBtn = document.getElementById("connection-footer").querySelector('.ok');
       }
 
       addListeners();
@@ -87,12 +87,6 @@ _pop.clicks = (function(){
 
       buttons.continueBtn.addEventListener('click', function(){
         chrome.runtime.sendMessage({message:'onConfirm', popoutId:_currentId, isAccept:true});
-      });
-    }else
-
-    if(_currentId === 'connection'){
-      buttons.okBtn.addEventListener('click', function(){
-        chrome.runtime.sendMessage({message:'onClosePopout', popoutId:_currentId});
       });
     }else
 

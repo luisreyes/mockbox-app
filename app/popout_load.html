@@ -16,22 +16,56 @@
     </section>
     <header class="popout-header"><span class="popout-title-icon"><span class="icon_grid-2x2"></span></span><span class="popout-title"><span>Load Prototypes</span></span></header>
     <section class="popout-content">
-      <section>
-        <ul id="prototype-list" class="load-list transition hidden"></ul>
-        <section id="prototype-list-empty" class="load-list-empty">You don't have anything to load</section>
+      <section class="view-load">
+        <section id="load-options" class="sidebar">
+          <ul>   
+            <li class="templates transition">
+              <section class="item"><span class="icon icon_heart"></span></section><span>TEMPLATES</span>
+            </li>
+            <li class="prototypes transition"> 
+              <section class="item"><span class="icon icon_documents"></span></section><span>PROTOTYPES</span>
+            </li>
+          </ul>
+        </section>
+        <section id="load-panels" class="load-options panels">
+          <ul>
+            <li class="templates panel hidden">
+              <section class="field">
+                <ul id="templates-list" class="load-list transition hidden"></ul>
+                <section id="templates-list-empty" class="load-list-empty">You don't have any templates</section>
+                <section id="templates-list-item-template" class="hidden">
+                  <li class="list-item transition">
+                    <table>
+                      <tr>
+                        <td class="list-item-load transition"><span class="list-item-title"></span></td>
+                      </tr>
+                    </table>
+                  </li>
+                </section>
+              </section>
+            </li>
+            <li class="prototypes panel">
+              <section class="field">
+                <ul id="prototype-list" class="load-list transition"></ul>
+                <section id="prototype-list-empty" class="load-list-empty">You don't have any prototypes</section>
+                <section id="prototypes-list-item-template" class="hidden">
+                  <li class="list-item transition">
+                    <table>
+                      <tr>
+                        <td class="list-item-load transition"><span class="list-item-title"></span><br><span class="list-item-subtitle"></span></td>
+                        <td title="DELETE" class="list-item-delete transition">
+                          <section><span class="icon icon_trash"></span></section>
+                        </td>
+                      </tr>
+                    </table>
+                  </li>
+                </section>
+              </section>
+            </li>
+          </ul>
+        </section>
       </section>
-      <section id="list-item-template" class="hidden">
-        <li class="list-item transition">
-          <table>
-            <tr>
-              <td class="list-item-load transition"><span class="list-item-title"></span><br><span class="list-item-subtitle"></span></td>
-              <td class="list-item-delete transition">
-                <section><span class="icon icon_trash"></span></section>
-              </td>
-            </tr>
-          </table>
-        </li>
-      </section>
+      
     </section>
     <!-- Scripts-->
     <script type="text/javascript" src="scripts/lib.js"></script>

@@ -19,6 +19,11 @@ var popout;
   };
 
   function init(){
+
+    chrome.runtime.getPlatformInfo(function(p){
+      apollo.addClass(document.body, p.os);
+    });
+
     _pop.clicks.init();
 
     chrome.runtime.onMessage.addListener(function(data) {

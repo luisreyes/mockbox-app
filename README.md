@@ -1,6 +1,18 @@
-MockBox v0.9.8
+MockBox v0.9.8.1
 =========
 
+---------------------------------------
+**v0.9.8.1 - 09/12/14 - 1:19am**
+
+
+```
+- Load from Template
+- DB API stability fixes
+- In-app notifications
+- Removed un-used code "mockbox.events" "connection popout"
+- Fix popout scroll issue
+- Major export Updates for stability
+```
 ---------------------------------------
 **v0.9.8 - 09/10/14 - 11:22am**
 
@@ -23,8 +35,6 @@ MockBox v0.9.8
 **v0.9.6 - 09/5/14 - 11:47am**
 
 
-d79f489682dab4f932dd4807cb5c5dfec55b8c7f
-
 ```
 - oAuth2 Clean up
 - Added About Window
@@ -34,8 +44,6 @@ d79f489682dab4f932dd4807cb5c5dfec55b8c7f
 ---------------------------------------
 **v0.9.5.3 - 09/3/14 - 12:36am**
 
-
-2d0df8ad67a07e367a52cb84813fe56e86d46e4a
 
 ```
 - Added to Licensing API
@@ -49,8 +57,6 @@ d79f489682dab4f932dd4807cb5c5dfec55b8c7f
 ---------------------------------------
 **v0.9.5.1 - 09/2/14 - 12:35am**
 
-
-e0fb5146c6bcd4c62c28a6e97a79e216fb2cddf0
 
 ```
 - Updates to changing themes and changed default to light

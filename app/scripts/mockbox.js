@@ -86,7 +86,7 @@ var mockbox;
           // Get token for google account
           _mock.oauth.getToken({'interactive':false},function(token){
             if (chrome.runtime.lastError) {
-              console.log(chrome.runtime.lastError);
+              //console.log(chrome.runtime.lastError);
             }else{
               tokens.google = token;
             }
@@ -99,6 +99,11 @@ var mockbox;
           if(_settings.lastGui && _settings.autoload){
             _mock.database.restoreEditorsFromId(_settings.lastGui);
           }
+
+          chrome.runtime.getPlatformInfo(function(p){
+            apollo.addClass(document.body, p.os);
+            apollo.removeClass(document.getElementById('app-window-controls'), 'hidden');
+          });
 
          break;
 
@@ -157,8 +162,14 @@ var mockbox;
           break;
 
           case 'onFirstRun':
-            apollo.removeClass(splashAllow, 'hidden');
-            apollo.addClass(splashLoading, 'hidden');
+
+            chrome.runtime.getPlatformInfo(function(p){
+              apollo.addClass(document.body, p.os);
+              apollo.removeClass(document.getElementById('app-window-controls'), 'hidden');
+            });
+
+            //apollo.removeClass(splashAllow, 'hidden');
+            //apollo.addClass(splashLoading, 'hidden');
 
             // Defulat App Settings
             _settings.theme = 'light';
@@ -168,7 +179,20 @@ var mockbox;
 
             currentSidebarToggleClassIndex = _settings.sidebarState;
 
+            _settings.isInited = true;
+
+            _mock.database.onReady(function(){
+              var templates = _mock.templates.getAll();
+              for(var i = 0; i < templates.length; i++){
+                _mock.database.save('templates',templates[i], true);
+              }  
+            });
+
+            closeSplash();
             saveSettings();
+
+            
+
           break;
           default: return;
       }
@@ -192,6 +216,7 @@ var mockbox;
   function closeSplash(){
     window.setTimeout(function(){
       apollo.addClass(splash, 'opaque');
+      apollo.removeClass(document.getElementById('app-header'), 'hidden');
       splash.addEventListener('webkitTransitionEnd', function() {
         apollo.addClass(splash, 'hidden');
       });
@@ -302,7 +327,8 @@ var mockbox;
     }
   }
 
-  function setEditorsData(data){
+  function setEditorsData(data, fromTemplate){
+    if(fromTemplate){currentGui = null;}
     if(data){
       document.getElementById('app-header').querySelector('.project-name').innerHTML = data.name;
       editors.html.setValue( data.html );
@@ -320,11 +346,8 @@ var mockbox;
     updateIframe();
     _mock.utils.isDirty(true);
     if(areAllEmpty()){
-      //_mock.clicks.buttons.removeClass('save','inactive');
       _mock.clicks.buttons.removeClass('export','inactive');
     }else{
-
-      //_mock.clicks.buttons.addClass('save','inactive');
       _mock.clicks.buttons.addClass('export','inactive');
     }
 
@@ -394,7 +417,6 @@ var mockbox;
 
   return {
     init: function(){
-      _mock.database.init();
       init();
 
     },
@@ -404,8 +426,8 @@ var mockbox;
     getSettings: function(){ 
       return _settings;
     },
-    restore: function(data){
-      setEditorsData(data);
+    restore: function(data, fromTemplate){
+      setEditorsData(data, fromTemplate);
     },
     gui: function(){
       if(arguments.length){
@@ -434,10 +456,7 @@ var mockbox;
       return exportPackage();
     },
     save: function(){
-      //if(areAllEmpty()){
-        _mock.database.save(getSaveData());
-        //_mock.clicks.buttons.addClass('save','inactive');
-      //}
+      _mock.database.save('prototypes',getSaveData());
     },
     reset:function(){
       if(mockbox.isDirty()){
@@ -609,8 +628,6 @@ _mock.clicks = (function(){
       _mock.popout.open('about', function(){
           // init the views js file
           views.about.init();
-          // Generate the list to display
-          //views.load.generateList();
         });
     });
 
@@ -763,15 +780,12 @@ _mock.database = (function(){
   var reqResult,
   listeningForResult = false,
   indexedDb = {};
-  indexedDb.db = null;
+  indexedDb.db = null,
+  _onReadyCallback = null;
   
   function init() {
     // open displays the data previously saved
     indexedDb.open(); 
-  }
-
-  function getUID() {
-      return ("000000" + (Math.random()*Math.pow(36,6) << 0).toString(36)).slice(-6);
   }
 
   indexedDb.open = function() {
@@ -785,33 +799,42 @@ _mock.database = (function(){
       // A versionchange transaction is started automatically.
       e.target.transaction.onerror = indexedDb.onerror;
       
-      if(db.objectStoreNames.contains("editor")) {
-        db.deleteObjectStore("editor");
+      if(db.objectStoreNames.contains("prototypes")) {
+        db.deleteObjectStore("prototypes");
       }
 
-      var store = db.createObjectStore("editor",{keyPath: "gui"});
-      var createdByIndex = store.createIndex("by_createdBy", "createdBy"),
-          guiIndex = store.createIndex("by_gui", "gui");
+      if(db.objectStoreNames.contains("templates")) {
+        db.deleteObjectStore("templates");
+      }
+
+      var store = db.createObjectStore("prototypes",{keyPath: "gui"});
+      var guiIndex = store.createIndex("by_prototypeId", "gui");
+
+      var store2 = db.createObjectStore("templates",{keyPath: "gui"});
+      var guiIndex2 = store2.createIndex("by_templateId", "gui");
     };
 
     request.onsuccess = function(e) {
       indexedDb.db = e.target.result;
+      _onReadyCallback && _onReadyCallback();
     };
 
     request.onerror = indexedDb.onerror;
   };
 
-  indexedDb.addEditEntry = function(data) {
+  indexedDb.addEditEntry = function(table, data, suppressNotification) {
     var db = indexedDb.db,
-        trans = db.transaction("editor", "readwrite"),
-        store = trans.objectStore("editor"),
-        currentGui = _mock.gui() || getUID();
+        trans = db.transaction(table, "readwrite"),
+        store = trans.objectStore(table),
+        currentGui = _mock.gui() || _mock.utils.getGUID();
 
-    _mock.gui(currentGui);
+    if(table !== 'templates'){
+      _mock.gui(currentGui);
+    }
     
     // Put Entry
     var entry = store.put({
-      "gui" : currentGui,
+      "gui" : (table === 'templates') ? _mock.utils.getGUID() : currentGui,
       "name": data.name || "No Name",
       "html": data.html,
       "css": data.css,
@@ -826,36 +849,36 @@ _mock.database = (function(){
     entry.onsuccess = function(e) {
       // Re-render all the editors
       mockbox.isDirty(false);
-      mockbox.notify({iconUrl:'icons/notifications/check.png',message:'Saved Successfully'});
+      !suppressNotification && mockbox.notify({type:'success',message:'Saved Successfully'});
     };
 
     entry.onerror = function(e) {
-      //console.log(e.value);
+      mockbox.notify({type:'error',message:'Problem Saving: ' + e.toString()});
     };
   };
   
-  indexedDb.deleteEntry = function(id) {
+  indexedDb.deleteEntry = function(id, table) {
     var db = indexedDb.db;
-    var trans = db.transaction("editor", "readwrite");
-    var store = trans.objectStore("editor");
+    var trans = db.transaction(table, "readwrite");
+    var store = trans.objectStore(table);
 
     var request = store.delete(id);
 
     request.onsuccess = function(e) {
-      mockbox.notify({iconUrl:'icons/notifications/error.png', message:'Deleted'});
+      mockbox.notify({type:'error', message:'Deleted'});
     };
 
     request.onerror = function(e) {
-      //console.log(e.value);
     };
   };
 
-  indexedDb.getAll = function() {
+  indexedDb.getAll = function(table, callback) {
     var db = indexedDb.db;
-    var transaction = db.transaction(["editor"]);
-    var objectStore = transaction.objectStore("editor");
+    var transaction = db.transaction([table]);
+    var objectStore = transaction.objectStore(table);
 
     var items = [];
+    var callback = callback;
     var request = objectStore.openCursor();
 
     request.onsuccess = function(event) {
@@ -865,8 +888,7 @@ _mock.database = (function(){
         cursor.continue();
       }
       else {
-        reqResult = items;
-        _mock.events.dispatch('dbresult');
+        callback(items);
       }
     };
 
@@ -877,74 +899,83 @@ _mock.database = (function(){
     };
   }; 
 
-  indexedDb.setEditorsFromId = function(id) {
+  indexedDb.setEditorsFromId = function(id, isTemplate) {
     var db = indexedDb.db;
-    var transaction = db.transaction(["editor"]);
-    var objectStore = transaction.objectStore("editor");
+    var table = isTemplate ? 'templates' : 'prototypes'
+    var transaction = db.transaction([table]);
+    var objectStore = transaction.objectStore(table);
     var request = objectStore.get(id);
     
     request.onsuccess = function(event) {
-      // Do something with the request.result!
-      _mock.gui(request.result.gui);
-      _mock.restore(request.result);
+      if(request.result){
+        // Do something with the request.result!
+        mockbox.notify({type:'info', message:'Loaded ' + request.result.name});
+        var gui = isTemplate ? _mock.utils.getGUID() : request.result.gui;
+        _mock.gui(gui);
+        _mock.restore(request.result, isTemplate);
+      }
     };
     
     request.onerror = function(event) {};
   }; 
-  function onDbResult(callback){
-    callback(reqResult);
-    _mock.events.removeListener('dbresult', function(){
-      onDbResult(callback);
-    });
-  }
-  
+
+
   return {
     init:init,
-    save: function(data){
-      indexedDb.addEditEntry(data);
+    save: function(table, data, suppressNotification){
+      indexedDb.addEditEntry(table, data, suppressNotification);
     },
     delete:function(id){
-      indexedDb.deleteEntry(id);
+      indexedDb.deleteEntry(id, 'prototypes');
     },
-    restoreEditorsFromId: function(id){
-      indexedDb.setEditorsFromId(id);
+    restoreEditorsFromId: function(id, isTemplate){
+      indexedDb.setEditorsFromId(id, isTemplate);
     },
-    getAll:function(callback){
-      indexedDb.getAll();
-      if(!listeningForResult){
-        _mock.events.addListener('dbresult', function(){
-          onDbResult(callback);
-        });
-        listeningForResult = true;
+    onReady: function(callback){
+      if(indexedDb.db){
+        callback();
+      }else{
+        _onReadyCallback = callback;
       }
+    },
+    getAll:function(table, callback){
+      indexedDb.getAll(table, callback);
     }
+
   };
 
 }());
 _mock.drive = (function(){
 "use strict";
 
-  var folderIds, mainCallback, countFoldersCreated, countFoldersToCreate;
+  var folderIds, mainCallback, countFoldersCreated, countFoldersToCreate, countFilesCreated=0, countFilesToCreate;
 
   // Get count for folders to be create and set the value on "countFoldersToCreate"
   function _setCountToCreate(data){
     
     // Initialize the count
     countFoldersToCreate = 0;
+    countFilesToCreate = 0;
     
     // Loop through all editors
     for (var type in data.editors) {
     
       // Check the property exists in the editors object do not include the HTML since it goes in 
       // the main folder and the main folder is always created
-      if ((type !== 'html') && data.editors.hasOwnProperty(type)) {
+      if (data.editors.hasOwnProperty(type)) {
     
         // Check the property has a value
         if(data.editors[type].value){
           // Increment count
-          countFoldersToCreate++;
-    
+          countFilesToCreate++;
+          
+          // Check the property has a value
+          if(type !== 'html'){
+            // Increment count
+            countFoldersToCreate++;
+          }
         }
+
       }
     }
   }
@@ -1020,6 +1051,20 @@ _mock.drive = (function(){
     }
   }
 
+  function onFileCreate(result){
+    
+    // Increment created counter
+    countFilesCreated++;
+
+    // Check all folders have been created
+    if(countFilesCreated === countFilesToCreate){
+
+      _mock.notification.send({type:'success', message:'Export Completed'}); 
+      
+      
+    }
+  }
+
   function _upload(data, callback){
     var model = data.model;
     var file = {
@@ -1057,14 +1102,22 @@ _mock.drive = (function(){
     
     chrome.identity.getAuthToken({'interactive':true},function(token){
       
-      req.open('POST', 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart');
+      req.open('POST', 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart', true);
       req.setRequestHeader('Authorization', 'Bearer ' + token);
       req.setRequestHeader('Content-Type', 'multipart/related; boundary='+boundary);
 
       req.onreadystatechange = function() {
+
         if (req.readyState == 4) {
-          var res = JSON.parse(req.responseText);
-          callback && callback(res,model);
+          if(req.status == 200){
+            var res = JSON.parse(req.responseText);
+            callback && callback(res,model);
+          }else
+          if(req.status == 401){
+            req.abort();
+            _mock.notification.send({type:'error', message:'Export Cancelled. You have not authorized access.'}); 
+
+          }
         }
       };
 
@@ -1073,7 +1126,8 @@ _mock.drive = (function(){
   }
   return {
     upload: function(file, callback){
-      _upload(file, callback);
+      var cb = callback || onFileCreate; 
+      _upload(file, cb);
     },
     generateFolders: function(data, callback){
       _createFolders(data, callback);
@@ -1081,46 +1135,10 @@ _mock.drive = (function(){
   };
 
 }());
-_mock.events = (function () {
-    'use strict';
-    //Private Methods and Vars
-    var _events = [];
-
-    //Public Methods
-    return {
-        
-        addListener: function (event, callback) {
-            _events[event] = _events[event] || [];
-            if (_events[event]) {
-                _events[event].push(callback);
-            }
-        },
-
-        removeListener: function (event, callback) {
-            if (_events[event]) {
-                var listeners = _events[event];
-                for (var i = listeners.length - 1; i >= 0; --i) {
-                    if (listeners[i] === callback) {
-                        listeners.splice(i, 1);
-                        return true;
-                    }
-                }
-            }
-            return false;
-        },
-
-        dispatch: function (event) {
-            if (_events[event]) {
-                var listeners = _events[event], len = listeners.length;
-                while (len--) {
-                    listeners[len](this); //callback with self
-                }
-            }
-        }
-    };
-}());
 _mock.local = (function(){
 "use strict";
+
+  var filesToBeWritten, filesWritten;
   
   function _getZip(data){
     var zip = new JSZip();
@@ -1137,20 +1155,26 @@ _mock.local = (function(){
     };
 
     chrome.fileSystem.chooseEntry({ type:'saveFile', suggestedName: data.filename }, function(entry, fileEntry){
-      // check isWritableEntry
-      entry.createWriter(function(fileWriter) {
+      
+      if(entry){
+        _mock.notification.send({type:'info', message:'Exporting to '+ entry.name, persist:true});
+        // check isWritableEntry
+        entry.createWriter(function(fileWriter) {
 
-        fileWriter.onwriteend = function(e) {
-          console.log('Write completed.');
-        };
+          fileWriter.onwriteend = function(e) {
+            _mock.notification.send({type:'success', message:'Export Completed'}); 
+          };
 
-        fileWriter.onerror = function(e) {
-          console.log('Write failed: ' + e.toString());
-        };
+          fileWriter.onerror = function(e) {
+            _mock.notification.send({type:'Error', message:'Error Creating Zip: ' + e.toString()});
+          };
 
-        fileWriter.write(data.filedata);
+          fileWriter.write(data.filedata);
 
-      });
+        });
+      }else{
+        _mock.notification.send({type:'error', message:'Export Cancelled'});
+      }
     });
   }
   
@@ -1161,32 +1185,43 @@ _mock.local = (function(){
     _rootName = data.folderName;
     chrome.fileSystem.chooseEntry({ type:'openDirectory'}, function(entry){
       _root = entry;
-      // check isWritableEntry
-      var req_fs = window.requestFileSystem || window.webkitRequestFileSystem || window.mozRequestFileSystem;
-      req_fs(window.TEMPORARY, 1024*1024, function(fs){
-        
-        _root.getDirectory(_rootName,{create:true}, function(entry){
-          debugger;
-          if(_files.html.filedata.size) {
-            entry.getFile(_files.html.filename, {create:true}, onGetFile, onGetError);  
-          }
 
-          if(_files.css.filedata.size) {
-            entry.getDirectory('styles',{create:true}, function(entry){
-              entry.getFile(_files.css.filename, {create:true}, onGetFile, onGetError);  
-            }, onGetError);
-          }
+      if(_root){
+        _mock.notification.send({type:'info', message:'Exporting to '+ _root.name, persist:true});
+        var req_fs = window.webkitRequestFileSystem;
+        req_fs(window.TEMPORARY, 1024*1024, function(fs){
           
-          if(_files.js.filedata.size) {
-            entry.getDirectory('scripts',{create:true}, function(entry){
-              entry.getFile(_files.js.filename, {create:true}, onGetFile, onGetError);
-            }, onGetError);
-          }
-                         
-        }, onGetError);
-        
+          filesWritten = 0;
+          filesToBeWritten = 0;
 
-      });
+          _root.getDirectory(_rootName,{create:true}, function(entry){
+            
+            if(_files.html.filedata.size) {
+              filesToBeWritten++;
+              entry.getFile(_files.html.filename, {create:true}, onGetFile, onGetError);  
+            }
+
+            if(_files.css.filedata.size) {
+              filesToBeWritten++;
+              entry.getDirectory('styles',{create:true}, function(entry){
+                entry.getFile(_files.css.filename, {create:true}, onGetFile, onGetError);  
+              }, onGetError);
+            }
+            
+            if(_files.js.filedata.size) {
+              filesToBeWritten++;
+              entry.getDirectory('scripts',{create:true}, function(entry){
+                entry.getFile(_files.js.filename, {create:true}, onGetFile, onGetError);
+              }, onGetError);
+            }
+                           
+          }, onGetError);
+          
+
+        });
+      }else{
+        _mock.notification.send({type:'error', message:'Export Cancelled'});
+      }
     });
   }
 
@@ -1194,11 +1229,14 @@ _mock.local = (function(){
     fileEntry.createWriter(function(fileWriter) {
 
       fileWriter.onwriteend = function(e) {
-        console.log('Write completed.');
+        filesWritten++;
+        if(filesWritten >= filesToBeWritten){
+          _mock.notification.send({type:'success', message:'Export Completed'});
+        }
       };
 
       fileWriter.onerror = function(e) {
-        console.log('Write failed: ' + e.toString());
+        _mock.notification.send({type:'Error', message:'Error Creating File: ' + e.toString()});
       };
 
       var type = fileEntry.name.substr(fileEntry.name.lastIndexOf('.') + 1);
@@ -1207,6 +1245,7 @@ _mock.local = (function(){
     },function(){ 
       return fileEntry;
     });
+
   }
 
   function onGetError(e){
@@ -1234,29 +1273,48 @@ _mock.local = (function(){
   };
 
 }());
-_mock.notify = (function(){
-'use strict'; 
+_mock.notification = (function(){
+"use strict";
 
-  var _counter = 0;
+  var icons = ['icon_error-oct', 'icon_check_alt', 'icon_cone', 'icon_info']
+  var timeout;
 
-  function _notify(options){
-    var data = options || {},
-        o = {
-          type: data.type || 'basic',
-          title: data.title || 'MockBox',
-          message: data.message || '',
-          iconUrl: data.iconUrl || "icons/mockbox96.png"
-        };
-    chrome.notifications.create('id'+_counter, o, _callback);
+  function _send(type, message, persist){
+    var doc = chrome.app.window.current().contentWindow.document;
+    var not = doc.getElementById('app-notification');
+    var notWrapper = doc.querySelector('.notification-wrapper');
+    var notIcon = doc.querySelector('.notification-icon');
+    var notMessage = doc.querySelector('.notification-message');
+    
+    notMessage.innerHTML = message;
+
+    apollo.removeClass(notIcon, icons);
+    apollo.removeClass(notWrapper, ['error', 'success', 'warning', 'info']);
+
+    var icon;
+    switch(type){
+      case 'error': icon = icons[0]; break;
+      case 'success': icon = icons[1]; break;
+      case 'warning': icon = icons[2]; break;
+      case 'info': icon = icons[3]; break;
+    };
+
+    apollo.addClass(notWrapper, type);
+    apollo.addClass(not, 'showing');
+    apollo.addClass(notIcon, icon);
+
+    if(!persist){
+      timeout = setTimeout(function(){
+        apollo.removeClass(not, 'showing');
+      }, 4000);
+    }else{
+      window.clearTimeout(timeout)
+    }
+
   }
-
-  function _callback(e){
-    _counter++;
-  }
-
   return {
-    send: function(o){
-      _notify(o);
+    send: function(options){
+      _send(options.type, options.message, options.persist);
     }
   };
 
@@ -1389,7 +1447,7 @@ _mock.receiver = (function(){
 
       case 'onLoadItem': 
         // Restore working project from db by id
-        _mock.database.restoreEditorsFromId(data.gui);
+        _mock.database.restoreEditorsFromId(data.gui, data.isTemplate);
         break;
 
       case 'onDeleteItem': 
@@ -1418,6 +1476,9 @@ _mock.receiver = (function(){
         break;
       
       case 'onExport':
+
+        _mock.popout.close('export');
+
         var exportData = {
           projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
           editors: _mock.getEditorsModel(),
@@ -1425,13 +1486,16 @@ _mock.receiver = (function(){
         };
         
         if(data.model.type === 'drive'){
+          
+          _mock.notification.send({type:'info', message:'Exporting to Google Drive', persist:true});
+          
           if(data.model.packaged){
             
             // Get zip file from utils
             var zip = _mock.utils.getExportPackage(exportData.editors);
             // Upload zip file to drive
             _mock.drive.upload({title: exportData.projectFolderName+'.zip',type:zip.type,value: zip}, function(){
-              console.log('Zip Uploaded');  
+              _mock.notification.send({type:'success', message:'Export Completed'}); 
             });
           
           }else{
@@ -1440,13 +1504,18 @@ _mock.receiver = (function(){
             _mock.drive.generateFolders(exportData, function(){
               // Export only if the editor has data.
               exportData.editors.html.value && _mock.drive.upload({title:'index.html',type:'text/html', value: btoa(exportData.editors.html.value), parent:'main'});
+              
               exportData.editors.css.value && _mock.drive.upload({title:'styles.css',type:'text/css', value: btoa(exportData.editors.css.value), parent:'styles'});
+
               exportData.editors.js.value && _mock.drive.upload({title:'scripts.js',type:'application/javascript', value: btoa(exportData.editors.js.value), parent:'scripts'});
             });
+
+            
           
           }
         }else
         if(data.model.type === 'local'){
+
           if(data.model.packaged){
             _mock.local.saveZip(exportData);
           }else{
@@ -1530,6 +1599,37 @@ _mock.storage = (function(){
   };
 
 }());
+_mock.templates = (function(){
+  'use strict';
+
+  function getTemplates(){
+    return [
+    {
+      name: 'Hello Template',
+      html: '<div class="wheel"><ul class="umbrella"><li class="color"></li><li class="color"></li><li class="color"></li><li class="color"></li><li class="color"></li><li class="color"></li><li class="color"></li><li class="color"></li><li class="color"></li><li class="color"></li><li class="color"></li><li class="color"></li></ul></div>',
+      css : '.color,.umbrella,.wheel{content:"";position:absolute;border-radius:50%;left:calc(50% - 7.5em);top:calc(50% - 7.5em);width:15em;height:15em}.wheel{overflow:hidden;width:15em;height:15em;position:relative}.umbrella{position:relative;-webkit-filter:blur(1.7em);-webkit-transform:scale(1.35)}.color,.color:nth-child(n+7):after{clip:rect(0,15em,15em,7.5em)}.color:after,.color:nth-child(n+7){content:"";position:absolute;border-radius:50%;left:calc(50% - 7.5em);top:calc(50% - 7.5em);width:15em;height:15em;clip:rect(0,7.5em,15em,0)}.color:nth-child(1):after{background-color:#9ED110;transform:rotate(30deg);z-index:12}.color:nth-child(2):after{background-color:#50B517;transform:rotate(60deg);z-index:11}.color:nth-child(3):after{background-color:#179067;transform:rotate(90deg);z-index:10}.color:nth-child(4):after{background-color:#476EAF;transform:rotate(120deg);z-index:9}.color:nth-child(5):after{background-color:#9f49ac;transform:rotate(150deg);z-index:8}.color:nth-child(6):after{background-color:#CC42A2;transform:rotate(180deg);z-index:7}.color:nth-child(7):after{background-color:#FF3BA7;transform:rotate(180deg)}.color:nth-child(8):after{background-color:#FF5800;transform:rotate(210deg)}.color:nth-child(9):after{background-color:#FF8100;transform:rotate(240deg)}.color:nth-child(10):after{background-color:#FEAC00;transform:rotate(270deg)}.color:nth-child(11):after{background-color:#FC0;transform:rotate(300deg)}.color:nth-child(12):after{background-color:#EDE604;transform:rotate(330deg)}body{background:#f2f2f2;padding:50px}',
+      js  : '// No JavaScript',
+      layout: [50,50,50],
+      author: '@luisreyesdev'
+    },
+    {
+      name: 'MockBox Template',
+      html: '<!-- MockBox HTML -->',
+      css : '/* MockBox CSS */',
+      js  : '// JavaScript Here',
+      layout: [60,70,50],
+      author: '@luisreyesdev'
+    }];
+
+  }    
+
+  return {
+    getAll:function(){
+      return getTemplates();
+    }
+  };
+
+}());
 _mock.utils = (function(){
   'use strict';
   var _isDirty = false;
@@ -1574,6 +1674,10 @@ _mock.utils = (function(){
     return obj;
   }
 
+  function _getGUID() {
+      return ("000000" + (Math.random()*Math.pow(36,6) << 0).toString(36)).slice(-6);
+  }
+
   function _getExportZip(data){
     var zip = new JSZip();
 
@@ -1598,6 +1702,9 @@ _mock.utils = (function(){
   
 
   return {
+    getGUID: function(){
+      return _getGUID();
+    },
     toDate: function(epoch){
       return toDate(epoch);
     }, 
@@ -1653,8 +1760,8 @@ _mock.windows = (function(){
         hidden: globals.hidden,
         resizable:false,
         bounds: {
-          width: 600,
-          height: 460
+          width: 500,
+          height: 450
         }
       }
     },
@@ -1683,7 +1790,7 @@ _mock.windows = (function(){
         hidden: globals.hidden,
         resizable:false,
         bounds: {
-          width: 600,
+          width: 500,
           height: 460
         }
       }
@@ -1699,22 +1806,7 @@ _mock.windows = (function(){
         resizable:false,
         bounds: {
           width: 300,
-          height: 260
-        }
-      }
-    },
-
-    connection :{
-      file:'popout_connection.html',
-      exists: false,
-      options:{
-        id:'connection',
-        frame: globals.frame,
-        hidden: globals.hidden,
-        resizable:false,
-        bounds: {
-          width: 400,
-          height: 200
+          height: 300
         }
       }
     }
@@ -1803,15 +1895,15 @@ _mock.windows = (function(){
   };
 
 }());
+  _mock.database.init();
   window.addEventListener("DOMContentLoaded", _mock.init, false);
-
   //Expose
   mockbox = {
     getSettings: function(){
       return _mock.getSettings();
     },
-    getAllPrototypes:function(callback){
-      return _mock.database.getAll(callback);
+    getAll:function(table,callback){
+      return _mock.database.getAll(table,callback);
     },
     popout:_mock.popout,
     reset:function(){
@@ -1819,7 +1911,8 @@ _mock.windows = (function(){
     },
     utils:_mock.utils,
     notify:function(o){
-      _mock.notify.send(o);
+      _mock.notification.send(o);
+      //_mock.notify.send(o);
     },
     getTokens: function(){
       return _mock.tokens();

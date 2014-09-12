@@ -94,6 +94,7 @@ gulp.task( 'compile_js', function () {
     .pipe( concat('views.js') )
     .pipe( gulp.dest( 'app/scripts/' ));
 
+
   // Minify, Bundle JavaScript
   gulp.src( 'dev/scripts/lib/**/*.js' )
     .pipe( concat('lib.js') )

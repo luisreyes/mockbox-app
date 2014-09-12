@@ -3,15 +3,12 @@ _mock.database = (function(){
   var reqResult,
   listeningForResult = false,
   indexedDb = {};
-  indexedDb.db = null;
+  indexedDb.db = null,
+  _onReadyCallback = null;
   
   function init() {
     // open displays the data previously saved
     indexedDb.open(); 
-  }
-
-  function getUID() {
-      return ("000000" + (Math.random()*Math.pow(36,6) << 0).toString(36)).slice(-6);
   }
 
   indexedDb.open = function() {
@@ -25,33 +22,42 @@ _mock.database = (function(){
       // A versionchange transaction is started automatically.
       e.target.transaction.onerror = indexedDb.onerror;
       
-      if(db.objectStoreNames.contains("editor")) {
-        db.deleteObjectStore("editor");
+      if(db.objectStoreNames.contains("prototypes")) {
+        db.deleteObjectStore("prototypes");
       }
 
-      var store = db.createObjectStore("editor",{keyPath: "gui"});
-      var createdByIndex = store.createIndex("by_createdBy", "createdBy"),
-          guiIndex = store.createIndex("by_gui", "gui");
+      if(db.objectStoreNames.contains("templates")) {
+        db.deleteObjectStore("templates");
+      }
+
+      var store = db.createObjectStore("prototypes",{keyPath: "gui"});
+      var guiIndex = store.createIndex("by_prototypeId", "gui");
+
+      var store2 = db.createObjectStore("templates",{keyPath: "gui"});
+      var guiIndex2 = store2.createIndex("by_templateId", "gui");
     };
 
     request.onsuccess = function(e) {
       indexedDb.db = e.target.result;
+      _onReadyCallback && _onReadyCallback();
     };
 
     request.onerror = indexedDb.onerror;
   };
 
-  indexedDb.addEditEntry = function(data) {
+  indexedDb.addEditEntry = function(table, data, suppressNotification) {
     var db = indexedDb.db,
-        trans = db.transaction("editor", "readwrite"),
-        store = trans.objectStore("editor"),
-        currentGui = _mock.gui() || getUID();
+        trans = db.transaction(table, "readwrite"),
+        store = trans.objectStore(table),
+        currentGui = _mock.gui() || _mock.utils.getGUID();
 
-    _mock.gui(currentGui);
+    if(table !== 'templates'){
+      _mock.gui(currentGui);
+    }
     
     // Put Entry
     var entry = store.put({
-      "gui" : currentGui,
+      "gui" : (table === 'templates') ? _mock.utils.getGUID() : currentGui,
       "name": data.name || "No Name",
       "html": data.html,
       "css": data.css,
@@ -66,36 +72,36 @@ _mock.database = (function(){
     entry.onsuccess = function(e) {
       // Re-render all the editors
       mockbox.isDirty(false);
-      mockbox.notify({iconUrl:'icons/notifications/check.png',message:'Saved Successfully'});
+      !suppressNotification && mockbox.notify({type:'success',message:'Saved Successfully'});
     };
 
     entry.onerror = function(e) {
-      //console.log(e.value);
+      mockbox.notify({type:'error',message:'Problem Saving: ' + e.toString()});
     };
   };
   
-  indexedDb.deleteEntry = function(id) {
+  indexedDb.deleteEntry = function(id, table) {
     var db = indexedDb.db;
-    var trans = db.transaction("editor", "readwrite");
-    var store = trans.objectStore("editor");
+    var trans = db.transaction(table, "readwrite");
+    var store = trans.objectStore(table);
 
     var request = store.delete(id);
 
     request.onsuccess = function(e) {
-      mockbox.notify({iconUrl:'icons/notifications/error.png', message:'Deleted'});
+      mockbox.notify({type:'error', message:'Deleted'});
     };
 
     request.onerror = function(e) {
-      //console.log(e.value);
     };
   };
 
-  indexedDb.getAll = function() {
+  indexedDb.getAll = function(table, callback) {
     var db = indexedDb.db;
-    var transaction = db.transaction(["editor"]);
-    var objectStore = transaction.objectStore("editor");
+    var transaction = db.transaction([table]);
+    var objectStore = transaction.objectStore(table);
 
     var items = [];
+    var callback = callback;
     var request = objectStore.openCursor();
 
     request.onsuccess = function(event) {
@@ -105,8 +111,7 @@ _mock.database = (function(){
         cursor.continue();
       }
       else {
-        reqResult = items;
-        _mock.events.dispatch('dbresult');
+        callback(items);
       }
     };
 
@@ -117,47 +122,49 @@ _mock.database = (function(){
     };
   }; 
 
-  indexedDb.setEditorsFromId = function(id) {
+  indexedDb.setEditorsFromId = function(id, isTemplate) {
     var db = indexedDb.db;
-    var transaction = db.transaction(["editor"]);
-    var objectStore = transaction.objectStore("editor");
+    var table = isTemplate ? 'templates' : 'prototypes'
+    var transaction = db.transaction([table]);
+    var objectStore = transaction.objectStore(table);
     var request = objectStore.get(id);
     
     request.onsuccess = function(event) {
-      // Do something with the request.result!
-      _mock.gui(request.result.gui);
-      _mock.restore(request.result);
+      if(request.result){
+        // Do something with the request.result!
+        mockbox.notify({type:'info', message:'Loaded ' + request.result.name});
+        var gui = isTemplate ? _mock.utils.getGUID() : request.result.gui;
+        _mock.gui(gui);
+        _mock.restore(request.result, isTemplate);
+      }
     };
     
     request.onerror = function(event) {};
   }; 
-  function onDbResult(callback){
-    callback(reqResult);
-    _mock.events.removeListener('dbresult', function(){
-      onDbResult(callback);
-    });
-  }
-  
+
+
   return {
     init:init,
-    save: function(data){
-      indexedDb.addEditEntry(data);
+    save: function(table, data, suppressNotification){
+      indexedDb.addEditEntry(table, data, suppressNotification);
     },
     delete:function(id){
-      indexedDb.deleteEntry(id);
+      indexedDb.deleteEntry(id, 'prototypes');
     },
-    restoreEditorsFromId: function(id){
-      indexedDb.setEditorsFromId(id);
+    restoreEditorsFromId: function(id, isTemplate){
+      indexedDb.setEditorsFromId(id, isTemplate);
     },
-    getAll:function(callback){
-      indexedDb.getAll();
-      if(!listeningForResult){
-        _mock.events.addListener('dbresult', function(){
-          onDbResult(callback);
-        });
-        listeningForResult = true;
+    onReady: function(callback){
+      if(indexedDb.db){
+        callback();
+      }else{
+        _onReadyCallback = callback;
       }
+    },
+    getAll:function(table, callback){
+      indexedDb.getAll(table, callback);
     }
+
   };
 
 }());

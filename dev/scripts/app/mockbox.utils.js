@@ -42,6 +42,10 @@ _mock.utils = (function(){
     return obj;
   }
 
+  function _getGUID() {
+      return ("000000" + (Math.random()*Math.pow(36,6) << 0).toString(36)).slice(-6);
+  }
+
   function _getExportZip(data){
     var zip = new JSZip();
 
@@ -66,6 +70,9 @@ _mock.utils = (function(){
   
 
   return {
+    getGUID: function(){
+      return _getGUID();
+    },
     toDate: function(epoch){
       return toDate(epoch);
     }, 

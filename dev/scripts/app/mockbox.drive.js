@@ -1,27 +1,34 @@
 _mock.drive = (function(){
 "use strict";
 
-  var folderIds, mainCallback, countFoldersCreated, countFoldersToCreate;
+  var folderIds, mainCallback, countFoldersCreated, countFoldersToCreate, countFilesCreated=0, countFilesToCreate;
 
   // Get count for folders to be create and set the value on "countFoldersToCreate"
   function _setCountToCreate(data){
     
     // Initialize the count
     countFoldersToCreate = 0;
+    countFilesToCreate = 0;
     
     // Loop through all editors
     for (var type in data.editors) {
     
       // Check the property exists in the editors object do not include the HTML since it goes in 
       // the main folder and the main folder is always created
-      if ((type !== 'html') && data.editors.hasOwnProperty(type)) {
+      if (data.editors.hasOwnProperty(type)) {
     
         // Check the property has a value
         if(data.editors[type].value){
           // Increment count
-          countFoldersToCreate++;
-    
+          countFilesToCreate++;
+          
+          // Check the property has a value
+          if(type !== 'html'){
+            // Increment count
+            countFoldersToCreate++;
+          }
         }
+
       }
     }
   }
@@ -97,6 +104,20 @@ _mock.drive = (function(){
     }
   }
 
+  function onFileCreate(result){
+    
+    // Increment created counter
+    countFilesCreated++;
+
+    // Check all folders have been created
+    if(countFilesCreated === countFilesToCreate){
+
+      _mock.notification.send({type:'success', message:'Export Completed'}); 
+      
+      
+    }
+  }
+
   function _upload(data, callback){
     var model = data.model;
     var file = {
@@ -134,14 +155,22 @@ _mock.drive = (function(){
     
     chrome.identity.getAuthToken({'interactive':true},function(token){
       
-      req.open('POST', 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart');
+      req.open('POST', 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart', true);
       req.setRequestHeader('Authorization', 'Bearer ' + token);
       req.setRequestHeader('Content-Type', 'multipart/related; boundary='+boundary);
 
       req.onreadystatechange = function() {
+
         if (req.readyState == 4) {
-          var res = JSON.parse(req.responseText);
-          callback && callback(res,model);
+          if(req.status == 200){
+            var res = JSON.parse(req.responseText);
+            callback && callback(res,model);
+          }else
+          if(req.status == 401){
+            req.abort();
+            _mock.notification.send({type:'error', message:'Export Cancelled. You have not authorized access.'}); 
+
+          }
         }
       };
 
@@ -150,7 +179,8 @@ _mock.drive = (function(){
   }
   return {
     upload: function(file, callback){
-      _upload(file, callback);
+      var cb = callback || onFileCreate; 
+      _upload(file, cb);
     },
     generateFolders: function(data, callback){
       _createFolders(data, callback);

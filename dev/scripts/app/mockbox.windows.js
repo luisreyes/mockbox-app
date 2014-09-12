@@ -32,8 +32,8 @@ _mock.windows = (function(){
         hidden: globals.hidden,
         resizable:false,
         bounds: {
-          width: 600,
-          height: 460
+          width: 500,
+          height: 450
         }
       }
     },
@@ -62,7 +62,7 @@ _mock.windows = (function(){
         hidden: globals.hidden,
         resizable:false,
         bounds: {
-          width: 600,
+          width: 500,
           height: 460
         }
       }
@@ -78,22 +78,7 @@ _mock.windows = (function(){
         resizable:false,
         bounds: {
           width: 300,
-          height: 260
-        }
-      }
-    },
-
-    connection :{
-      file:'popout_connection.html',
-      exists: false,
-      options:{
-        id:'connection',
-        frame: globals.frame,
-        hidden: globals.hidden,
-        resizable:false,
-        bounds: {
-          width: 400,
-          height: 200
+          height: 300
         }
       }
     }

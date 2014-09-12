@@ -7,20 +7,19 @@
 
   .window-drag{
     -webkit-app-region: drag;
-    width:-webkit-calc(100% - 100px);
+    width:-webkit-calc(100% - 103px);
     height: 100%;
+    float:left;
   }
 
   .popout-drag{
     -webkit-app-region: drag;
-    width:-webkit-calc(100% - 50px);
+    width:-webkit-calc(100% - 51px);
     height: 100%;
+    float:left;
   }
 
   .window-controls{ 
-    position: absolute;
-    top: 0;
-    right: 0;
     height: 100%;
     span{
 
@@ -69,7 +68,7 @@
     width: 100%;
   }
   &.frame-right{
-    height: 100%;
+    height: -webkit-calc(100% - 1px);
     left:0;
   }
   &.frame-bottom{
@@ -77,7 +76,7 @@
     width: 100%;
   }
   &.frame-left{
-    height: 100%;
+    height: -webkit-calc(100% - 1px);
     right:0;
   }
 }

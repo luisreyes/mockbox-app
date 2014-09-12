@@ -11,7 +11,7 @@ _mock.receiver = (function(){
 
       case 'onLoadItem': 
         // Restore working project from db by id
-        _mock.database.restoreEditorsFromId(data.gui);
+        _mock.database.restoreEditorsFromId(data.gui, data.isTemplate);
         break;
 
       case 'onDeleteItem': 
@@ -40,6 +40,9 @@ _mock.receiver = (function(){
         break;
       
       case 'onExport':
+
+        _mock.popout.close('export');
+
         var exportData = {
           projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
           editors: _mock.getEditorsModel(),
@@ -47,13 +50,16 @@ _mock.receiver = (function(){
         };
         
         if(data.model.type === 'drive'){
+          
+          _mock.notification.send({type:'info', message:'Exporting to Google Drive', persist:true});
+          
           if(data.model.packaged){
             
             // Get zip file from utils
             var zip = _mock.utils.getExportPackage(exportData.editors);
             // Upload zip file to drive
             _mock.drive.upload({title: exportData.projectFolderName+'.zip',type:zip.type,value: zip}, function(){
-              console.log('Zip Uploaded');  
+              _mock.notification.send({type:'success', message:'Export Completed'}); 
             });
           
           }else{
@@ -62,13 +68,18 @@ _mock.receiver = (function(){
             _mock.drive.generateFolders(exportData, function(){
               // Export only if the editor has data.
               exportData.editors.html.value && _mock.drive.upload({title:'index.html',type:'text/html', value: btoa(exportData.editors.html.value), parent:'main'});
+              
               exportData.editors.css.value && _mock.drive.upload({title:'styles.css',type:'text/css', value: btoa(exportData.editors.css.value), parent:'styles'});
+
               exportData.editors.js.value && _mock.drive.upload({title:'scripts.js',type:'application/javascript', value: btoa(exportData.editors.js.value), parent:'scripts'});
             });
+
+            
           
           }
         }else
         if(data.model.type === 'local'){
+
           if(data.model.packaged){
             _mock.local.saveZip(exportData);
           }else{

@@ -7,6 +7,7 @@
 }
 
 .sidebar{
+
   background-color: darken($accent-dark-color-0, 2%);
   color:$accent-color;
   font-weight: bold;
@@ -44,6 +45,7 @@
         color:$accent-color-font-hover;
         padding-left:12px;
         .icon path{ fill:  $accent-color-font-hover; }
+
       }
 
       .icon{ 

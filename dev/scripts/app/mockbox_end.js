@@ -1,12 +1,12 @@
+  _mock.database.init();
   window.addEventListener("DOMContentLoaded", _mock.init, false);
-
   //Expose
   mockbox = {
     getSettings: function(){
       return _mock.getSettings();
     },
-    getAllPrototypes:function(callback){
-      return _mock.database.getAll(callback);
+    getAll:function(table,callback){
+      return _mock.database.getAll(table,callback);
     },
     popout:_mock.popout,
     reset:function(){
@@ -14,7 +14,8 @@
     },
     utils:_mock.utils,
     notify:function(o){
-      _mock.notify.send(o);
+      _mock.notification.send(o);
+      //_mock.notify.send(o);
     },
     getTokens: function(){
       return _mock.tokens();

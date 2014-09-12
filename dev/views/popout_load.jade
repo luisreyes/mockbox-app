@@ -6,19 +6,58 @@ block titleIcon
   span.icon_grid-2x2
 
 block content
-  section
-    ul#prototype-list.load-list.transition.hidden
-    section#prototype-list-empty.load-list-empty You don't have anything to load
+  section.view-load
+    section#load-options.sidebar
+      ul    
+        
+        li.templates.transition
+          section.item
+            span.icon.icon_heart
+          span TEMPLATES
+
+        li.prototypes.transition 
+          section.item
+            span.icon.icon_documents
+          span PROTOTYPES
+
+        
+    section#load-panels.load-options.panels
+      ul
+        
+        li.templates.panel.hidden
+          section.field
+            ul#templates-list.load-list.transition.hidden
+            section#templates-list-empty.load-list-empty You don't have any templates
+            
+            section#templates-list-item-template.hidden
+              li.list-item.transition
+                table
+                  tr
+                    td.list-item-load.transition
+                      span.list-item-title
+
+        li.prototypes.panel
+          section.field
+            ul#prototype-list.load-list.transition
+            section#prototype-list-empty.load-list-empty You don't have any prototypes
+            
+            section#prototypes-list-item-template.hidden
+              li.list-item.transition
+                table
+                  tr
+                    td.list-item-load.transition
+                      span.list-item-title
+                      br
+                      span.list-item-subtitle
+                    td(title="DELETE").list-item-delete.transition
+                      section
+                        span.icon.icon_trash
+
+
+
+
+
+
+  //------------------------------------------------------
   
-  section#list-item-template.hidden
-    li.list-item.transition
-      table
-        tr
-          td.list-item-load.transition
-            span.list-item-title
-            br
-            span.list-item-subtitle
-          td.list-item-delete.transition
-            section
-              span.icon.icon_trash
 

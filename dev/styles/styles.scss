@@ -9,6 +9,7 @@ body, html {
 }
 
 .transition{ -webkit-transition: all 0.12s; }
+.transition-slow{ -webkit-transition: all 0.5s; }
 .absolute{ position:absolute; }
 .bottom{ bottom:0; }
 .center{ text-align:center; }
@@ -72,6 +73,12 @@ ul{margin: 0; padding: 0; list-style: none;}
   background-size: cover;
   margin: 25px;
   float: none;
+}
+
+.about-version{
+  font-size: medium;
+  font-weight: 600;
+  margin-bottom: 5px;
 }
 
 header {

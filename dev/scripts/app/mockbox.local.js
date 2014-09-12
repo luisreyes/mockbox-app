@@ -1,5 +1,7 @@
 _mock.local = (function(){
 "use strict";
+
+  var filesToBeWritten, filesWritten;
   
   function _getZip(data){
     var zip = new JSZip();
@@ -16,20 +18,26 @@ _mock.local = (function(){
     };
 
     chrome.fileSystem.chooseEntry({ type:'saveFile', suggestedName: data.filename }, function(entry, fileEntry){
-      // check isWritableEntry
-      entry.createWriter(function(fileWriter) {
+      
+      if(entry){
+        _mock.notification.send({type:'info', message:'Exporting to '+ entry.name, persist:true});
+        // check isWritableEntry
+        entry.createWriter(function(fileWriter) {
 
-        fileWriter.onwriteend = function(e) {
-          console.log('Write completed.');
-        };
+          fileWriter.onwriteend = function(e) {
+            _mock.notification.send({type:'success', message:'Export Completed'}); 
+          };
 
-        fileWriter.onerror = function(e) {
-          console.log('Write failed: ' + e.toString());
-        };
+          fileWriter.onerror = function(e) {
+            _mock.notification.send({type:'Error', message:'Error Creating Zip: ' + e.toString()});
+          };
 
-        fileWriter.write(data.filedata);
+          fileWriter.write(data.filedata);
 
-      });
+        });
+      }else{
+        _mock.notification.send({type:'error', message:'Export Cancelled'});
+      }
     });
   }
   
@@ -40,32 +48,43 @@ _mock.local = (function(){
     _rootName = data.folderName;
     chrome.fileSystem.chooseEntry({ type:'openDirectory'}, function(entry){
       _root = entry;
-      // check isWritableEntry
-      var req_fs = window.requestFileSystem || window.webkitRequestFileSystem || window.mozRequestFileSystem;
-      req_fs(window.TEMPORARY, 1024*1024, function(fs){
-        
-        _root.getDirectory(_rootName,{create:true}, function(entry){
-          debugger;
-          if(_files.html.filedata.size) {
-            entry.getFile(_files.html.filename, {create:true}, onGetFile, onGetError);  
-          }
 
-          if(_files.css.filedata.size) {
-            entry.getDirectory('styles',{create:true}, function(entry){
-              entry.getFile(_files.css.filename, {create:true}, onGetFile, onGetError);  
-            }, onGetError);
-          }
+      if(_root){
+        _mock.notification.send({type:'info', message:'Exporting to '+ _root.name, persist:true});
+        var req_fs = window.webkitRequestFileSystem;
+        req_fs(window.TEMPORARY, 1024*1024, function(fs){
           
-          if(_files.js.filedata.size) {
-            entry.getDirectory('scripts',{create:true}, function(entry){
-              entry.getFile(_files.js.filename, {create:true}, onGetFile, onGetError);
-            }, onGetError);
-          }
-                         
-        }, onGetError);
-        
+          filesWritten = 0;
+          filesToBeWritten = 0;
 
-      });
+          _root.getDirectory(_rootName,{create:true}, function(entry){
+            
+            if(_files.html.filedata.size) {
+              filesToBeWritten++;
+              entry.getFile(_files.html.filename, {create:true}, onGetFile, onGetError);  
+            }
+
+            if(_files.css.filedata.size) {
+              filesToBeWritten++;
+              entry.getDirectory('styles',{create:true}, function(entry){
+                entry.getFile(_files.css.filename, {create:true}, onGetFile, onGetError);  
+              }, onGetError);
+            }
+            
+            if(_files.js.filedata.size) {
+              filesToBeWritten++;
+              entry.getDirectory('scripts',{create:true}, function(entry){
+                entry.getFile(_files.js.filename, {create:true}, onGetFile, onGetError);
+              }, onGetError);
+            }
+                           
+          }, onGetError);
+          
+
+        });
+      }else{
+        _mock.notification.send({type:'error', message:'Export Cancelled'});
+      }
     });
   }
 
@@ -73,11 +92,14 @@ _mock.local = (function(){
     fileEntry.createWriter(function(fileWriter) {
 
       fileWriter.onwriteend = function(e) {
-        console.log('Write completed.');
+        filesWritten++;
+        if(filesWritten >= filesToBeWritten){
+          _mock.notification.send({type:'success', message:'Export Completed'});
+        }
       };
 
       fileWriter.onerror = function(e) {
-        console.log('Write failed: ' + e.toString());
+        _mock.notification.send({type:'Error', message:'Error Creating File: ' + e.toString()});
       };
 
       var type = fileEntry.name.substr(fileEntry.name.lastIndexOf('.') + 1);
@@ -86,6 +108,7 @@ _mock.local = (function(){
     },function(){ 
       return fileEntry;
     });
+
   }
 
   function onGetError(e){

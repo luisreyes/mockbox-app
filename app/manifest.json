@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "MockBox",
-  "version": "0.9.8",
+  "version": "0.9.8.1",
   "description": "Prorotype and Deploy",
   "sandbox": {
     "pages": ["mockbox_prototype.html"]
@@ -23,14 +23,14 @@
   "permissions": [
     "identity",
     "notifications",
-    {"fileSystem": ["write", "retainEntries", "directory"]},
+    {"fileSystem": ["write", "directory"]},
     "storage",
     "https://www.googleapis.com/"
   ],
   "oauth2": {
     "client_id": "599622858138-0pnf0pheaoe3ltssbjor765l7cb95eam.apps.googleusercontent.com",
     "scopes": [
-      "https://www.googleapis.com/auth/drive",
+      "https://www.googleapis.com/auth/drive.file",
       "https://www.googleapis.com/auth/chromewebstore.readonly"
 
     ]

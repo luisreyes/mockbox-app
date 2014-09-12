@@ -10,7 +10,7 @@ _v.about = (function(){
 
   function init(){
     doc = chrome.app.window.get('about').contentWindow.document;
-    doc.getElementById('about-version').innerHTML = 'Current version: ' + chrome.runtime.getManifest().version;
+    doc.getElementById('about-version').innerHTML = 'v' + chrome.runtime.getManifest().version;
 
     buttons = {
       twitter: doc.getElementById('about-footer').querySelector('.twitter'),
@@ -18,6 +18,8 @@ _v.about = (function(){
     };
 
     addListeners();
+
+    checkUpdate();
   }
 
   function addListeners(){
@@ -60,9 +62,38 @@ _v.about = (function(){
           }
         });
   }
+
+  function checkUpdate(){
+    chrome.runtime.requestUpdateCheck(function(status){
+      var msg;
+      switch(status){
+        case 'no_update':
+          msg = 'You are running on the latest version';
+          break;
+        case 'update_available':
+          msg = 'An update is avalable';
+          break;
+        case 'throttled':
+          msg = 'There are no updates available';
+          break;
+      }
+
+      doc.getElementById('about-update').innerHTML = msg;
+      
+
+    });
+  }
+
+  function onLoad(){
+    checkUpdate();
+  }
   return {
     init: function(){
-      !doc && init();
+      if(!doc){
+        init();
+      }else{
+        onLoad();
+      }
     }
   };
 

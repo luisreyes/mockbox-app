@@ -86,7 +86,7 @@ var mockbox;
           // Get token for google account
           _mock.oauth.getToken({'interactive':false},function(token){
             if (chrome.runtime.lastError) {
-              console.log(chrome.runtime.lastError);
+              //console.log(chrome.runtime.lastError);
             }else{
               tokens.google = token;
             }
@@ -99,6 +99,11 @@ var mockbox;
           if(_settings.lastGui && _settings.autoload){
             _mock.database.restoreEditorsFromId(_settings.lastGui);
           }
+
+          chrome.runtime.getPlatformInfo(function(p){
+            apollo.addClass(document.body, p.os);
+            apollo.removeClass(document.getElementById('app-window-controls'), 'hidden');
+          });
 
          break;
 
@@ -157,8 +162,14 @@ var mockbox;
           break;
 
           case 'onFirstRun':
-            apollo.removeClass(splashAllow, 'hidden');
-            apollo.addClass(splashLoading, 'hidden');
+
+            chrome.runtime.getPlatformInfo(function(p){
+              apollo.addClass(document.body, p.os);
+              apollo.removeClass(document.getElementById('app-window-controls'), 'hidden');
+            });
+
+            //apollo.removeClass(splashAllow, 'hidden');
+            //apollo.addClass(splashLoading, 'hidden');
 
             // Defulat App Settings
             _settings.theme = 'light';
@@ -168,7 +179,20 @@ var mockbox;
 
             currentSidebarToggleClassIndex = _settings.sidebarState;
 
+            _settings.isInited = true;
+
+            _mock.database.onReady(function(){
+              var templates = _mock.templates.getAll();
+              for(var i = 0; i < templates.length; i++){
+                _mock.database.save('templates',templates[i], true);
+              }  
+            });
+
+            closeSplash();
             saveSettings();
+
+            
+
           break;
           default: return;
       }
@@ -192,6 +216,7 @@ var mockbox;
   function closeSplash(){
     window.setTimeout(function(){
       apollo.addClass(splash, 'opaque');
+      apollo.removeClass(document.getElementById('app-header'), 'hidden');
       splash.addEventListener('webkitTransitionEnd', function() {
         apollo.addClass(splash, 'hidden');
       });
@@ -302,7 +327,8 @@ var mockbox;
     }
   }
 
-  function setEditorsData(data){
+  function setEditorsData(data, fromTemplate){
+    if(fromTemplate){currentGui = null;}
     if(data){
       document.getElementById('app-header').querySelector('.project-name').innerHTML = data.name;
       editors.html.setValue( data.html );
@@ -320,11 +346,8 @@ var mockbox;
     updateIframe();
     _mock.utils.isDirty(true);
     if(areAllEmpty()){
-      //_mock.clicks.buttons.removeClass('save','inactive');
       _mock.clicks.buttons.removeClass('export','inactive');
     }else{
-
-      //_mock.clicks.buttons.addClass('save','inactive');
       _mock.clicks.buttons.addClass('export','inactive');
     }
 
@@ -394,7 +417,6 @@ var mockbox;
 
   return {
     init: function(){
-      _mock.database.init();
       init();
 
     },
@@ -404,8 +426,8 @@ var mockbox;
     getSettings: function(){ 
       return _settings;
     },
-    restore: function(data){
-      setEditorsData(data);
+    restore: function(data, fromTemplate){
+      setEditorsData(data, fromTemplate);
     },
     gui: function(){
       if(arguments.length){
@@ -434,10 +456,7 @@ var mockbox;
       return exportPackage();
     },
     save: function(){
-      //if(areAllEmpty()){
-        _mock.database.save(getSaveData());
-        //_mock.clicks.buttons.addClass('save','inactive');
-      //}
+      _mock.database.save('prototypes',getSaveData());
     },
     reset:function(){
       if(mockbox.isDirty()){
