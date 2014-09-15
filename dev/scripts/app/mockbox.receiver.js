@@ -1,6 +1,23 @@
 _mock.receiver = (function(){
   'use strict';
 
+  document.addEventListener('keypress', function(event) {
+      if ( (event.which == 115 && event.ctrlKey) || (event.which == 19) ){
+        if(_mock.utils.isDirty()){
+          _mock.save();
+        }  
+      }
+
+      if ( (event.which == 108 && event.ctrlKey) || (event.which == 12) ){
+        chrome.runtime.sendMessage({message:'onOpenPopout', popout:'load'});
+      }
+
+      if ( (event.which == 110 && event.ctrlKey) || (event.which == 14) ){
+        _mock.reset();
+      }
+      
+  });
+
   chrome.runtime.onMessage.addListener(function(data) {
     switch(data.message){
       
@@ -13,6 +30,28 @@ _mock.receiver = (function(){
         // Restore working project from db by id
         _mock.database.restoreEditorsFromId(data.gui, data.isTemplate);
         break;
+
+      case 'onOpenPopout':
+        switch(data.popout){
+          case 'load':
+            // Open the window and run the function
+            _mock.popout.open('load', function(){
+              // init the views js file
+              views.load.init();
+              // Generate the list to display
+              views.load.generateList();
+            });
+            break;  
+          case 'export':
+            // Open the window and run the function
+            _mock.popout.open('export', function(){
+             // init the views js file
+              views.export.init();
+            });
+            break;  
+        }
+        
+      break;
 
       case 'onDeleteItem': 
         // Delete the item by the passed id
@@ -101,6 +140,40 @@ _mock.receiver = (function(){
             // Save all files to local
             _mock.local.saveFiles({ files: files, folderName: exportData.projectFolderName });
           }
+        }else
+
+        if(data.model.type === 'ftp'){
+          _mock.notification.send({type:'info', message:'Exporting to: '+data.model.host, persist:true});
+          var files = [];
+          if(data.model.packaged){
+            
+            // Get zip file from utils
+            files[0] = {
+              name: './'+data.model.folder+'/mockbox/'+exportData.projectFolderName+'.zip',
+              data: _mock.utils.getExportPackage(exportData.editors, 'arraybuffer')
+            }               
+            
+          }else{
+            // Generate all blob files from the editors
+            for(var type in exportData.editors){
+              if(exportData.editors.hasOwnProperty(type)){
+                // Create Blob
+                var blob = new Blob([exportData.editors[type].value], {type:'text/'+type});
+                _mock.utils.blobToArrayBuffer(blob, type, function(result, type){
+                  files.push({
+                    name:exportData.editors[type].title === 'main' ? './'+data.model.folder+'/mockbox/index'+ '.' + type : './'+data.model.folder+'/mockbox/'+exportData.editors[type].title + '.' + type,
+                    data:result
+                  });
+                });
+                
+              }
+            }
+          }
+
+          _mock.ftp.send(data.model, files)
+          .then(function(){ 
+            _mock.notification.send({type:'success', message:'Export Completed'});
+          });
         }
 
         

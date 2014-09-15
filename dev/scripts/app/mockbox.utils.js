@@ -46,7 +46,7 @@ _mock.utils = (function(){
       return ("000000" + (Math.random()*Math.pow(36,6) << 0).toString(36)).slice(-6);
   }
 
-  function _getExportZip(data){
+  function _getExportZip(data, type){
     var zip = new JSZip();
 
     if(data.html.value){
@@ -64,9 +64,41 @@ _mock.utils = (function(){
       zip.file(data.js.title + '/scripts.js').asBinary();
     }
 
-    return zip.generate();
+    return zip.generate({type: type || 'base64' });
   }
 
+  function _blobToArrayBuffer(bb, id, callback) {
+    var f = new FileReader();
+    f.onload = function(e) {
+        callback(e.target.result, id);
+    };
+    f.readAsArrayBuffer(bb);
+  };
+
+  // `condition` is a function that returns a boolean
+  // `fn` is a function that returns a promise
+  // returns a promise for the completion of the loop
+  function _promiseWhile(condition, fn) {
+    var deferred = Q.defer();
+
+    function loop() {
+        // When the result of calling `condition` is no longer true, we are
+        // done.
+        if (!condition()) return deferred.resolve();
+        // Use `when`, in case `fn` does not return a promise.
+        // When it completes loop again otherwise, if it fails, reject the
+        // done promise
+        Q.when(fn(), loop, deferred.reject);
+    }
+
+    // Start running the loop in the next tick so that this function is
+    // completely async. It would be unexpected if `fn` was called
+    // synchronously the first time.
+    Q.nextTick(loop);
+
+    // The promise
+    return deferred.promise;
+  }
   
 
   return {
@@ -76,8 +108,14 @@ _mock.utils = (function(){
     toDate: function(epoch){
       return toDate(epoch);
     }, 
-    getExportPackage: function(data){
-      return _getExportZip(data);
+    getExportPackage: function(data, type){
+      return _getExportZip(data, type);
+    },
+    blobToArrayBuffer: function(blob, id, callback){
+      return _blobToArrayBuffer(blob, id, callback);
+    },
+    promiseLoop: function(condition, fn){
+      return _promiseWhile(condition, fn);
     },
     isDirty:function(){
       if(arguments.length){

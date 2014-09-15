@@ -656,13 +656,7 @@ _mock.clicks = (function(){
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        // Open the window and run the function
-        _mock.popout.open('load', function(){
-          // init the views js file
-          views.load.init();
-          // Generate the list to display
-          views.load.generateList();
-        });
+        chrome.runtime.sendMessage({message:'onOpenPopout', popout:'load'});
       }
     });
 
@@ -674,11 +668,7 @@ _mock.clicks = (function(){
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        // Open the window and run the function
-        _mock.popout.open('export', function(){
-         // init the views js file
-          views.export.init();
-        });
+        chrome.runtime.sendMessage({message:'onOpenPopout', popout:'export'});
       }
     });
 
@@ -1135,6 +1125,86 @@ _mock.drive = (function(){
   };
 
 }());
+_mock.ftp = (function(){
+  'use strict';
+
+    var ftpClient, host,root,user,password,port;
+
+    function _send(data, files){
+        var deferred = Q.defer();
+        host = data.host;
+        root = 'mockbox';
+        user = data.user;
+        password = data.pass;
+        port = data.port || 21;
+
+        _upload(files).then(deferred.resolve);
+
+        return deferred.promise;
+    }
+
+    function _upload(files){
+        var deferred = Q.defer();
+        ftpClient = new FtpClient(host, port, user, password);
+
+        // Connect
+        ftpClient.connect()
+            // List directory contents
+            .then(ftpClient.list.bind(ftpClient))
+            .then(
+                // Check/Create Root Directory
+                function(dirs) {
+                var deferred = Q.defer();
+                var hasFolder = false;
+                // Look to see if folder exists
+                dirs.forEach(function(dir) {
+                    if (dir.name === root) {
+                        hasFolder = true;
+                        return false;
+                    }
+                });
+
+                // Create a folder if one doesn't exist
+                if (!hasFolder) {
+                    ftpClient._mkd("./"+root).then(deferred.resolve);
+                } else {
+                    deferred.resolve();
+                }
+
+                return deferred.promise;
+            })
+
+            .then(function(){
+                var deferred = Q.defer();
+
+                var i = 0;
+                _mock.utils.promiseLoop(function(){ return i < files.length; },
+                  function () {
+                    ftpClient.upload(files[i].name, files[i].data);
+                    i++;
+                    return Q.delay(500); // arbitrary async
+                  }).then(deferred.resolve);
+
+                  return deferred.promise;
+                
+            })
+
+            // Disconnect
+            .then(ftpClient.disconnect.bind(ftpClient))
+            .then(deferred.resolve);
+
+            return deferred.promise;
+    }
+
+  return {
+    send: function(data, files){
+         var deferred = Q.defer();
+        _send(data, files).then(deferred.resolve);
+        return deferred.promise;
+    }
+  };
+
+}());
 _mock.local = (function(){
 "use strict";
 
@@ -1437,6 +1507,23 @@ _mock.popout = (function(){
 _mock.receiver = (function(){
   'use strict';
 
+  document.addEventListener('keypress', function(event) {
+      if ( (event.which == 115 && event.ctrlKey) || (event.which == 19) ){
+        if(_mock.utils.isDirty()){
+          _mock.save();
+        }  
+      }
+
+      if ( (event.which == 108 && event.ctrlKey) || (event.which == 12) ){
+        chrome.runtime.sendMessage({message:'onOpenPopout', popout:'load'});
+      }
+
+      if ( (event.which == 110 && event.ctrlKey) || (event.which == 14) ){
+        _mock.reset();
+      }
+      
+  });
+
   chrome.runtime.onMessage.addListener(function(data) {
     switch(data.message){
       
@@ -1449,6 +1536,28 @@ _mock.receiver = (function(){
         // Restore working project from db by id
         _mock.database.restoreEditorsFromId(data.gui, data.isTemplate);
         break;
+
+      case 'onOpenPopout':
+        switch(data.popout){
+          case 'load':
+            // Open the window and run the function
+            _mock.popout.open('load', function(){
+              // init the views js file
+              views.load.init();
+              // Generate the list to display
+              views.load.generateList();
+            });
+            break;  
+          case 'export':
+            // Open the window and run the function
+            _mock.popout.open('export', function(){
+             // init the views js file
+              views.export.init();
+            });
+            break;  
+        }
+        
+      break;
 
       case 'onDeleteItem': 
         // Delete the item by the passed id
@@ -1537,6 +1646,40 @@ _mock.receiver = (function(){
             // Save all files to local
             _mock.local.saveFiles({ files: files, folderName: exportData.projectFolderName });
           }
+        }else
+
+        if(data.model.type === 'ftp'){
+          _mock.notification.send({type:'info', message:'Exporting to: '+data.model.host, persist:true});
+          var files = [];
+          if(data.model.packaged){
+            
+            // Get zip file from utils
+            files[0] = {
+              name: './'+data.model.folder+'/mockbox/'+exportData.projectFolderName+'.zip',
+              data: _mock.utils.getExportPackage(exportData.editors, 'arraybuffer')
+            }               
+            
+          }else{
+            // Generate all blob files from the editors
+            for(var type in exportData.editors){
+              if(exportData.editors.hasOwnProperty(type)){
+                // Create Blob
+                var blob = new Blob([exportData.editors[type].value], {type:'text/'+type});
+                _mock.utils.blobToArrayBuffer(blob, type, function(result, type){
+                  files.push({
+                    name:exportData.editors[type].title === 'main' ? './'+data.model.folder+'/mockbox/index'+ '.' + type : './'+data.model.folder+'/mockbox/'+exportData.editors[type].title + '.' + type,
+                    data:result
+                  });
+                });
+                
+              }
+            }
+          }
+
+          _mock.ftp.send(data.model, files)
+          .then(function(){ 
+            _mock.notification.send({type:'success', message:'Export Completed'});
+          });
         }
 
         
@@ -1678,7 +1821,7 @@ _mock.utils = (function(){
       return ("000000" + (Math.random()*Math.pow(36,6) << 0).toString(36)).slice(-6);
   }
 
-  function _getExportZip(data){
+  function _getExportZip(data, type){
     var zip = new JSZip();
 
     if(data.html.value){
@@ -1696,9 +1839,41 @@ _mock.utils = (function(){
       zip.file(data.js.title + '/scripts.js').asBinary();
     }
 
-    return zip.generate();
+    return zip.generate({type: type || 'base64' });
   }
 
+  function _blobToArrayBuffer(bb, id, callback) {
+    var f = new FileReader();
+    f.onload = function(e) {
+        callback(e.target.result, id);
+    };
+    f.readAsArrayBuffer(bb);
+  };
+
+  // `condition` is a function that returns a boolean
+  // `fn` is a function that returns a promise
+  // returns a promise for the completion of the loop
+  function _promiseWhile(condition, fn) {
+    var deferred = Q.defer();
+
+    function loop() {
+        // When the result of calling `condition` is no longer true, we are
+        // done.
+        if (!condition()) return deferred.resolve();
+        // Use `when`, in case `fn` does not return a promise.
+        // When it completes loop again otherwise, if it fails, reject the
+        // done promise
+        Q.when(fn(), loop, deferred.reject);
+    }
+
+    // Start running the loop in the next tick so that this function is
+    // completely async. It would be unexpected if `fn` was called
+    // synchronously the first time.
+    Q.nextTick(loop);
+
+    // The promise
+    return deferred.promise;
+  }
   
 
   return {
@@ -1708,8 +1883,14 @@ _mock.utils = (function(){
     toDate: function(epoch){
       return toDate(epoch);
     }, 
-    getExportPackage: function(data){
-      return _getExportZip(data);
+    getExportPackage: function(data, type){
+      return _getExportZip(data, type);
+    },
+    blobToArrayBuffer: function(blob, id, callback){
+      return _blobToArrayBuffer(blob, id, callback);
+    },
+    promiseLoop: function(condition, fn){
+      return _promiseWhile(condition, fn);
     },
     isDirty:function(){
       if(arguments.length){

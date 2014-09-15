@@ -1,6 +1,16 @@
-MockBox v0.9.8.1
+MockBox v0.9.8.2
 =========
 
+---------------------------------------
+**v0.9.8.2 - 09/15/14 - 1:28am**
+
+
+```
+- FTP export wroking for zip or un-packaged files
+  (Still need to export to folders in server)
+- Clean up and minor UI changes to notification
+- Code cleanup for performance
+```
 ---------------------------------------
 **v0.9.8.1 - 09/12/14 - 1:19am**
 

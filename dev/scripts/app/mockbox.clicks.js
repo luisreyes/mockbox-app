@@ -183,13 +183,7 @@ _mock.clicks = (function(){
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        // Open the window and run the function
-        _mock.popout.open('load', function(){
-          // init the views js file
-          views.load.init();
-          // Generate the list to display
-          views.load.generateList();
-        });
+        chrome.runtime.sendMessage({message:'onOpenPopout', popout:'load'});
       }
     });
 
@@ -201,11 +195,7 @@ _mock.clicks = (function(){
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        // Open the window and run the function
-        _mock.popout.open('export', function(){
-         // init the views js file
-          views.export.init();
-        });
+        chrome.runtime.sendMessage({message:'onOpenPopout', popout:'export'});
       }
     });
 

@@ -137,9 +137,9 @@ _v.export = (function(){
 
     buttons = {
       sidebar:{
-        mockbox :sidebarOptions.querySelector('.mockbox'),
+        //mockbox :sidebarOptions.querySelector('.mockbox'),
         drive   :sidebarOptions.querySelector('.drive'),
-        dropbox :sidebarOptions.querySelector('.dropbox'),
+        //dropbox :sidebarOptions.querySelector('.dropbox'),
         ftp     :sidebarOptions.querySelector('.ftp'),
         local   :sidebarOptions.querySelector('.local')
       },
@@ -173,6 +173,16 @@ _v.export = (function(){
       break;
 
       case 'local':
+        model.type = selectedClass;
+        model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
+      break;
+
+      case 'ftp':
+        model.host = 'get from credentials files';
+        model.folder='get from credentials files';
+        model.user = 'get from credentials files';
+        model.pass = 'get from credentials files';
+
         model.type = selectedClass;
         model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
       break;

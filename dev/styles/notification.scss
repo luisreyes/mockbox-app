@@ -4,11 +4,11 @@
   right:0;
   z-index: 1030;
   font-weight: 600;
-  width: 0;
+  width: 100%;
   opacity:0;
 
   &.showing{
-    width: -webkit-calc(100% - 170px);
+    bottom: 20px;
     opacity:1;
   }
   .notification-icon{
@@ -25,11 +25,10 @@
 
   .notification-wrapper{
     
-    width: 100%;
+    width: 50%;
     padding: 5px;
-    margin: 10px 0px;
     box-shadow: 0 0 5px $base-color-shadow;
-    float: right;
+    margin: 0 auto;
     
     &.error{
       background-color:#E4B7B7;
