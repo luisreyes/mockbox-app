@@ -85,7 +85,7 @@ _mock.receiver = (function(){
         var exportData = {
           projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
           editors: _mock.getEditorsModel(),
-          projectFolderName: 'MockBox-' + document.getElementById('app-header').querySelector('.project-name').innerHTML
+          projectFolderName: 'MockBox_' + document.getElementById('app-header').querySelector('.project-name').innerHTML.replace(/\s/g, '_')
         };
         
         if(data.model.type === 'drive'){
@@ -120,8 +120,10 @@ _mock.receiver = (function(){
         if(data.model.type === 'local'){
 
           if(data.model.packaged){
+            // Save as ZIP
             _mock.local.saveZip(exportData);
           }else{
+            // Collect all files to be saved
             // Var to cache the files data
             var files = {};
             
@@ -145,23 +147,26 @@ _mock.receiver = (function(){
         if(data.model.type === 'ftp'){
           _mock.notification.send({type:'info', message:'Exporting to: '+data.model.host, persist:true});
           var files = [];
+          data.model.projectname = exportData.projectName.replace(/\s/g,'_');
+
           if(data.model.packaged){
             
             // Get zip file from utils
             files[0] = {
-              name: './'+data.model.folder+'/mockbox/'+exportData.projectFolderName+'.zip',
+              name: exportData.projectFolderName+'.zip',
               data: _mock.utils.getExportPackage(exportData.editors, 'arraybuffer')
             }               
             
           }else{
             // Generate all blob files from the editors
             for(var type in exportData.editors){
-              if(exportData.editors.hasOwnProperty(type)){
+              if(exportData.editors.hasOwnProperty(type) && exportData.editors[type].value){
                 // Create Blob
                 var blob = new Blob([exportData.editors[type].value], {type:'text/'+type});
                 _mock.utils.blobToArrayBuffer(blob, type, function(result, type){
                   files.push({
-                    name:exportData.editors[type].title === 'main' ? './'+data.model.folder+'/mockbox/index'+ '.' + type : './'+data.model.folder+'/mockbox/'+exportData.editors[type].title + '.' + type,
+                    folder:_mock.utils.getFolderForType(type),
+                    name:exportData.editors[type].title === 'main' ? 'index'+ '.' + type : exportData.editors[type].title + '.' + type,
                     data:result
                   });
                 });
@@ -170,10 +175,7 @@ _mock.receiver = (function(){
             }
           }
 
-          _mock.ftp.send(data.model, files)
-          .then(function(){ 
-            _mock.notification.send({type:'success', message:'Export Completed'});
-          });
+          _mock.ftp.send(data.model, files);
         }
 
         

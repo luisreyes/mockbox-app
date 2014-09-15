@@ -984,7 +984,7 @@ _mock.drive = (function(){
     mainCallback = callback;
     
     // Generate the "main" folder
-    _upload({title:'MockBox-' + data.projectName, type:'application/vnd.google-apps.folder',model:data.editors.html}, function(result, folder){ 
+    _upload({title:'MockBox_' + data.projectName.replace(/\s/g, '_'), type:'application/vnd.google-apps.folder',model:data.editors.html}, function(result, folder){ 
       
       // Cache the folder id for later reference
       folderIds[folder.title] = result.id;
@@ -1128,17 +1128,20 @@ _mock.drive = (function(){
 _mock.ftp = (function(){
   'use strict';
 
-    var ftpClient, host,root,user,password,port;
+    var ftpClient, host,root,user,password,port, projectname, cid, cwd;
 
     function _send(data, files){
         var deferred = Q.defer();
         host = data.host;
-        root = 'mockbox';
+        root = data.folder || '.';
         user = data.user;
         password = data.pass;
         port = data.port || 21;
+        projectname = data.projectname;
 
         _upload(files).then(deferred.resolve);
+
+        cwd = host+'/'+root;
 
         return deferred.promise;
     }
@@ -1151,41 +1154,37 @@ _mock.ftp = (function(){
         ftpClient.connect()
             // List directory contents
             .then(ftpClient.list.bind(ftpClient))
-            .then(
-                // Check/Create Root Directory
-                function(dirs) {
+            
+            // Verify the root folder exists and verify the mockbox folder exists
+            .then(verifyBaseFolders)
+
+            // Verify the project folder exists 
+            .then(verifyProjFolder)
+
+            // Create a Version Folder 
+            .then(newVersionFolder)
+
+            // Verify the required sub folders exists  i.e (script/, styles/)
+            .then(function(){
                 var deferred = Q.defer();
-                var hasFolder = false;
-                // Look to see if folder exists
-                dirs.forEach(function(dir) {
-                    if (dir.name === root) {
-                        hasFolder = true;
-                        return false;
-                    }
-                });
-
-                // Create a folder if one doesn't exist
-                if (!hasFolder) {
-                    ftpClient._mkd("./"+root).then(deferred.resolve);
-                } else {
-                    deferred.resolve();
-                }
-
+                createSubFolders(files).then(deferred.resolve);
                 return deferred.promise;
             })
-
             .then(function(){
                 var deferred = Q.defer();
 
                 var i = 0;
                 _mock.utils.promiseLoop(function(){ return i < files.length; },
                   function () {
-                    ftpClient.upload(files[i].name, files[i].data);
+                    var filename = files[i].folder ? files[i].folder+'/'+files[i].name : files[i].name;
+                    if(files[i].data){
+                        ftpClient.upload(filename, files[i].data);
+                    }
                     i++;
                     return Q.delay(500); // arbitrary async
                   }).then(deferred.resolve);
 
-                  return deferred.promise;
+                return deferred.promise;
                 
             })
 
@@ -1196,10 +1195,200 @@ _mock.ftp = (function(){
             return deferred.promise;
     }
 
+    function verifyBaseFolders(dirs){
+        var deferred = Q.defer();
+        var hasFolder = false;
+
+        // Look to see if folder exists
+        dirs.forEach(function(dir) {
+            if (dir.name === root) {
+                hasFolder = true;
+                return false;
+            }
+        });
+
+        // Create a folder if one doesn't exist
+        if (!hasFolder) {
+            // Create Root Folder
+            ftpClient._mkd('./'+root)
+            // Point to newly created Root Folder
+            .then(function(){
+                var deferred = Q.defer();
+                ftpClient._cwd('./'+root).then(deferred.resolve)
+                return deferred.promise;
+            })
+
+            // Create mockbox folder
+            .then(verifyMockboxFolder)
+
+            // Exit
+            .then(deferred.resolve);
+        
+        } else {
+            // Point to Root Folder
+            ftpClient._cwd('./'+root)
+
+            // Create mockbox folder if needed
+            .then(verifyMockboxFolder)
+
+            // Exit
+            .then(deferred.resolve);
+        }
+
+        return deferred.promise;
+    }
+
+    function verifyMockboxFolder(){
+        var deferred = Q.defer();        
+        
+        ftpClient.list()
+        .then(function(dirs){
+            var deferred = Q.defer();
+            var hasFolder = false;
+
+            // Look to see if folder exists
+            dirs.forEach(function(dir) {
+                if (dir.name === 'mockbox') {
+                    hasFolder = true;
+                    return false;
+                }
+            });
+
+            // Create a folder if one doesn't exist
+            if (!hasFolder) {
+                // Create folder
+                ftpClient._mkd('mockbox')
+            
+                // Point to newly created folder
+                .then(function(){
+                    var deferred = Q.defer();
+                    ftpClient._cwd('mockbox').then(deferred.resolve)
+                    return deferred.promise;
+                })
+
+                // Exit
+                .then(deferred.resolve);
+            
+            } else {
+                // Point to folder & exit
+                ftpClient._cwd('mockbox').then(deferred.resolve);
+            }
+
+            cwd += '/mockbox';
+
+            return deferred.promise;
+        }).then(deferred.resolve);
+
+        return deferred.promise;
+    }
+
+    function verifyProjFolder(){
+        var deferred = Q.defer();        
+
+        ftpClient.list()
+        .then(function(dirs){
+            var deferred = Q.defer();
+            var hasFolder = false;
+
+            // Look to see if folder exists
+            dirs.forEach(function(dir) {
+                if (dir.name === projectname) {
+                    hasFolder = true;
+                    return false;
+                }
+            });
+
+            // Create a folder if one doesn't exist
+            if (!hasFolder) {
+                // Create Folder
+                ftpClient._mkd(projectname)
+            
+                // Point to folder
+                .then(function(){
+                    var deferred = Q.defer();
+                    ftpClient._cwd(projectname).then(deferred.resolve)
+                    return deferred.promise;
+                })
+
+                // Exit
+                .then(deferred.resolve);
+            } else {
+
+                // Point to folder & exit
+                ftpClient._cwd(projectname).then(deferred.resolve);
+            }
+
+            cwd += '/' + projectname;
+
+            return deferred.promise;
+
+        }).then(deferred.resolve);
+
+        return deferred.promise;
+    }
+
+    function newVersionFolder(){
+        var deferred = Q.defer();        
+        var versionId = _mock.utils.getGUID();
+
+        cwd += '/' + versionId;
+        // Create a folder if one doesn't exist
+        ftpClient._mkd(versionId)
+
+        // Point to folder
+        .then(function(){
+            var deferred = Q.defer();
+            cid = versionId;
+            ftpClient._cwd(versionId).then(deferred.resolve)
+            return deferred.promise;
+        })
+
+        // Exit
+        .then(deferred.resolve);
+
+        return deferred.promise;
+    }
+
+    function createSubFolders(files){
+        var deferred = Q.defer(); 
+        loopFolders(files).then(deferred.resolve);
+        return deferred.promise;
+    }
+
+
+    function loopFolders(files){
+        var deferred = Q.defer();
+
+        var i = 0;
+        _mock.utils.promiseLoop(function(){ return i < files.length; },
+          function () {
+            if(files[i].folder){
+                ftpClient._mkd(files[i].folder);
+            }
+            
+            i++;
+            
+            return Q.delay(500); // arbitrary async
+
+          }).then(deferred.resolve);
+
+        return deferred.promise;
+        
+    }
+
   return {
     send: function(data, files){
          var deferred = Q.defer();
-        _send(data, files).then(deferred.resolve);
+        _send(data, files)
+        .then(function(){
+            var deferred = Q.defer();
+            _mock.notification.setLink({url:cwd, text:'[ID: '+cid+']', title:cwd});
+            _mock.notification.send({type:'success', message:'Export Completed: ', persist:true});
+
+            deferred.resolve();
+            return deferred.promise;
+        })
+        .then(deferred.resolve);
         return deferred.promise;
     }
   };
@@ -1324,7 +1513,7 @@ _mock.local = (function(){
 
   function _saveZip(data){
     _saveFile({
-      filename:'MockBox-' + data.projectName + '.zip',
+      filename:'MockBox_' + data.projectName.replace(/\s/g,'_') + '.zip',
       filedata: _getZip(data)
     });
   }
@@ -1348,6 +1537,8 @@ _mock.notification = (function(){
 
   var icons = ['icon_error-oct', 'icon_check_alt', 'icon_cone', 'icon_info']
   var timeout;
+  var linkUrl;
+  var notLink;
 
   function _send(type, message, persist){
     var doc = chrome.app.window.current().contentWindow.document;
@@ -1355,8 +1546,15 @@ _mock.notification = (function(){
     var notWrapper = doc.querySelector('.notification-wrapper');
     var notIcon = doc.querySelector('.notification-icon');
     var notMessage = doc.querySelector('.notification-message');
+    notLink = doc.querySelector('.notification-link');
     
     notMessage.innerHTML = message;
+
+    notLink.addEventListener('click', function(){
+      if(linkUrl){
+        window.open(linkUrl, '_blank');
+      }
+    });
 
     apollo.removeClass(notIcon, icons);
     apollo.removeClass(notWrapper, ['error', 'success', 'warning', 'info']);
@@ -1385,6 +1583,16 @@ _mock.notification = (function(){
   return {
     send: function(options){
       _send(options.type, options.message, options.persist);
+    },
+    setLink: function(data){
+      notLink.innerHTML = data.text;
+      notLink.setAttribute('title', data.title);
+      linkUrl = data.url;
+    },
+    clearLink: function(){
+      notLink.innerHTML = '';
+      notLink.setAttribute('title', '')
+      linkUrl = null;
     }
   };
 
@@ -1591,7 +1799,7 @@ _mock.receiver = (function(){
         var exportData = {
           projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
           editors: _mock.getEditorsModel(),
-          projectFolderName: 'MockBox-' + document.getElementById('app-header').querySelector('.project-name').innerHTML
+          projectFolderName: 'MockBox_' + document.getElementById('app-header').querySelector('.project-name').innerHTML.replace(/\s/g, '_')
         };
         
         if(data.model.type === 'drive'){
@@ -1626,8 +1834,10 @@ _mock.receiver = (function(){
         if(data.model.type === 'local'){
 
           if(data.model.packaged){
+            // Save as ZIP
             _mock.local.saveZip(exportData);
           }else{
+            // Collect all files to be saved
             // Var to cache the files data
             var files = {};
             
@@ -1651,23 +1861,26 @@ _mock.receiver = (function(){
         if(data.model.type === 'ftp'){
           _mock.notification.send({type:'info', message:'Exporting to: '+data.model.host, persist:true});
           var files = [];
+          data.model.projectname = exportData.projectName.replace(/\s/g,'_');
+
           if(data.model.packaged){
             
             // Get zip file from utils
             files[0] = {
-              name: './'+data.model.folder+'/mockbox/'+exportData.projectFolderName+'.zip',
+              name: exportData.projectFolderName+'.zip',
               data: _mock.utils.getExportPackage(exportData.editors, 'arraybuffer')
             }               
             
           }else{
             // Generate all blob files from the editors
             for(var type in exportData.editors){
-              if(exportData.editors.hasOwnProperty(type)){
+              if(exportData.editors.hasOwnProperty(type) && exportData.editors[type].value){
                 // Create Blob
                 var blob = new Blob([exportData.editors[type].value], {type:'text/'+type});
                 _mock.utils.blobToArrayBuffer(blob, type, function(result, type){
                   files.push({
-                    name:exportData.editors[type].title === 'main' ? './'+data.model.folder+'/mockbox/index'+ '.' + type : './'+data.model.folder+'/mockbox/'+exportData.editors[type].title + '.' + type,
+                    folder:_mock.utils.getFolderForType(type),
+                    name:exportData.editors[type].title === 'main' ? 'index'+ '.' + type : exportData.editors[type].title + '.' + type,
                     data:result
                   });
                 });
@@ -1676,10 +1889,7 @@ _mock.receiver = (function(){
             }
           }
 
-          _mock.ftp.send(data.model, files)
-          .then(function(){ 
-            _mock.notification.send({type:'success', message:'Export Completed'});
-          });
+          _mock.ftp.send(data.model, files);
         }
 
         
@@ -1799,6 +2009,17 @@ _mock.utils = (function(){
       }
   };
 
+  function _getFolderNameFromType(type){
+    switch(type){
+      case 'css': return 'styles';
+      break;
+      case 'js': return 'scripts';
+      break;
+      default: return '';
+      break;
+    }
+  }
+
   function _isDirtyDispatcher(){
       chrome.runtime.sendMessage({message:'onDirty', isDirty:_isDirty });
   }
@@ -1899,6 +2120,9 @@ _mock.utils = (function(){
       }else{
         return _isDirty;
       }
+    },
+    getFolderForType: function(type){
+      return _getFolderNameFromType(type);
     },
     Collect: function(baseObj, updateObj){
       return _collect(baseObj, updateObj);

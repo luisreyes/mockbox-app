@@ -24,6 +24,17 @@ _mock.utils = (function(){
       }
   };
 
+  function _getFolderNameFromType(type){
+    switch(type){
+      case 'css': return 'styles';
+      break;
+      case 'js': return 'scripts';
+      break;
+      default: return '';
+      break;
+    }
+  }
+
   function _isDirtyDispatcher(){
       chrome.runtime.sendMessage({message:'onDirty', isDirty:_isDirty });
   }
@@ -124,6 +135,9 @@ _mock.utils = (function(){
       }else{
         return _isDirty;
       }
+    },
+    getFolderForType: function(type){
+      return _getFolderNameFromType(type);
     },
     Collect: function(baseObj, updateObj){
       return _collect(baseObj, updateObj);

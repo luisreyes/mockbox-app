@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "MockBox",
-  "version": "0.9.8.2",
+  "version": "0.9.8.25",
   "description": "Prorotype and Deploy",
   "sandbox": {
     "pages": ["mockbox_prototype.html"]

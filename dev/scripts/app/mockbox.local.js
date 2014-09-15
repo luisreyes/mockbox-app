@@ -117,7 +117,7 @@ _mock.local = (function(){
 
   function _saveZip(data){
     _saveFile({
-      filename:'MockBox-' + data.projectName + '.zip',
+      filename:'MockBox_' + data.projectName.replace(/\s/g,'_') + '.zip',
       filedata: _getZip(data)
     });
   }

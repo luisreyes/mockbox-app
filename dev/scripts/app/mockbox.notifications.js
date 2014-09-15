@@ -3,6 +3,8 @@ _mock.notification = (function(){
 
   var icons = ['icon_error-oct', 'icon_check_alt', 'icon_cone', 'icon_info']
   var timeout;
+  var linkUrl;
+  var notLink;
 
   function _send(type, message, persist){
     var doc = chrome.app.window.current().contentWindow.document;
@@ -10,8 +12,15 @@ _mock.notification = (function(){
     var notWrapper = doc.querySelector('.notification-wrapper');
     var notIcon = doc.querySelector('.notification-icon');
     var notMessage = doc.querySelector('.notification-message');
+    notLink = doc.querySelector('.notification-link');
     
     notMessage.innerHTML = message;
+
+    notLink.addEventListener('click', function(){
+      if(linkUrl){
+        window.open(linkUrl, '_blank');
+      }
+    });
 
     apollo.removeClass(notIcon, icons);
     apollo.removeClass(notWrapper, ['error', 'success', 'warning', 'info']);
@@ -40,6 +49,16 @@ _mock.notification = (function(){
   return {
     send: function(options){
       _send(options.type, options.message, options.persist);
+    },
+    setLink: function(data){
+      notLink.innerHTML = data.text;
+      notLink.setAttribute('title', data.title);
+      linkUrl = data.url;
+    },
+    clearLink: function(){
+      notLink.innerHTML = '';
+      notLink.setAttribute('title', '')
+      linkUrl = null;
     }
   };
 

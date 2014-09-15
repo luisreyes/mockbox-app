@@ -60,10 +60,10 @@ _v.export = (function(){
       break;
 
       case 'ftp':
-        model.host = 'get from credentials files';
-        model.folder='get from credentials files';
-        model.user = 'get from credentials files';
-        model.pass = 'get from credentials files';
+        model.host = '';
+        model.folder = ''
+        model.user = '';
+        model.pass = '';
 
         model.type = selectedClass;
         model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
