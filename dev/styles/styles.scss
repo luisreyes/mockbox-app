@@ -17,11 +17,23 @@ body, html {
 .visible{ display:block !important; }
 .opaque{opacity:0 !important;}
 .clear{clear:both;}
-.left-container{float:left;width: 69%;}
+.left-container{float:left;clear: both;margin-bottom:15px;}
 .right-container{float:right;}
+.small{ font-size: 10px; }
+
 
 *:focus{outline:none;}
 ::selection { background: $accent-color; color:#EEE; }
+
+input{
+  
+  &[type=password],
+  &[type=text]{
+    padding: 2px;
+    color:$base-color-font;
+    border: 1px solid $base-color-0;
+  }
+}
 
 ul{margin: 0; padding: 0; list-style: none;}
 .project-name{
@@ -46,6 +58,7 @@ ul{margin: 0; padding: 0; list-style: none;}
     margin: 11px 5px 0 2px;
     color: $base-color-font;
     display:none;
+    float:left;
     font-size: smaller;
   }
 

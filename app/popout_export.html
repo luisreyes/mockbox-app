@@ -34,11 +34,15 @@
           <ul>
             <li class="drive hidden">
               <section class="field">
-                <section class="field-title">Google Drive Export</section>
-                <section class="field-option"><span class="left-container"><span>Export as packaged zip file</span>
+                <section class="field-title">Options</section>
+                <section class="field-option"><span class="left-container"><span>Export as zip file</span>
                     <section class="clear"></section></span><span class="right-container">
                     <label class="switch">
                       <input type="checkbox" class="zip switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                    </label></span><span class="left-container"><span>Export as versions</span>
+                    <section class="clear"></section></span><span class="right-container">
+                    <label class="switch">
+                      <input type="checkbox" class="version switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
                     </label></span>
                   <section class="clear"></section>
                 </section>
@@ -46,23 +50,42 @@
             </li>
             <li class="ftp hidden">
               <section class="field">
-                <section class="field-title">FTP Export</section>
-                <section class="field-option"><span class="left-container"><span>Export as packaged zip file</span>
+                <section class="field-title">Options</section>
+                <section class="field-option"><span class="left-container"><span>Export as zip file</span>
                     <section class="clear"></section></span><span class="right-container">
                     <label class="switch">
                       <input type="checkbox" class="zip switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                    </label></span><span class="left-container"><span>Export as versions</span>
+                    <section class="clear"></section></span><span class="right-container">
+                    <label class="switch">
+                      <input type="checkbox" class="version switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
                     </label></span>
+                  <section class="clear"></section>
+                </section>
+              </section>
+              <section class="field">
+                <section class="field-title">FTP Settings</section>
+                <section class="field-option"><span class="left-container"><span>Host</span></span><span class="right-container">
+                    <input type="text" placeholder="ftp.yoursite.com" id="ftp-export-host-input"></span><span class="left-container"><span>Path</span></span><span class="right-container">
+                    <input type="text" placeholder="(leave empty for root)" id="ftp-export-path-input"></span><span class="left-container"><span>Username</span></span><span class="right-container">
+                    <input type="text" placeholder="Username" id="ftp-export-user-input"></span><span class="left-container"><span>Password</span></span><span class="right-container">
+                    <input type="password" placeholder="Password" id="ftp-export-pass-input">
+                    <section class="small">Passwords are not saved</section></span>
                   <section class="clear"></section>
                 </section>
               </section>
             </li>
             <li class="local hidden">
               <section class="field">
-                <section class="field-title">Local Drive Export</section>
-                <section class="field-option"><span class="left-container"><span>Export as packaged zip file</span>
+                <section class="field-title">Options</section>
+                <section class="field-option"><span class="left-container"><span>Export as zip file</span>
                     <section class="clear"></section></span><span class="right-container">
                     <label class="switch">
                       <input type="checkbox" class="zip switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                    </label></span><span class="left-container"><span>Export as versions</span>
+                    <section class="clear"></section></span><span class="right-container">
+                    <label class="switch">
+                      <input type="checkbox" class="version switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
                     </label></span>
                   <section class="clear"></section>
                 </section>

@@ -66,16 +66,27 @@ block content
 
         li.drive.hidden
           section.field
-            section.field-title Google Drive Export
+            section.field-title Options
             section.field-option
+              //- Zip Toggle
               span.left-container
-                span Export as packaged zip file
+                span Export as zip file
                 section.clear
               span.right-container
                 label.switch
                   input(type="checkbox").zip.switch-input
                   span(data-on="On" data-off="Off").switch-label
                   span.switch-handle.transition
+              //- Version Toggle
+              span.left-container
+                span Export as versions
+                section.clear
+              span.right-container
+                label.switch
+                  input(type="checkbox").version.switch-input
+                  span(data-on="On" data-off="Off").switch-label
+                  span.switch-handle.transition
+              
               section.clear
 
         //- li.dropbox.hidden
@@ -103,30 +114,75 @@ block content
           //-       span.icon.icon_lock-open
           //-       span unlock
           section.field
-            section.field-title FTP Export
+            section.field-title Options
             section.field-option
+              //- Zip Toggle
               span.left-container
-                span Export as packaged zip file
+                span Export as zip file
                 section.clear
               span.right-container
                 label.switch
                   input(type="checkbox").zip.switch-input
                   span(data-on="On" data-off="Off").switch-label
                   span.switch-handle.transition
+              //- Version Toggle
+              span.left-container
+                span Export as versions
+                section.clear
+              span.right-container
+                label.switch
+                  input(type="checkbox").version.switch-input
+                  span(data-on="On" data-off="Off").switch-label
+                  span.switch-handle.transition
+
+              section.clear
+
+          section.field
+            section.field-title FTP Settings
+            section.field-option
+              span.left-container
+                span Host
+              span.right-container
+                input(type="text" placeholder="ftp.yoursite.com")#ftp-export-host-input
+              span.left-container
+                span Path
+              span.right-container
+                input(type="text" placeholder="(leave empty for root)")#ftp-export-path-input
+              span.left-container
+                span Username
+              span.right-container
+                input(type="text" placeholder="Username")#ftp-export-user-input
+              span.left-container
+                span Password
+              span.right-container
+                input(type="password" placeholder="Password")#ftp-export-pass-input
+                section.small Passwords are not saved
+              
               section.clear
 
         li.local.hidden
           section.field
-            section.field-title Local Drive Export
+            section.field-title Options
             section.field-option
+              //- Zip Toggle
               span.left-container
-                span Export as packaged zip file
+                span Export as zip file
                 section.clear
               span.right-container
                 label.switch
                   input(type="checkbox").zip.switch-input
                   span(data-on="On" data-off="Off").switch-label
                   span.switch-handle.transition
+              //- Version Toggle
+              span.left-container
+                span Export as versions
+                section.clear
+              span.right-container
+                label.switch
+                  input(type="checkbox").version.switch-input
+                  span(data-on="On" data-off="Off").switch-label
+                  span.switch-handle.transition
+              
               section.clear
 
     footer#export-options-footer

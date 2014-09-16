@@ -8,9 +8,10 @@ _v.export = (function(){
       panels,
       selectedClass,
       selectedPanel,
+      saveTimeout,
       buttons = {};
   
-  function init(){
+  function init(restoreData){
     doc = chrome.app.window.get('export').contentWindow.document;
     sidebar = doc.getElementById('export-options');
     sidebarOptions = sidebar.getElementsByTagName('ul')[0];
@@ -29,18 +30,25 @@ _v.export = (function(){
       cancel  :doc.getElementById('export-options-footer').querySelector('.cancel')
     };
     
-    addListener();
+    addListeners();
     
+    restoreData && restoreFields(restoreData);
+
     setPanel({target:buttons.sidebar.local});
   }
 
-  function addListener(){
+  function addListeners(){
     for(var i in buttons.sidebar){
       buttons.sidebar[i].addEventListener('click', setPanel);
     }
 
     buttons.export.addEventListener('click', onExportClick);
     buttons.cancel.addEventListener('click', onCancelClick);
+
+    doc.getElementById('ftp-export-host-input').addEventListener('blur', onInputBlur);
+    doc.getElementById('ftp-export-path-input').addEventListener('blur', onInputBlur);
+    doc.getElementById('ftp-export-user-input').addEventListener('blur', onInputBlur);
+
   }
 
   function onExportClick(e){
@@ -52,11 +60,13 @@ _v.export = (function(){
       case 'drive':
         model.type = selectedClass;
         model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
+        model.versioned = selectedPanel.querySelector('.version.switch-input').checked;
       break;
 
       case 'local':
         model.type = selectedClass;
         model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
+        model.versioned = selectedPanel.querySelector('.version.switch-input').checked;
       break;
 
       case 'ftp':
@@ -67,6 +77,11 @@ _v.export = (function(){
 
         model.type = selectedClass;
         model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
+        model.versioned = selectedPanel.querySelector('.version.switch-input').checked;
+        model.host = doc.getElementById('ftp-export-host-input').value;
+        model.folder = doc.getElementById('ftp-export-path-input').value;
+        model.user = doc.getElementById('ftp-export-user-input').value;
+        model.pass = doc.getElementById('ftp-export-pass-input').value;
       break;
 
       default: return;
@@ -76,8 +91,38 @@ _v.export = (function(){
 
   }
 
+  function onInputBlur(e){
+    
+    if(saveTimeout) clearTimeout(saveTimeout);
+    
+    var data = {
+      message:'saveSettings', 
+      settings:{
+        ftp:{
+          host: doc.getElementById('ftp-export-host-input').value,
+          path: doc.getElementById('ftp-export-path-input').value,
+          user: doc.getElementById('ftp-export-user-input').value
+        }
+      }
+    };
+
+    saveTimeout = setTimeout(function(){
+      chrome.runtime.sendMessage(data);  
+    }, 1000);
+    
+  }
+
   function onCancelClick(e){
     chrome.runtime.sendMessage({message:'onClosePopout', popoutId:'export' });
+  }
+
+  function restoreFields(data){
+    if(data.ftp){
+      doc.getElementById('ftp-export-host-input').value = data.ftp.host || '';
+      doc.getElementById('ftp-export-path-input').value = data.ftp.path || '';
+      doc.getElementById('ftp-export-user-input').value = data.ftp.user || '';
+    }
+
   }
 
   function setPanel(e){
@@ -117,8 +162,8 @@ _v.export = (function(){
 
 
   return {
-    init: function(){
-      !doc && init();
+    init: function(data){
+      !doc && init(data);
     }
   };
 

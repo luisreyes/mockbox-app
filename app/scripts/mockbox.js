@@ -1136,6 +1136,25 @@ _mock.ftp = (function(){
         port = data.port || 21;
         projectname = data.projectname;
 
+        if(data.packaged && data.versioned){
+            // Upload versioned zip
+            // TODO
+        }else
+
+        if(!data.packaged && !data.versioned){
+            // Upload all files (overwrite)
+            // TODO 
+        }else
+
+        if(!data.packaged && data.versioned){
+            // Upload versioned files
+            // TODO
+        }else{
+            // Upload zip (overwrite)
+            // TODO
+
+        }
+
         _upload(files).then(deferred.resolve);
 
         cwd = host+'/'+root;
@@ -1379,7 +1398,7 @@ _mock.ftp = (function(){
         _send(data, files)
         .then(function(){
             var deferred = Q.defer();
-            _mock.notification.setLink({url:cwd, text:'[ID: '+cid+']', title:cwd});
+            //_mock.notification.setLink({url:cwd, text:'[ID: '+cid+']', title:cwd});
             _mock.notification.send({type:'success', message:'Export Completed: ', persist:true});
 
             deferred.resolve();
@@ -1756,8 +1775,8 @@ _mock.receiver = (function(){
           case 'export':
             // Open the window and run the function
             _mock.popout.open('export', function(){
-             // init the views js file
-              views.export.init();
+              // init the views js file
+              views.export.init(mockbox.getSettings());
             });
             break;  
         }
@@ -1799,6 +1818,10 @@ _mock.receiver = (function(){
           projectFolderName: 'MockBox_' + document.getElementById('app-header').querySelector('.project-name').innerHTML.replace(/\s/g, '_')
         };
         
+        var gui = data.model.versioned ? '_'+_mock.utils.getGUID() : '';
+        exportData.projectName += gui;
+
+
         if(data.model.type === 'drive'){
           
           _mock.notification.send({type:'info', message:'Exporting to Google Drive', persist:true});
@@ -1808,7 +1831,7 @@ _mock.receiver = (function(){
             // Get zip file from utils
             var zip = _mock.utils.getExportPackage(exportData.editors);
             // Upload zip file to drive
-            _mock.drive.upload({title: exportData.projectFolderName+'.zip',type:zip.type,value: zip}, function(){
+            _mock.drive.upload({title: exportData.projectFolderName+gui+'.zip',type:zip.type,value: zip}, function(){
               _mock.notification.send({type:'success', message:'Export Completed'}); 
             });
           
@@ -1851,12 +1874,14 @@ _mock.receiver = (function(){
               }
             }
             // Save all files to local
-            _mock.local.saveFiles({ files: files, folderName: exportData.projectFolderName });
+            _mock.local.saveFiles({ files: files, folderName: exportData.projectFolderName+gui });
           }
         }else
 
         if(data.model.type === 'ftp'){
+          
           _mock.notification.send({type:'info', message:'Exporting to: '+data.model.host, persist:true});
+          
           var files = [];
           data.model.projectname = exportData.projectName.replace(/\s/g,'_');
 
@@ -1864,7 +1889,7 @@ _mock.receiver = (function(){
             
             // Get zip file from utils
             files[0] = {
-              name: exportData.projectFolderName+'.zip',
+              name: exportData.projectFolderName+gui+'.zip',
               data: _mock.utils.getExportPackage(exportData.editors, 'arraybuffer')
             }               
             
@@ -1952,6 +1977,8 @@ _mock.storage = (function(){
 _mock.templates = (function(){
   "use strict";
 
+
+
   function getTemplates(){
     return [
     {
@@ -1977,6 +2004,20 @@ _mock.templates = (function(){
       "js"  : "",
       "layout": [60,70,50],
       "author": "@luisreyesdev"
+    }];
+
+  } 
+
+  function getExport(type){
+      switch(type){
+        case 'html': 
+        break;
+
+      }
+
+    var type = [
+    {
+      "html" : ".col"
     }];
 
   }    
@@ -2030,14 +2071,12 @@ _mock.utils = (function(){
   }
 
   function _collect(baseObj, updateObj) {
+    // TODO Check for identical values
     // Updates the base object with the new object
+    debugger;
     var obj = baseObj; {
         for (var prop in updateObj) {
-            var val = updateObj[prop];
-            if (typeof val == "object") // this also applies to arrays or null!
-                update(obj[prop], val);
-            else
-                obj[prop] = val;
+            obj[prop] = updateObj[prop];
         }
     }
     return obj;

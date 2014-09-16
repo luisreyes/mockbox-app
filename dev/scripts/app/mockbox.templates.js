@@ -1,6 +1,8 @@
 _mock.templates = (function(){
   "use strict";
 
+
+
   function getTemplates(){
     return [
     {
@@ -26,6 +28,20 @@ _mock.templates = (function(){
       "js"  : "",
       "layout": [60,70,50],
       "author": "@luisreyesdev"
+    }];
+
+  } 
+
+  function getExport(type){
+      switch(type){
+        case 'html': 
+        break;
+
+      }
+
+    var type = [
+    {
+      "html" : ".col"
     }];
 
   }    

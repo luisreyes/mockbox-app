@@ -12,6 +12,25 @@ _mock.ftp = (function(){
         port = data.port || 21;
         projectname = data.projectname;
 
+        if(data.packaged && data.versioned){
+            // Upload versioned zip
+            // TODO
+        }else
+
+        if(!data.packaged && !data.versioned){
+            // Upload all files (overwrite)
+            // TODO 
+        }else
+
+        if(!data.packaged && data.versioned){
+            // Upload versioned files
+            // TODO
+        }else{
+            // Upload zip (overwrite)
+            // TODO
+
+        }
+
         _upload(files).then(deferred.resolve);
 
         cwd = host+'/'+root;
@@ -255,7 +274,7 @@ _mock.ftp = (function(){
         _send(data, files)
         .then(function(){
             var deferred = Q.defer();
-            _mock.notification.setLink({url:cwd, text:'[ID: '+cid+']', title:cwd});
+            //_mock.notification.setLink({url:cwd, text:'[ID: '+cid+']', title:cwd});
             _mock.notification.send({type:'success', message:'Export Completed: ', persist:true});
 
             deferred.resolve();

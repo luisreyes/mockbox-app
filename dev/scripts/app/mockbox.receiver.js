@@ -45,8 +45,8 @@ _mock.receiver = (function(){
           case 'export':
             // Open the window and run the function
             _mock.popout.open('export', function(){
-             // init the views js file
-              views.export.init();
+              // init the views js file
+              views.export.init(mockbox.getSettings());
             });
             break;  
         }
@@ -88,6 +88,10 @@ _mock.receiver = (function(){
           projectFolderName: 'MockBox_' + document.getElementById('app-header').querySelector('.project-name').innerHTML.replace(/\s/g, '_')
         };
         
+        var gui = data.model.versioned ? '_'+_mock.utils.getGUID() : '';
+        exportData.projectName += gui;
+
+
         if(data.model.type === 'drive'){
           
           _mock.notification.send({type:'info', message:'Exporting to Google Drive', persist:true});
@@ -97,7 +101,7 @@ _mock.receiver = (function(){
             // Get zip file from utils
             var zip = _mock.utils.getExportPackage(exportData.editors);
             // Upload zip file to drive
-            _mock.drive.upload({title: exportData.projectFolderName+'.zip',type:zip.type,value: zip}, function(){
+            _mock.drive.upload({title: exportData.projectFolderName+gui+'.zip',type:zip.type,value: zip}, function(){
               _mock.notification.send({type:'success', message:'Export Completed'}); 
             });
           
@@ -140,12 +144,14 @@ _mock.receiver = (function(){
               }
             }
             // Save all files to local
-            _mock.local.saveFiles({ files: files, folderName: exportData.projectFolderName });
+            _mock.local.saveFiles({ files: files, folderName: exportData.projectFolderName+gui });
           }
         }else
 
         if(data.model.type === 'ftp'){
+          
           _mock.notification.send({type:'info', message:'Exporting to: '+data.model.host, persist:true});
+          
           var files = [];
           data.model.projectname = exportData.projectName.replace(/\s/g,'_');
 
@@ -153,7 +159,7 @@ _mock.receiver = (function(){
             
             // Get zip file from utils
             files[0] = {
-              name: exportData.projectFolderName+'.zip',
+              name: exportData.projectFolderName+gui+'.zip',
               data: _mock.utils.getExportPackage(exportData.editors, 'arraybuffer')
             }               
             
