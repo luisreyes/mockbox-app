@@ -283,6 +283,12 @@ Author: Michael Costello (michael.a.costello@gmail.com)
       controlSocket.addResponseListener(function(data) {
         var code = this._responseToCode(data);
 
+        if(code.toString().substr(0,1) === '5'){
+          debugger;
+          mockbox.notify({type:'error', message:'FTP Error: ' + data, persist:true});
+        }
+        
+
         log(data);
 
         if (code === successCode) {

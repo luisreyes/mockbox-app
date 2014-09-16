@@ -18,6 +18,11 @@
     position: relative;
     top: 1px;
   }
+  .notification-close{
+    float: right;
+    font-size: large;
+    margin: 2px;
+  }
   .notification-message{ 
     white-space: nowrap; 
     position: relative;
@@ -33,6 +38,7 @@
     padding: 5px;
     box-shadow: 0 0 5px $base-color-shadow;
     margin: 0 auto;
+    overflow: hidden;
     
     &.error{
       background-color:#E4B7B7;

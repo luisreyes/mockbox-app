@@ -1,6 +1,16 @@
-MockBox v0.9.8.3
+MockBox v0.9.8.35
 =========
 
+---------------------------------------
+**v0.9.8.35 - 09/15/14 - 12:37am**
+
+
+```
+- Validate export to FTP
+- Notification Close Button on Persist
+- Save FTP Credentials except for password
+
+```
 ---------------------------------------
 **v0.9.8.3 - 09/15/14 - 12:37am**
 

@@ -30,7 +30,7 @@ input{
   &[type=password],
   &[type=text]{
     padding: 2px;
-    color:$base-color-font;
+    color:#666;
     border: 1px solid $base-color-0;
   }
 }
@@ -108,7 +108,7 @@ header {
 
   .icon:hover{
     color:$accent-color;
-    cursor:pointer;
+    cursor: default;/*pointer;*/
   }
 
   &.open { 
@@ -135,7 +135,7 @@ footer {
 }
 
 .a{
-  cursor:pointer;
+  cursor: default;/*pointer;*/
   &:hover{ text-decoration: underline; }
   &.small{ 
     color:$app-popout-link-color;
@@ -169,7 +169,7 @@ button, select {
   text-shadow:1px 1px 0px $accent-dark-color-0;
   min-width: 70px;
   height: 35px;
-  cursor:pointer;
+  cursor: default;/*pointer;*/
   padding: 0 10px;
   
   &:hover {

@@ -275,7 +275,7 @@ _mock.ftp = (function(){
         .then(function(){
             var deferred = Q.defer();
             //_mock.notification.setLink({url:cwd, text:'[ID: '+cid+']', title:cwd});
-            _mock.notification.send({type:'success', message:'Export Completed: ', persist:true});
+            _mock.notification.send({type:'success', message:'Export Complete'});
 
             deferred.resolve();
             return deferred.promise;

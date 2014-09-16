@@ -42,7 +42,6 @@ _mock.utils = (function(){
   function _collect(baseObj, updateObj) {
     // TODO Check for identical values
     // Updates the base object with the new object
-    debugger;
     var obj = baseObj; {
         for (var prop in updateObj) {
             obj[prop] = updateObj[prop];

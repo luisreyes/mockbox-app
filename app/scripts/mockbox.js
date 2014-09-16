@@ -1399,7 +1399,7 @@ _mock.ftp = (function(){
         .then(function(){
             var deferred = Q.defer();
             //_mock.notification.setLink({url:cwd, text:'[ID: '+cid+']', title:cwd});
-            _mock.notification.send({type:'success', message:'Export Completed: ', persist:true});
+            _mock.notification.send({type:'success', message:'Export Complete'});
 
             deferred.resolve();
             return deferred.promise;
@@ -1551,26 +1551,24 @@ _mock.local = (function(){
 _mock.notification = (function(){
 "use strict";
 
-  var icons = ['icon_error-oct', 'icon_check_alt', 'icon_cone', 'icon_info']
-  var timeout;
-  var linkUrl;
-  var notLink;
+  var icons = ['icon_error-oct', 'icon_check_alt', 'icon_cone', 'icon_info'],
+      doc, not, notWrapper, notIcon, notMessage, notClose, notLink, notClose, timeout, linkUrl;
+
+  function init(){
+    doc = chrome.app.window.current().contentWindow.document;
+    not = doc.getElementById('app-notification');
+    notWrapper = doc.querySelector('.notification-wrapper');
+    notIcon = doc.querySelector('.notification-icon');
+    notMessage = doc.querySelector('.notification-message');
+    notClose = doc.querySelector('.notification-close');
+    notLink = doc.querySelector('.notification-link');
+
+    addListeners();
+  }
 
   function _send(type, message, persist){
-    var doc = chrome.app.window.current().contentWindow.document;
-    var not = doc.getElementById('app-notification');
-    var notWrapper = doc.querySelector('.notification-wrapper');
-    var notIcon = doc.querySelector('.notification-icon');
-    var notMessage = doc.querySelector('.notification-message');
-    notLink = doc.querySelector('.notification-link');
     
     notMessage.innerHTML = message;
-
-    notLink.addEventListener('click', function(){
-      if(linkUrl){
-        window.open(linkUrl, '_blank');
-      }
-    });
 
     apollo.removeClass(notIcon, icons);
     apollo.removeClass(notWrapper, ['error', 'success', 'warning', 'info']);
@@ -1586,18 +1584,45 @@ _mock.notification = (function(){
     apollo.addClass(notWrapper, type);
     apollo.addClass(not, 'showing');
     apollo.addClass(notIcon, icon);
+    apollo.addClass(notClose, 'hidden');
 
-    if(!persist){
-      timeout = setTimeout(function(){
-        apollo.removeClass(not, 'showing');
-      }, 4000);
-    }else{
-      window.clearTimeout(timeout)
+    var time = persist ? 60000 : 4000;
+
+    timeout = setTimeout(function(){
+      apollo.removeClass(not, 'showing');
+    }, time);
+
+    if(persist){
+      apollo.removeClass(notClose, 'hidden');
     }
 
   }
+
+  function addListeners(){
+    notClose.addEventListener('mouseover', function(){
+      apollo.addClass(notClose, 'icon_close_alt');
+    });
+
+    notClose.addEventListener('mouseleave', function(){
+      apollo.removeClass(notClose, 'icon_close_alt');
+    });
+    
+    notClose.addEventListener('click', function(){
+      window.clearTimeout(timeout);
+      apollo.removeClass(not, 'showing');
+    });
+
+    notLink.addEventListener('click', function(){
+      if(linkUrl){
+        window.open(linkUrl, '_blank');
+      }
+    });
+
+  }
+
   return {
     send: function(options){
+      !doc && init();
       _send(options.type, options.message, options.persist);
     },
     setLink: function(data){
@@ -2073,7 +2098,6 @@ _mock.utils = (function(){
   function _collect(baseObj, updateObj) {
     // TODO Check for identical values
     // Updates the base object with the new object
-    debugger;
     var obj = baseObj; {
         for (var prop in updateObj) {
             obj[prop] = updateObj[prop];

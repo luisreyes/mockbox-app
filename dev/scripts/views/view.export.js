@@ -11,7 +11,7 @@ _v.export = (function(){
       saveTimeout,
       buttons = {};
   
-  function init(restoreData){
+  function init(){
     doc = chrome.app.window.get('export').contentWindow.document;
     sidebar = doc.getElementById('export-options');
     sidebarOptions = sidebar.getElementsByTagName('ul')[0];
@@ -32,8 +32,6 @@ _v.export = (function(){
     
     addListeners();
     
-    restoreData && restoreFields(restoreData);
-
     setPanel({target:buttons.sidebar.local});
   }
 
@@ -45,14 +43,10 @@ _v.export = (function(){
     buttons.export.addEventListener('click', onExportClick);
     buttons.cancel.addEventListener('click', onCancelClick);
 
-    doc.getElementById('ftp-export-host-input').addEventListener('blur', onInputBlur);
-    doc.getElementById('ftp-export-path-input').addEventListener('blur', onInputBlur);
-    doc.getElementById('ftp-export-user-input').addEventListener('blur', onInputBlur);
-
   }
 
   function onExportClick(e){
-
+    var isValid = false;
     var model = {};
 
     switch(selectedClass){
@@ -61,12 +55,14 @@ _v.export = (function(){
         model.type = selectedClass;
         model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
         model.versioned = selectedPanel.querySelector('.version.switch-input').checked;
+        isValid = true;
       break;
 
       case 'local':
         model.type = selectedClass;
         model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
         model.versioned = selectedPanel.querySelector('.version.switch-input').checked;
+        isValid = true;
       break;
 
       case 'ftp':
@@ -82,19 +78,31 @@ _v.export = (function(){
         model.folder = doc.getElementById('ftp-export-path-input').value;
         model.user = doc.getElementById('ftp-export-user-input').value;
         model.pass = doc.getElementById('ftp-export-pass-input').value;
+
+        if(model.host === ''){
+          mockbox.notify({type:'error', message:'Please enter a valid host address'});
+          return;
+        }
+
+        if(model.user === ''){
+          mockbox.notify({type:'error', message:'Please enter a valid username'});
+          return;
+        }
+        
+        isValid = true;      
+
       break;
 
       default: return;
     }
-
-    chrome.runtime.sendMessage({message:'onExport', model:model });
+    if(isValid){
+      saveFieldsToSettings();
+      chrome.runtime.sendMessage({message:'onExport', model:model });
+    }
 
   }
 
-  function onInputBlur(e){
-    
-    if(saveTimeout) clearTimeout(saveTimeout);
-    
+  function saveFieldsToSettings(){    
     var data = {
       message:'saveSettings', 
       settings:{
@@ -106,10 +114,7 @@ _v.export = (function(){
       }
     };
 
-    saveTimeout = setTimeout(function(){
-      chrome.runtime.sendMessage(data);  
-    }, 1000);
-    
+    chrome.runtime.sendMessage(data);
   }
 
   function onCancelClick(e){
@@ -163,7 +168,9 @@ _v.export = (function(){
 
   return {
     init: function(data){
-      !doc && init(data);
+      !doc && init();
+
+      restoreFields(data);
     }
   };
 

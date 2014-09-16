@@ -46,7 +46,7 @@
   padding: 10px;
   
   .list-item{
-    cursor: pointer;
+    cursor: default;/*pointer;*/
     table{
       width: 100%;
       border-collapse: collapse;
