@@ -1,6 +1,18 @@
-MockBox v0.9.8.25
+MockBox v0.9.8.3
 =========
 
+---------------------------------------
+**v0.9.8.3 - 09/15/14 - 12:37am**
+
+
+```
+- Added groundwork for output panel
+- Beautify code on load
+- Changed default light theme on editors
+- Removed unused themes
+- Added a template
+
+```
 ---------------------------------------
 **v0.9.8.25 - 09/15/14 - 4:31pm**
 

@@ -1,15 +1,16 @@
 .notification{
   position: absolute;
-  bottom:0;
-  right:0;
+  bottom: 0;
+  right: -webkit-calc(50% - 300px);
   z-index: 1030;
   font-weight: 600;
-  width: 100%;
-  opacity:0;
+  width: 600px;
+  opacity: 0;
 
   &.showing{
     bottom: 20px;
     opacity:1;
+
   }
   .notification-icon{
     margin-right: 5px;
@@ -29,8 +30,6 @@
   }
 
   .notification-wrapper{
-    
-    width: 50%;
     padding: 5px;
     box-shadow: 0 0 5px $base-color-shadow;
     margin: 0 auto;

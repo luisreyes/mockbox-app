@@ -1,7 +1,7 @@
 /*! SplitView.js Custom styles */
 
 .sv-split-space {
-  height: -webkit-calc(100% - (#{$topbar-height} + 20px));
+  height: -webkit-calc(100% - (#{$topbar-height} + 22px + #{$footbar-height}));
   background-color: #DDD;
   right: 0;
   margin-top: $topbar-height;

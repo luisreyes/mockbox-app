@@ -1,0 +1,21 @@
+.footbar{
+  height: $footbar-height;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  background: $base-color-1;
+  border: 1px solid $base-color-2;
+  border-top-color: $base-color-shadow;
+  z-index: 10;
+  right: 0;
+
+  &.open { 
+    width:-webkit-calc( 100% - #{ $sidebar-width } );  
+  }
+
+  &.open-half { 
+    width:-webkit-calc( 100% - #{ $sidebar-width-half } );  
+  }
+
+  //&:hover{ height: 60px; }
+}

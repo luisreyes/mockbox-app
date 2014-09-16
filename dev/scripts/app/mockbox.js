@@ -13,6 +13,7 @@ var mockbox;
       domCss  = document.getElementById('css').querySelector('.code'),
       domJs   = document.getElementById('js').querySelector('.code'),
       header = document.getElementById('app-header'),
+      footer = document.getElementById('app-footer'),
       splash = document.getElementById('app-splash'),
       splashAllow = document.getElementById('app-splash-access'),
       splashLoading = document.getElementById('app-splash-loading'),
@@ -207,9 +208,11 @@ var mockbox;
 
   function setSidebarState(stateIndex){
     apollo.removeClass(domEditors, ['open','closed', 'open-half']);
+    apollo.removeClass(footer, ['open','closed', 'open-half']);
     apollo.removeClass(header, ['open','closed', 'open-half']);
 
     apollo.addClass(domEditors, sidebarToggleClasses[stateIndex]);
+    apollo.addClass(footer, sidebarToggleClasses[stateIndex]);
     apollo.addClass(header, sidebarToggleClasses[stateIndex]);
   }
 
@@ -234,7 +237,7 @@ var mockbox;
 
   function setSettings(){
     // Set Convert to theme css name
-    var theme = (_settings.theme === 'dark') ? 'mbo' : 'xq-light';
+    var theme = (_settings.theme === 'dark') ? 'mbo' : 'default';
     
     //Set Editos Theme
     setGlobalEditorOption('theme', theme);
@@ -254,13 +257,6 @@ var mockbox;
   // Initialize Editors
   function initEditors(){
 
-    // var mixedMode = {
-    //   name: "htmlmixed",
-    //   scriptTypes: [{matches: /\/x-handlebars-template|\/x-mustache|\/x-jade/i,
-    //                  mode: null},
-    //                 {matches: /(text|application)\/(x-)?vb(a|script)/i,
-    //                  mode: "vbscript"}]};
-
     // Initialize Main Code Editors
     editors.html  = new CodeMirror(domHtml,  { mode: 'htmlmixed' });
     editors.js    = new CodeMirror(domJs,    { mode: 'javascript' });
@@ -269,9 +265,10 @@ var mockbox;
     // Set CodeMirror Options to all editors
     setGlobalEditorOption('lineNumbers', true);
     setGlobalEditorOption('fixedGutter', true);
+    setGlobalEditorOption('autocomplete', true);
     setGlobalEditorOption('styleActiveLine', true);
     setGlobalEditorOption('matchBrackets', true);
-    setGlobalEditorOption('theme', 'xq-light');
+    setGlobalEditorOption('theme', 'default');
 
     // Listen for viewport size change
     sv.addEventListener('resize', function(){
@@ -331,9 +328,9 @@ var mockbox;
     if(fromTemplate){currentGui = null;}
     if(data){
       document.getElementById('app-header').querySelector('.project-name').innerHTML = data.name;
-      editors.html.setValue( data.html );
-      editors.js.setValue( data.js );
-      editors.css.setValue( data.css );
+      editors.html.setValue( html_beautify(data.html) );
+      editors.js.setValue( js_beautify(data.js) );
+      editors.css.setValue( css_beautify(data.css) );
       sv.setLayout( data.layout[0], data.layout[1], data.layout[2] );
       updateIframe();
       _mock.utils.isDirty(false);
@@ -356,7 +353,7 @@ var mockbox;
 
   function getSaveData(){
     var size0 = document.getElementById('html').style.height,
-        size1 = document.getElementById('css').style.width,
+        size1 = document.getElementById('html').style.width,
         size2 = document.getElementById('css').style.height;
     return {
           gui : currentGui,
@@ -365,9 +362,9 @@ var mockbox;
           js  : editors.js.getValue(),
           css : editors.css.getValue(),
           layout: [
-            size0.substr(0,size0.length-1),
-            size1.substr(0,size1.length-1),
-            size2.substr(0,size2.length-1)
+            Math.round(size0.substr(0,size0.length-1)),
+            Math.round(size1.substr(0,size1.length-1)),
+            Math.round(size2.substr(0,size2.length-1))
             ]
         };
 
