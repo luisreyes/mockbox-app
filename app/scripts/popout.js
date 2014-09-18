@@ -89,8 +89,12 @@ _pop.clicks = (function(){
         chrome.runtime.sendMessage({message:'onClosePopout', popoutId:_currentId});
       });
     }
+
+    document.body.addEventListener('keydown', onKeyDown);
     
   }
+
+  function onKeyDown(e){ if(e.keyCode === 27) buttons.closeBtn.click(); }
 
   return {
     init: init

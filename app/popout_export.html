@@ -66,9 +66,9 @@
               <section class="field">
                 <section class="field-title">FTP Settings</section>
                 <section class="field-option"><span class="left-container"><span>Host & Port</span></span><span class="right-container">
-                    <input type="text" placeholder="ftp.yoursite.com" id="ftp-export-host-input" class="ftp-host-input"><span> :</span>
-                    <input type="text" placeholder="21" id="ftp-export-port-input" class="ftp-port-input"></span><span class="left-container"><span>Path</span></span><span class="right-container">
-                    <input type="text" placeholder="(leave empty for root)" id="ftp-export-path-input"></span><span class="left-container"><span>Username</span></span><span class="right-container">
+                    <input type="text" placeholder="ftp.yoursite.com" data-validate="url" id="ftp-export-host-input" class="ftp-host-input"><span> :</span>
+                    <input type="text" placeholder="21" data-validate="number" id="ftp-export-port-input" class="ftp-port-input"></span><span class="left-container"><span>Path</span></span><span class="right-container">
+                    <input type="text" placeholder="(leave empty for root)" data-validate="string" id="ftp-export-path-input"></span><span class="left-container"><span>Username</span></span><span class="right-container">
                     <input type="text" placeholder="Username" id="ftp-export-user-input"></span><span class="left-container"><span>Password</span></span><span class="right-container">
                     <input type="password" placeholder="Password" id="ftp-export-pass-input">
                     <section class="small">Passwords are not saved</section></span>

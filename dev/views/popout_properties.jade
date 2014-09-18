@@ -10,32 +10,59 @@ block content
     section#properties-options.sidebar
       ul    
         
-        li.application.transition
+        li.css-properties.transition
           section.item
             span.icon.icon_adjust-horiz
-          span APPLICATION
+          span CSS
+
+        li.js-properties.transition
+          section.item
+            span.icon.icon_adjust-horiz
+          span JavaScript
 
 
     section#properties-panels.properties-options.panels
       ul
-        li.application.panel
+        li.css-properties.panel
+          section.field
+            section.field-title Options          
+            section.field-option
+              span.left-container
+                span Normalize CSS
+                section.clear
+              span.right-container
+                label.switch
+                  input(type="checkbox" checked).normalize.switch-input
+                  span(data-on="On" data-off="Off").switch-label
+                  span.switch-handle.transition
+              section.clear
+
+              span.left-container
+                span External CSS
+              span.right-container
+                input(type="text" placeholder="http://youresites.com/styles.css"  data-validate="url")#properties-css-input
+
+              section.clear
+
+        li.js-properties.panel.hidden
           section.field
             section.field-title Options
-            
             section.field-option
+
               span.left-container
-                span Autoload last
-              span.right-container 
-                input.input#properties-open-check(type="checkbox")
-              section.clear
-                
-            section.field-option
+                span Modernizer
+                section.clear
+              span.right-container
+                label.switch
+                  input(type="checkbox" checked).modernizer.switch-input
+                  span(data-on="On" data-off="Off").switch-label
+                  span.switch-handle.transition
+              
               span.left-container
-                span Select a theme
-              span.right-container 
-                select.input#properties-theme-select
-                  option light
-                  option dark
+                span External JS
+              span.right-container
+                input(type="text" placeholder="http://youresites.com/scripts.js"  data-validate="url")#properties-js-input
+
               section.clear
           
   footer#properties-footer

@@ -19,7 +19,8 @@ _v.properties = (function(){
     
     buttons = {
       sidebar:{
-        application:sidebarOptions.querySelector('.application')
+        css:sidebarOptions.querySelector('.css-properties'),
+        js:sidebarOptions.querySelector('.js-properties')
       },
       ok:doc.getElementById('properties-footer').querySelector('.ok'),
       cancel:doc.getElementById('properties-footer').querySelector('.cancel')
@@ -27,7 +28,7 @@ _v.properties = (function(){
 
     addListeners();
 
-    setPanel({target:buttons.sidebar.application});
+    setPanel({target:buttons.sidebar.js});
 
     if(callback) callback();
 

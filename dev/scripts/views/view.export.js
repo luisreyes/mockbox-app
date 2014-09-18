@@ -9,7 +9,8 @@ _v.export = (function(){
       selectedClass,
       selectedPanel,
       saveTimeout,
-      buttons = {};
+      buttons = {}, 
+      fields = [];
   
   function init(){
     doc = chrome.app.window.get('export').contentWindow.document;
@@ -29,6 +30,14 @@ _v.export = (function(){
       export  :doc.getElementById('export-options-footer').querySelector('.ok'),
       cancel  :doc.getElementById('export-options-footer').querySelector('.cancel')
     };
+
+    fields = [
+      doc.getElementById('ftp-export-host-input'),
+      doc.getElementById('ftp-export-port-input'),
+      doc.getElementById('ftp-export-path-input'),
+      doc.getElementById('ftp-export-user-input'),
+      doc.getElementById('ftp-export-pass-input')
+    ];
     
     addListeners();
     
@@ -42,6 +51,21 @@ _v.export = (function(){
 
     buttons.export.addEventListener('click', onExportClick);
     buttons.cancel.addEventListener('click', onCancelClick);
+
+    fields.forEach(function(field){
+          
+      // Add listener to for ENTER key
+      field.addEventListener('focus', function(){
+        this.addEventListener('keypress', onKeypress);
+      });
+
+      // Remove listener to for ENTER key
+      field.addEventListener('blur', function(){
+        this.removeEventListener('keypress', onKeypress);
+      });
+
+    });
+
 
   }
 
@@ -74,11 +98,11 @@ _v.export = (function(){
         model.type = selectedClass;
         model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
         model.versioned = selectedPanel.querySelector('.version.switch-input').checked;
-        model.host = doc.getElementById('ftp-export-host-input').value;
-        model.port = doc.getElementById('ftp-export-port-input').value;
-        model.folder = doc.getElementById('ftp-export-path-input').value;
-        model.user = doc.getElementById('ftp-export-user-input').value;
-        model.pass = doc.getElementById('ftp-export-pass-input').value;
+        model.host =    fields[0].value;
+        model.port =    fields[1].value;
+        model.folder =  fields[2].value;
+        model.user =    fields[3].value;
+        model.pass =    fields[4].value;
 
         if(model.host === ''){
           mockbox.notify({type:'error', message:'Please enter a valid host address'});
@@ -101,6 +125,12 @@ _v.export = (function(){
       chrome.runtime.sendMessage({message:'onExport', model:model });
     }
 
+  }
+
+  function onKeypress(e){
+    if(e.keyCode === 13){
+      buttons.export.click();
+    }
   }
 
   function saveFieldsToSettings(){    

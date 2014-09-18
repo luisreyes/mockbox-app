@@ -19,25 +19,39 @@
       <section class="view-properties">
         <section id="properties-options" class="sidebar">
           <ul>   
-            <li class="application transition">
-              <section class="item"><span class="icon icon_adjust-horiz"></span></section><span>APPLICATION</span>
+            <li class="css-properties transition">
+              <section class="item"><span class="icon icon_adjust-horiz"></span></section><span>CSS</span>
+            </li>
+            <li class="js-properties transition">
+              <section class="item"><span class="icon icon_adjust-horiz"></span></section><span>JavaScript</span>
             </li>
           </ul>
         </section>
         <section id="properties-panels" class="properties-options panels">
           <ul>
-            <li class="application panel">
+            <li class="css-properties panel">
               <section class="field">
-                <section class="field-title">Options</section>
-                <section class="field-option"><span class="left-container"><span>Autoload last</span></span><span class="right-container"> 
-                    <input id="properties-open-check" type="checkbox" class="input"></span>
+                <section class="field-title">Options          </section>
+                <section class="field-option"><span class="left-container"><span>Normalize CSS</span>
+                    <section class="clear"></section></span><span class="right-container">
+                    <label class="switch">
+                      <input type="checkbox" checked class="normalize switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                    </label></span>
+                  <section class="clear"></section><span class="left-container"><span>External CSS</span></span><span class="right-container">
+                    <input type="text" placeholder="http://youresites.com/styles.css" data-validate="url" id="properties-css-input"></span>
                   <section class="clear"></section>
                 </section>
-                <section class="field-option"><span class="left-container"><span>Select a theme</span></span><span class="right-container"> 
-                    <select id="properties-theme-select" class="input">
-                      <option>light</option>
-                      <option>dark</option>
-                    </select></span>
+              </section>
+            </li>
+            <li class="js-properties panel hidden">
+              <section class="field">
+                <section class="field-title">Options</section>
+                <section class="field-option"><span class="left-container"><span>Modernizer</span>
+                    <section class="clear"></section></span><span class="right-container">
+                    <label class="switch">
+                      <input type="checkbox" checked class="modernizer switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                    </label></span><span class="left-container"><span>External JS</span></span><span class="right-container">
+                    <input type="text" placeholder="http://youresites.com/scripts.js" data-validate="url" id="properties-js-input"></span>
                   <section class="clear"></section>
                 </section>
               </section>

@@ -143,13 +143,13 @@ block content
               span.left-container
                 span Host & Port
               span.right-container
-                input(type="text" placeholder="ftp.yoursite.com")#ftp-export-host-input.ftp-host-input
+                input(type="text" placeholder="ftp.yoursite.com" data-validate="url")#ftp-export-host-input.ftp-host-input
                 span  :
-                input(type="text" placeholder="21")#ftp-export-port-input.ftp-port-input
+                input(type="text" placeholder="21"  data-validate="number")#ftp-export-port-input.ftp-port-input
               span.left-container
                 span Path
               span.right-container
-                input(type="text" placeholder="(leave empty for root)")#ftp-export-path-input
+                input(type="text" placeholder="(leave empty for root)"  data-validate="string")#ftp-export-path-input
               span.left-container
                 span Username
               span.right-container

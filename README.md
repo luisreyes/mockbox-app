@@ -1,5 +1,16 @@
-MockBox v0.9.8.4
+MockBox v0.9.8.45
 
+---------------------------------------
+**v0.9.8.45 - 09/18/14 - 3:01pm**
+
+
+```
+- Validate Project Name for not empty
+- Added Prototype Properties Window
+- Refactor CSS Panels
+- Fix minor FTP Export Bugs
+
+```
 ---------------------------------------
 **v0.9.8.4 - 09/18/14 - 12:56am**
 

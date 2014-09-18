@@ -36,7 +36,9 @@ body, html {
 ::selection { background: $accent-color; color:#EEE; }
 
 input{
-  
+  &.invalid{
+    border-color:#AA4B4B;
+  }
   &[type=password],
   &[type=text]{
     padding: 2px;
