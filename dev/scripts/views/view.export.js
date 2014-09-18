@@ -109,6 +109,7 @@ _v.export = (function(){
       settings:{
         ftp:{
           host: doc.getElementById('ftp-export-host-input').value,
+          port: doc.getElementById('ftp-export-port-input').value,
           path: doc.getElementById('ftp-export-path-input').value,
           user: doc.getElementById('ftp-export-user-input').value
         }
@@ -125,6 +126,7 @@ _v.export = (function(){
   function restoreFields(data){
     if(data.ftp){
       doc.getElementById('ftp-export-host-input').value = data.ftp.host || '';
+      doc.getElementById('ftp-export-port-input').value = data.ftp.port || '';
       doc.getElementById('ftp-export-path-input').value = data.ftp.path || '';
       doc.getElementById('ftp-export-user-input').value = data.ftp.user || '';
     }

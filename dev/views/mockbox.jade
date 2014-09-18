@@ -24,10 +24,10 @@ html
 
 
     // Notification
-    section#app-notification.transition-slow.notification
+    section#app-notification.transition.slow.bounce.notification
       section.notification-wrapper.error
-        span.notification-icon
-        span.notification-message
+        span.notification-icon.transition.bounce.delayed
+        span.notification-message.transition.delayed
         span.notification-link
         span.notification-close.icon_close
 
@@ -99,7 +99,7 @@ html
       span#app-sidebar-toggle.sidebar-toggle.icon(data-icon="a")
       span.app-logo
       span.project-name.transition New Prototype
-      span.icon.icon_check
+      span(title="PROTOTYPE PROPERTIES").icon_adjust-horiz
 
     // SplitView container
     

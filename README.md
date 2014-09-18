@@ -1,6 +1,15 @@
-MockBox v0.9.8.35
-=========
+MockBox v0.9.8.4
 
+---------------------------------------
+**v0.9.8.4 - 09/18/14 - 12:56am**
+
+
+```
+- Tweak to export UI
+- Fixed Issue with window load method order
+- Added body headr and footer templates
+
+```
 ---------------------------------------
 **v0.9.8.35 - 09/15/14 - 12:37am**
 

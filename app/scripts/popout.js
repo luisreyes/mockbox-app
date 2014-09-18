@@ -57,13 +57,6 @@ _pop.clicks = (function(){
         buttons.continueBtn = document.getElementById("confirm-buttons").querySelector('.continue');
       }
 
-      if(_currentId === 'settings'){
-        var services = document.getElementById("settings-access-services");
-        buttons.switches = services.getElementsByTagName('label');
-        buttons.okBtn = document.getElementById("settings-footer").querySelector('.ok');
-        buttons.cancelBtn = document.getElementById("settings-footer").querySelector('.cancel');
-      }
-
       if(_currentId === 'about'){
         buttons.okBtn = document.getElementById("about-footer").querySelector('.ok');
       }
@@ -90,34 +83,6 @@ _pop.clicks = (function(){
       });
     }else
 
-    if(_currentId === 'settings'){
-
-      var data = {};
-
-      buttons.okBtn.addEventListener('click', function(){
-
-        data = {
-          message:'saveSettings', 
-          settings:{
-            theme: document.getElementById('settings-theme-select').value,
-            autoload:document.getElementById('settings-open-check').checked
-          }
-        };
-
-        chrome.runtime.sendMessage(data);
-        chrome.runtime.sendMessage({message:'onClosePopout', popoutId:_currentId});
-      });
-
-      buttons.cancelBtn.addEventListener('click', function(){
-        chrome.runtime.sendMessage({message:'onClosePopout', popoutId:_currentId});
-      });
-
-      for(var i = 0; i < buttons.switches.length;i++){
-        buttons.switches[i].addEventListener('click', onSwitchClick);
-      }
-
-    }else
-
     if(_currentId === 'about'){
 
       buttons.okBtn.addEventListener('click', function(){
@@ -125,21 +90,6 @@ _pop.clicks = (function(){
       });
     }
     
-  }
-
-  function onSwitchClick(e){
-    var service = e.target.parentElement.parentElement.parentElement.classList[0];
-    
-    if(e.target.tagName === 'INPUT'){
-      var on = e.target.checked;
-      
-      if(on){
-        chrome.runtime.sendMessage( { message:'allowAccess', service: service });
-      }else{
-        chrome.runtime.sendMessage( { message:'revokeAccess', service: service });
-      }
-    }
-
   }
 
   return {

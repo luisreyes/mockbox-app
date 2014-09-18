@@ -79,7 +79,6 @@ _mock.receiver = (function(){
         break;
       
       case 'onExport':
-        debugger;
         _mock.popout.close('export');
 
         var exportData = {

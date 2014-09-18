@@ -8,8 +8,18 @@ body, html {
   font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-.transition{ -webkit-transition: all 0.12s; }
-.transition-slow{ -webkit-transition: all 0.5s; }
+.transition{ 
+  -webkit-transition: all 0.12s; 
+  &.slow{ -webkit-transition: all 0.5s; }
+  &.bounce{ 
+    -webkit-transition-timing-function: cubic-bezier(.74,-1.24,.23,1.97); }
+  &.delayed{
+    -webkit-transition-delay:.25s;
+    -webkit-transition-duration: .5s;
+  }
+}
+
+
 .absolute{ position:absolute; }
 .bottom{ bottom:0; }
 .center{ text-align:center; }
@@ -54,15 +64,6 @@ ul{margin: 0; padding: 0; list-style: none;}
   
 }
 
-.icon_check{
-    margin: 11px 5px 0 2px;
-    color: $base-color-font;
-    display:none;
-    float:left;
-    font-size: smaller;
-  }
-
-
 .app-name{
   float: right;
   margin: 9px 8px 0 5px;
@@ -106,9 +107,25 @@ header {
   z-index: 1010;
   width:100%;
 
-  .icon:hover{
-    color:$accent-color;
-    cursor: default;/*pointer;*/
+  .icon{
+    &:hover{
+      color:$accent-dark-color-0;
+    }
+  }
+  
+  .icon_adjust-horiz{
+    margin: 9px 5px;
+    color: $accent-dark-color-0;
+    background:$base-color-icon-button;
+    float: left;
+    padding: 2px 3px 2px 2px;
+    border-radius: 3px;
+
+    &:hover{
+      color:#FFF;//$accent-color;
+      background:$accent-dark-color-0;
+      text-shadow: 0px 1px 1px $accent-dark-color-2;
+    }
   }
 
   &.open { 

@@ -20,7 +20,7 @@ _mock.ftp = (function(){
         root = data.folder || '.';
         user = data.user;
         password = data.pass;
-        port = data.port || 21;
+        port = parseInt(data.port) || 21;
         projectname = data.projectname;
 
         if(data.packaged && data.versioned){
@@ -439,7 +439,7 @@ _mock.ftp = (function(){
         .then(function(){
             var deferred = Q.defer();
             //_mock.notification.setLink({url:cwd, text:'[ID: '+cid+']', title:cwd});
-            _mock.notification.send({type:'success', message:'Export Complete'});
+            _mock.notification.send({type:'success', message:'Export Complete: ' + cwd});
 
             deferred.resolve();
             return deferred.promise;

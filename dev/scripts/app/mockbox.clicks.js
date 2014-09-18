@@ -44,7 +44,7 @@ _mock.clicks = (function(){
     later     :splash.querySelector('.maybelater'),
     
     // Header Bar
-    check     :header.querySelector('.icon_check'),
+    projectProperties     :header.querySelector('.icon_adjust-horiz'),
     
     // Application Chrome Controls
     appMin    :windowControls.querySelector('.window-min'),
@@ -117,8 +117,16 @@ _mock.clicks = (function(){
     });
     
     // Project Name Accept
-    buttons.check.addEventListener( 'click', function(){
-     prototypeName.blur();
+    buttons.projectProperties.addEventListener( 'click', function(){
+      _mock.popout.open('properties', function(){
+        var data = {
+          title: header.querySelector('.project-name').innerHTML
+        }
+        // init the views js file
+        views.properties.init(function(){
+          views.properties.restorePropertiesStates(data);
+        });
+      });
     });
 
 
@@ -223,7 +231,7 @@ _mock.clicks = (function(){
 
   function clickToEditProjectName(){
     // Cache initial value to manage dirty flag
-    var initValue = prototypeName.innerHTML, newValue;
+    var initValue = prototypeName.innerHTML, newValue, latestValidValue;
    
     // On click of the field
     prototypeName.addEventListener('click', function(){
@@ -236,9 +244,7 @@ _mock.clicks = (function(){
       
       // Set classes for editing styles
       apollo.addClass(prototypeName,'editing');
-      // Display the check to accept changes
-      apollo.addClass(prototypeName.nextSibling,'visible');
-
+      
       this.addEventListener('keypress', onKeypress);
       
     });
@@ -246,6 +252,10 @@ _mock.clicks = (function(){
     // On 'blur' of the field
     prototypeName.addEventListener('blur', function(){
       
+      // Validate new input name for not empty
+      prototypeName.innerHTML = prototypeName.innerHTML || latestValidValue;
+      latestValidValue = prototypeName.innerHTML;
+
       // Cache new value for comparison and dirty flag management
       newValue = prototypeName.innerHTML;
 
@@ -256,9 +266,6 @@ _mock.clicks = (function(){
       prototypeName.setAttribute('contenteditable','false');
       apollo.removeClass(prototypeName,'editing');
       
-      // Hide 'check'
-      apollo.removeClass(prototypeName.nextSibling,'visible');
-
       this.removeEventListener('keypress', onKeypress);
     });
   }

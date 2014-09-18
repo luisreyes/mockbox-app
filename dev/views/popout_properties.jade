@@ -1,13 +1,13 @@
 extends mockbox_popout.jade
 
 block title
-  span Settings
+  span Prototype Properties
 block titleIcon
   span.icon_cog
 
 block content
-  section.view-settings
-    section#settings-options.sidebar
+  section.view-properties
+    section#properties-options.sidebar
       ul    
         
         li.application.transition
@@ -16,7 +16,7 @@ block content
           span APPLICATION
 
 
-    section#settings-panels.settings-options.panels
+    section#properties-panels.properties-options.panels
       ul
         li.application.panel
           section.field
@@ -26,18 +26,18 @@ block content
               span.left-container
                 span Autoload last
               span.right-container 
-                input.input#settings-open-check(type="checkbox")
+                input.input#properties-open-check(type="checkbox")
               section.clear
                 
             section.field-option
               span.left-container
                 span Select a theme
               span.right-container 
-                select.input#settings-theme-select
+                select.input#properties-theme-select
                   option light
                   option dark
               section.clear
           
-  footer#settings-footer
+  footer#properties-footer
     button.cancel cancel
     button.ok ok

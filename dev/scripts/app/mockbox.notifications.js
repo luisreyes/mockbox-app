@@ -34,17 +34,12 @@ _mock.notification = (function(){
     apollo.addClass(notWrapper, type);
     apollo.addClass(not, 'showing');
     apollo.addClass(notIcon, icon);
-    apollo.addClass(notClose, 'hidden');
-
-    var time = persist ? 60000 : 4000;
+    
+    var time = persist ? 60000 : 5000;
 
     timeout = setTimeout(function(){
       apollo.removeClass(not, 'showing');
     }, time);
-
-    if(persist){
-      apollo.removeClass(notClose, 'hidden');
-    }
 
   }
 

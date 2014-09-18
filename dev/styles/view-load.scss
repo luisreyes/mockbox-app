@@ -1,28 +1,6 @@
 
 .view-load{
   
-  .sidebar{
-    width: 150px;
-    border-top:none;
-    
-    .selected{
-      background:$base-color-2;
-      color:$base-color-font;
-      padding-left:10px;
-      border-radius: 3px 0 0 3px;
-      margin: 0px 0 0px 10px;
-
-      path{ fill:  $base-color-font; }
-      &:hover{
-        path{ fill:  $base-color-font; }
-      }
-    }
-  }
-
-  .panels{
-    margin-left:150px;
-  }
-
   .prototypes{
     .list-item{
       height:61px;

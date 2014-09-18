@@ -23,6 +23,21 @@ _mock.windows = (function(){
       }
     },
 
+    properties :{
+      file:'popout_properties.html',
+      created: false,
+      options:{
+        id:'properties',
+        frame: globals.frame,
+        hidden: globals.hidden,
+        resizable:false,
+        bounds: {
+          width: 500,
+          height: 450
+        }
+      }
+    },
+
     load :{
       file:'popout_load.html',
       created: false,
@@ -47,8 +62,8 @@ _mock.windows = (function(){
         hidden: globals.hidden,
         resizable:false,
         bounds: {
-          width: 400,
-          height: 400
+          width: 500,
+          height: 450
         }
       }
     },
