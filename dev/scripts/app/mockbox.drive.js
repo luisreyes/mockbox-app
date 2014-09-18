@@ -93,7 +93,7 @@ _mock.drive = (function(){
     countFoldersCreated++;
 
     // Cache the folders id for file creation reference
-    folderIds[data.title] = result.id
+    folderIds[data.title] = result.id;
     
     // Check all folders have been created
     if(countFoldersCreated === countFoldersToCreate){
@@ -164,7 +164,7 @@ _mock.drive = (function(){
         if (req.readyState == 4) {
           if(req.status == 200){
             var res = JSON.parse(req.responseText);
-            callback && callback(res,model);
+            if(callback) callback(res,model);
           }else
           if(req.status == 401){
             req.abort();

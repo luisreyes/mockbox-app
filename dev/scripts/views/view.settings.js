@@ -53,7 +53,7 @@ _v.settings = (function(){
 
   return {
     init: function(callback){
-      !doc && _init(callback);
+      if(!doc) _init(callback);
     },
     restoreSettingStates: function(settings){
       _restoreStates(settings);

@@ -141,9 +141,11 @@ block content
             section.field-title FTP Settings
             section.field-option
               span.left-container
-                span Host
+                span Host & Port
               span.right-container
-                input(type="text" placeholder="ftp.yoursite.com")#ftp-export-host-input
+                input(type="text" placeholder="ftp.yoursite.com")#ftp-export-host-input.ftp-host-input
+                span  :
+                input(type="text" placeholder="21")#ftp-export-port-input.ftp-port-input
               span.left-container
                 span Path
               span.right-container

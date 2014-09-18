@@ -2,11 +2,11 @@ _mock.database = (function(){
 
   var reqResult,
   listeningForResult = false,
-  indexedDb = {};
-  indexedDb.db = null,
+  indexedDb = {},
   _onReadyCallback = null;
   
   function init() {
+    indexedDb.db = null;
     // open displays the data previously saved
     indexedDb.open(); 
   }
@@ -39,7 +39,7 @@ _mock.database = (function(){
 
     request.onsuccess = function(e) {
       indexedDb.db = e.target.result;
-      _onReadyCallback && _onReadyCallback();
+      if(_onReadyCallback) _onReadyCallback();
     };
 
     request.onerror = indexedDb.onerror;
@@ -72,7 +72,7 @@ _mock.database = (function(){
     entry.onsuccess = function(e) {
       // Re-render all the editors
       mockbox.isDirty(false);
-      !suppressNotification && mockbox.notify({type:'success',message:'Saved Successfully'});
+      if(!suppressNotification) mockbox.notify({type:'success',message:'Saved Successfully'});
     };
 
     entry.onerror = function(e) {
@@ -101,7 +101,7 @@ _mock.database = (function(){
     var objectStore = transaction.objectStore(table);
 
     var items = [];
-    var callback = callback;
+    var cb = callback;
     var request = objectStore.openCursor();
 
     request.onsuccess = function(event) {
@@ -111,7 +111,7 @@ _mock.database = (function(){
         cursor.continue();
       }
       else {
-        callback(items);
+        cb(items);
       }
     };
 
@@ -124,7 +124,7 @@ _mock.database = (function(){
 
   indexedDb.setEditorsFromId = function(id, isTemplate) {
     var db = indexedDb.db;
-    var table = isTemplate ? 'templates' : 'prototypes'
+    var table = isTemplate ? 'templates' : 'prototypes';
     var transaction = db.transaction([table]);
     var objectStore = transaction.objectStore(table);
     var request = objectStore.get(id);

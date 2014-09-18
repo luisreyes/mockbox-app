@@ -64,11 +64,11 @@ _v.load = (function(){
       } 
     }
 
-    for(var i in buttons.sidebar){
-       if(buttons.sidebar[i].classList[0] === selectedClass){
-        apollo.addClass(buttons.sidebar[i], 'selected');
+    for(var item in buttons.sidebar){
+       if(buttons.sidebar[item].classList[0] === selectedClass){
+        apollo.addClass(buttons.sidebar[item], 'selected');
       }else{
-        apollo.removeClass(buttons.sidebar[i], 'selected');  
+        apollo.removeClass(buttons.sidebar[item], 'selected');  
       }
     }
   }
@@ -214,7 +214,7 @@ _v.load = (function(){
 
   return {
     init: function(){
-      !doc && init();
+      if(!doc) init();
     },
     generateList: function(){
       setAvailableTemplateIds();

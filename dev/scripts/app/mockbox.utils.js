@@ -25,14 +25,17 @@ _mock.utils = (function(){
   };
 
   function _getFolderNameFromType(type){
+    var result;
     switch(type){
-      case 'css': return 'styles';
+      case 'css': result = 'styles';
       break;
-      case 'js': return 'scripts';
+      case 'js': result = 'scripts';
       break;
-      default: return '';
+      default: result = '';
       break;
     }
+
+    return result;
   }
 
   function _isDirtyDispatcher(){
@@ -81,7 +84,7 @@ _mock.utils = (function(){
         callback(e.target.result, id);
     };
     f.readAsArrayBuffer(bb);
-  };
+  }
 
   // `condition` is a function that returns a boolean
   // `fn` is a function that returns a promise

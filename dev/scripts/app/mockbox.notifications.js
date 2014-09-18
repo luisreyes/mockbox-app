@@ -2,7 +2,7 @@ _mock.notification = (function(){
 "use strict";
 
   var icons = ['icon_error-oct', 'icon_check_alt', 'icon_cone', 'icon_info'],
-      doc, not, notWrapper, notIcon, notMessage, notClose, notLink, notClose, timeout, linkUrl;
+      doc, not, notWrapper, notIcon, notMessage, notClose, notLink, timeout, linkUrl;
 
   function init(){
     doc = chrome.app.window.current().contentWindow.document;
@@ -29,7 +29,7 @@ _mock.notification = (function(){
       case 'success': icon = icons[1]; break;
       case 'warning': icon = icons[2]; break;
       case 'info': icon = icons[3]; break;
-    };
+    }
 
     apollo.addClass(notWrapper, type);
     apollo.addClass(not, 'showing');
@@ -72,7 +72,7 @@ _mock.notification = (function(){
 
   return {
     send: function(options){
-      !doc && init();
+      if(!doc) init();
       _send(options.type, options.message, options.persist);
     },
     setLink: function(data){
@@ -82,7 +82,7 @@ _mock.notification = (function(){
     },
     clearLink: function(){
       notLink.innerHTML = '';
-      notLink.setAttribute('title', '')
+      notLink.setAttribute('title', '');
       linkUrl = null;
     }
   };

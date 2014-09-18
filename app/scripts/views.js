@@ -185,7 +185,7 @@ _v.export = (function(){
 
       case 'ftp':
         model.host = '';
-        model.folder = ''
+        model.folder = '';
         model.user = '';
         model.pass = '';
 
@@ -193,6 +193,7 @@ _v.export = (function(){
         model.packaged = selectedPanel.querySelector('.zip.switch-input').checked;
         model.versioned = selectedPanel.querySelector('.version.switch-input').checked;
         model.host = doc.getElementById('ftp-export-host-input').value;
+        model.port = doc.getElementById('ftp-export-port-input').value;
         model.folder = doc.getElementById('ftp-export-path-input').value;
         model.user = doc.getElementById('ftp-export-user-input').value;
         model.pass = doc.getElementById('ftp-export-pass-input').value;
@@ -260,7 +261,8 @@ _v.export = (function(){
     selectedClass = element.classList[0];
 
     // Loop and set class hidden to unselected and remove class hidden from slected
-    for(var i = 0; i < panels.length; i++){
+    var i = 0;
+    for(; i < panels.length; i++){
       if(panels[i].classList[0] === selectedClass){
         // Cache selected element
         selectedPanel = panels[i];
@@ -271,7 +273,8 @@ _v.export = (function(){
       } 
     }
 
-    for(var i in buttons.sidebar){
+    i = 0;
+    for(i in buttons.sidebar){
        if(buttons.sidebar[i].classList[0] === selectedClass){
         apollo.addClass(buttons.sidebar[i], 'selected');
       }else{
@@ -286,7 +289,7 @@ _v.export = (function(){
 
   return {
     init: function(data){
-      !doc && init();
+      if(!doc) init();
 
       restoreFields(data);
     }
@@ -359,11 +362,11 @@ _v.load = (function(){
       } 
     }
 
-    for(var i in buttons.sidebar){
-       if(buttons.sidebar[i].classList[0] === selectedClass){
-        apollo.addClass(buttons.sidebar[i], 'selected');
+    for(var item in buttons.sidebar){
+       if(buttons.sidebar[item].classList[0] === selectedClass){
+        apollo.addClass(buttons.sidebar[item], 'selected');
       }else{
-        apollo.removeClass(buttons.sidebar[i], 'selected');  
+        apollo.removeClass(buttons.sidebar[item], 'selected');  
       }
     }
   }
@@ -509,7 +512,7 @@ _v.load = (function(){
 
   return {
     init: function(){
-      !doc && init();
+      if(!doc) init();
     },
     generateList: function(){
       setAvailableTemplateIds();
@@ -573,7 +576,7 @@ _v.settings = (function(){
 
   return {
     init: function(callback){
-      !doc && _init(callback);
+      if(!doc) _init(callback);
     },
     restoreSettingStates: function(settings){
       _restoreStates(settings);

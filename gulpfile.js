@@ -103,8 +103,15 @@ gulp.task( 'compile_js', function () {
 });
 
 
-gulp.task('lint', function(){
+gulp.task('lint_app', function(){
   gulp.src('app/scripts/*.js')
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish))
+});
+
+
+gulp.task('lint_dev', function(){
+  gulp.src(['dev/scripts/**/*.js','!dev/scripts/lib/**/*.*'])
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
 });

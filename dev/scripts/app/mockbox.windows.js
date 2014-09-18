@@ -4,13 +4,13 @@ _mock.windows = (function(){
 
   var globals = {
     frame:'none',
-    hidden:false
+    hidden:true
   };
 
   var model = {
     confirm :{
       file:'popout_confirm.html',
-      exists: false,
+      created: false,
       options:{
         id:'confirm',
         frame: globals.frame,
@@ -25,7 +25,7 @@ _mock.windows = (function(){
 
     load :{
       file:'popout_load.html',
-      exists: false,
+      created: false,
       options:{
         id:'load',
         frame: globals.frame,
@@ -40,7 +40,7 @@ _mock.windows = (function(){
 
     settings :{
       file:'popout_settings.html',
-      exists: false,
+      created: false,
       options:{
         id:'settings',
         frame: globals.frame,
@@ -55,7 +55,7 @@ _mock.windows = (function(){
 
     export :{
       file:'popout_export.html',
-      exists: false,
+      created: false,
       options:{
         id:'export',
         frame: globals.frame,
@@ -70,7 +70,7 @@ _mock.windows = (function(){
 
     about :{
       file:'popout_about.html',
-      exists: false,
+      created: false,
       options:{
         id:'about',
         frame: globals.frame,
@@ -87,15 +87,16 @@ _mock.windows = (function(){
 
   function _showCreate(id, callback){
     
-    if(!model[id].exists){
+    if(!model[id].created){
       
       // Create Window
       chrome.app.window.create(model[id].file, model[id].options, function(w){
         // Window Callback
         ids.push(id);
-        model[id].exists = true;
+        model[id].created = true;
         w.contentWindow.addEventListener("DOMContentLoaded", function(){
           setWindowProperties(w);
+          w.show();
           if(callback){
             callback();
           }
@@ -105,8 +106,8 @@ _mock.windows = (function(){
       
     }else{
       var win = chrome.app.window.get(id);
-      win.show();
       setWindowProperties(win);
+      win.show();
       if(callback){
         callback();
       }  
@@ -128,7 +129,7 @@ _mock.windows = (function(){
   }
 
   function _hide(id, callback){
-    if(model[id].exists){
+    if(model[id].created){
       chrome.app.window.get(id).hide();
       if(callback){
         callback();

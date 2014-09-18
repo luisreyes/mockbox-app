@@ -6,8 +6,8 @@ _mock.local = (function(){
   function _getZip(data){
     var zip = new JSZip();
       zip.file("index.html", data.editors.html.value);
-      data.editors.js.value && zip.file("scripts/scripts.js", data.editors.js.value);
-      data.editors.css.value && zip.file("styles/styles.css", data.editors.css.value);
+      if(data.editors.js.value) zip.file("scripts/scripts.js", data.editors.js.value);
+      if(data.editors.css.value) zip.file("styles/styles.css", data.editors.css.value);
       return zip.generate({type:"blob"});
   }
 
@@ -36,7 +36,7 @@ _mock.local = (function(){
 
         });
       }else{
-        _mock.notification.send({type:'error', message:'Export Cancelled'});
+        _mock.notification.send({type:'warning', message:'Export Cancelled'});
       }
     });
   }
@@ -83,7 +83,7 @@ _mock.local = (function(){
 
         });
       }else{
-        _mock.notification.send({type:'error', message:'Export Cancelled'});
+        _mock.notification.send({type:'warning', message:'Export Cancelled'});
       }
     });
   }
@@ -117,7 +117,7 @@ _mock.local = (function(){
 
   function _saveZip(data){
     _saveFile({
-      filename:'MockBox_' + data.projectName.replace(/\s/g,'_') + '.zip',
+      filename: data.projectFolderName + '.zip',
       filedata: _getZip(data)
     });
   }

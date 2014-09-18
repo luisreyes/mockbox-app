@@ -1,7 +1,17 @@
 _mock.templates = (function(){
   "use strict";
 
+  function getBodyHeader(params){
+    var htmlHeader = '<!doctype html><html><head><meta charset="utf-8"><title>' + params.title + ' - MockBox Prototype</title><link rel="stylesheet" href="styles/styles.css"></head>';
 
+    return htmlHeader;
+  }
+
+  function getBodyFooter(params){
+    var htmlFooter = '<script src="scripts/scripts.js"></script>';
+
+    return htmlFooter;
+  }
 
   function getTemplates(){
     return [
@@ -30,26 +40,14 @@ _mock.templates = (function(){
       "author": "@luisreyesdev"
     }];
 
-  } 
-
-  function getExport(type){
-      switch(type){
-        case 'html': 
-        break;
-
-      }
-
-    var type = [
-    {
-      "html" : ".col"
-    }];
-
-  }    
+  }   
 
   return {
     getAll:function(){
       return getTemplates();
-    }
+    },
+    getBodyHeader: function(type){ return getBodyHeader(type) },
+    getBodyFooter: function(type){ return getBodyFooter(type) }
   };
 
 }());

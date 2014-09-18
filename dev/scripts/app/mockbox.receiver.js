@@ -79,19 +79,22 @@ _mock.receiver = (function(){
         break;
       
       case 'onExport':
-
+        debugger;
         _mock.popout.close('export');
 
         var exportData = {
           projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
           editors: _mock.getEditorsModel(),
           projectFolderName: 'MockBox_' + document.getElementById('app-header').querySelector('.project-name').innerHTML.replace(/\s/g, '_')
-        };
+        },
+        type,
+        blob,
+        version,
+        files = {},
+        gui = data.model.versioned ? '_'+_mock.utils.getGUID() : '';
+
+        exportData.editors.html.value = html_beautify(_mock.templates.getBodyHeader({title: exportData.projectName})) + exportData.editors.html.value + _mock.templates.getBodyFooter('foot');
         
-        var gui = data.model.versioned ? '_'+_mock.utils.getGUID() : '';
-        exportData.projectName += gui;
-
-
         if(data.model.type === 'drive'){
           
           _mock.notification.send({type:'info', message:'Exporting to Google Drive', persist:true});
@@ -110,11 +113,11 @@ _mock.receiver = (function(){
             // Create Individual folders in drive
             _mock.drive.generateFolders(exportData, function(){
               // Export only if the editor has data.
-              exportData.editors.html.value && _mock.drive.upload({title:'index.html',type:'text/html', value: btoa(exportData.editors.html.value), parent:'main'});
+              if(exportData.editors.html.value) _mock.drive.upload({title:'index.html',type:'text/html', value: btoa(exportData.editors.html.value), parent:'main'});
               
-              exportData.editors.css.value && _mock.drive.upload({title:'styles.css',type:'text/css', value: btoa(exportData.editors.css.value), parent:'styles'});
+              if(exportData.editors.css.value) _mock.drive.upload({title:'styles.css',type:'text/css', value: btoa(exportData.editors.css.value), parent:'styles'});
 
-              exportData.editors.js.value && _mock.drive.upload({title:'scripts.js',type:'application/javascript', value: btoa(exportData.editors.js.value), parent:'scripts'});
+              if(exportData.editors.js.value) _mock.drive.upload({title:'scripts.js',type:'application/javascript', value: btoa(exportData.editors.js.value), parent:'scripts'});
             });
 
             
@@ -124,18 +127,24 @@ _mock.receiver = (function(){
         if(data.model.type === 'local'){
 
           if(data.model.packaged){
+            
+            if(data.model.versioned){ 
+              version = '_' + new Date().toLocaleDateString().replace(/[\/20]+/g, '') +'_'+new Date().toLocaleTimeString().replace(/[\:]+/g, '').split(' ')[0];
+              exportData.projectFolderName = exportData.projectFolderName+version; 
+            }
+            
             // Save as ZIP
             _mock.local.saveZip(exportData);
           }else{
             // Collect all files to be saved
             // Var to cache the files data
-            var files = {};
-            
+            files = {};
+            type = null;
             // Generate all blob files from the editors
-            for(var type in exportData.editors){
+            for(type in exportData.editors){
               if(exportData.editors.hasOwnProperty(type)){
                 // Create Blob
-                var blob = new Blob([exportData.editors[type].value], {type:'text/'+type});
+                blob = new Blob([exportData.editors[type].value], {type:'text/'+type});
                 // New file blob
                 files[type] = {
                   filename:exportData.editors[type].title === 'main' ? 'index'+ '.' + type : exportData.editors[type].title + '.' + type,
@@ -149,43 +158,72 @@ _mock.receiver = (function(){
         }else
 
         if(data.model.type === 'ftp'){
-          
+          // Display Notification
           _mock.notification.send({type:'info', message:'Exporting to: '+data.model.host, persist:true});
           
-          var files = [];
+          // Initialize Collection and Counter
+          files = [];
+          
+          // Substitude Spaces for Underscores in Project Name
           data.model.projectname = exportData.projectName.replace(/\s/g,'_');
-
+          
+          // If Zip Export
           if(data.model.packaged){
             
-            // Get zip file from utils
+            if(data.model.versioned){ 
+              version = '_' + new Date().toLocaleDateString().replace(/[\/20]+/g, '') +'_'+new Date().toLocaleTimeString().replace(/[\:]+/g, '').split(' ')[0];
+              exportData.projectFolderName = exportData.projectFolderName+version; 
+            }
+
+            // Get Zip File from Utils Method
             files[0] = {
-              name: exportData.projectFolderName+gui+'.zip',
+              name: exportData.projectFolderName+'.zip',
               data: _mock.utils.getExportPackage(exportData.editors, 'arraybuffer')
-            }               
-            
+            };            
+
+            // Send to FTP
+            _mock.ftp.send(data.model, files);
+          
+          // If Files Export
           }else{
-            // Generate all blob files from the editors
-            for(var type in exportData.editors){
+            // Initialize File Counter for "Done" watch
+            var filesToCreate = 0;
+            type = null;
+            // Loop through Editors Collection 
+            for(type in exportData.editors){
+
+              // Verify it has data to export
               if(exportData.editors.hasOwnProperty(type) && exportData.editors[type].value){
-                // Create Blob
-                var blob = new Blob([exportData.editors[type].value], {type:'text/'+type});
+                // Increment Counter
+                filesToCreate++;
+                
+                // Create Blob from Editor Data
+                blob = new Blob([exportData.editors[type].value], {type:'text/'+type});
+                
+                // Convert Blob to ArrayBuffer for FTP transfer
                 _mock.utils.blobToArrayBuffer(blob, type, function(result, type){
+                  
+                  // Collect in files array
                   files.push({
                     folder:_mock.utils.getFolderForType(type),
                     name:exportData.editors[type].title === 'main' ? 'index'+ '.' + type : exportData.editors[type].title + '.' + type,
                     data:result
                   });
+
+                  // Check if all files have been converted
+                  if(files.length === filesToCreate){
+                    // Send all files to FTP
+                    _mock.ftp.send(data.model, files);
+                  }
+
                 });
                 
               }
             }
           }
-
-          _mock.ftp.send(data.model, files);
         }
 
-        
-       break;
+        break;
 
       default: return;
     }
