@@ -124,7 +124,7 @@ _mock.clicks = (function(){
         }
         // init the views js file
         views.properties.init(function(){
-          views.properties.restorePropertiesStates(data);
+          views.properties.restoreFields(data);
         });
       });
     });

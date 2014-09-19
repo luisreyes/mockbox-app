@@ -1,5 +1,15 @@
-MockBox v0.9.8.45
+MockBox v0.9.8.50
 
+---------------------------------------
+**v0.9.8.50 - 09/19/14 - 12:46am**
+
+
+```
+- Added project properties fields to properties window
+- Added custom_includes with files for processing
+- Minor Refactoring in function names
+
+```
 ---------------------------------------
 **v0.9.8.45 - 09/18/14 - 3:01pm**
 

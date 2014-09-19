@@ -27,6 +27,11 @@
 .settings-options,
 .properties-options,
 .export-options{
+
+  ul li{
+    margin-bottom: 65px;
+  }
+
   .field{
 
     border-bottom:1px solid $base-color-1;
@@ -53,6 +58,9 @@
       cursor: default;
     }
   }
+
+
+  
 
   .purchase-required{
     position: absolute;

@@ -30,6 +30,8 @@ body, html {
 .left-container{float:left;clear: both;margin-bottom:15px;}
 .right-container{float:right;}
 .small{ font-size: 10px; }
+.floatRight{ float:right; }
+.floatLeft{ float:left; }
 
 
 *:focus{outline:none;}
@@ -45,6 +47,11 @@ input{
     color:#666;
     border: 1px solid $base-color-0;
   }
+}
+
+textarea{
+  width:100%;
+  resize:vertical;
 }
 
 ul{margin: 0; padding: 0; list-style: none;}

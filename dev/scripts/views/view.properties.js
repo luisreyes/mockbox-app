@@ -19,6 +19,7 @@ _v.properties = (function(){
     
     buttons = {
       sidebar:{
+        html:sidebarOptions.querySelector('.html-properties'),
         css:sidebarOptions.querySelector('.css-properties'),
         js:sidebarOptions.querySelector('.js-properties')
       },
@@ -28,7 +29,7 @@ _v.properties = (function(){
 
     addListeners();
 
-    setPanel({target:buttons.sidebar.js});
+    setPanel({target:buttons.sidebar.html});
 
     if(callback) callback();
 
@@ -95,7 +96,7 @@ _v.properties = (function(){
     }
   }
 
-  function _restoreStates(properties){
+  function _restoreFieldsFromSettings(properties){
     // Set Window Title
     var title = properties.title || 'Prototype';
     doc.querySelector('.popout-title').innerHTML = title + ' Properties';
@@ -110,8 +111,8 @@ _v.properties = (function(){
         callback();
       };
     },
-    restorePropertiesStates: function(properties){
-      _restoreStates(properties);
+    restoreFields: function(properties){
+      _restoreFieldsFromSettings(properties);
     }
   };
 

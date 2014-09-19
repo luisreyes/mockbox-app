@@ -19,39 +19,116 @@
       <section class="view-properties">
         <section id="properties-options" class="sidebar">
           <ul>   
+            <li class="html-properties transition">
+              <section class="item"></section><span>HTML</span>
+            </li>
             <li class="css-properties transition">
-              <section class="item"><span class="icon icon_adjust-horiz"></span></section><span>CSS</span>
+              <section class="item"></section><span>CSS</span>
             </li>
             <li class="js-properties transition">
-              <section class="item"><span class="icon icon_adjust-horiz"></span></section><span>JavaScript</span>
+              <section class="item"></section><span>JavaScript</span>
             </li>
           </ul>
         </section>
         <section id="properties-panels" class="properties-options panels">
           <ul>
+            <li class="html-properties panel hidden">
+              <section class="field">
+                <section class="field-title"></section>
+                <section class="field-option"><span class="left-container"><span>Preprocessor</span></span><span class="right-container"> 
+                    <select id="properties-lib-select" class="input">
+                      <option>None</option>
+                      <option>Haml</option>
+                      <option>Jade</option>
+                    </select></span>
+                  <section class="clear"></section>
+                </section>
+              </section>
+              <section class="field">
+                <section class="field-title"><span><span>Head includes</span></span>
+                  <section class="clear"></section>
+                  <textarea placeholder="&lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=1, minimal-ui&quot;&gt;"></textarea>
+                  <section class="clear"></section>
+                </section>
+              </section>
+            </li>
             <li class="css-properties panel">
               <section class="field">
-                <section class="field-title">Options          </section>
-                <section class="field-option"><span class="left-container"><span>Normalize CSS</span>
-                    <section class="clear"></section></span><span class="right-container">
+                <section class="field-title"></section>
+                <section class="field-option"><span class="left-container"><span>Preprocessor</span></span><span class="right-container"> 
+                    <select id="properties-lib-select" class="input">
+                      <option>None</option>
+                      <option>SCSS</option>
+                      <option>Less</option>
+                      <option>Stylus</option>
+                    </select></span>
+                  <section class="clear"></section>
+                </section>
+              </section>
+              <section class="field">
+                <section class="field-title">         </section>
+                <section class="field-option"><span class="left-container"><span>Normalize</span>
+                    <section class="clear">             </section></span><span class="right-container">
                     <label class="switch">
-                      <input type="checkbox" checked class="normalize switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                      <input type="checkbox" class="normalize-css switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
                     </label></span>
-                  <section class="clear"></section><span class="left-container"><span>External CSS</span></span><span class="right-container">
-                    <input type="text" placeholder="http://youresites.com/styles.css" data-validate="url" id="properties-css-input"></span>
+                  <section class="clear"></section><span class="left-container"><span>Animate.css</span>
+                    <section class="clear">             </section></span><span class="right-container">
+                    <label class="switch">
+                      <input type="checkbox" class="animate-css switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                    </label></span>
+                  <section class="clear"></section>
+                </section>
+              </section>
+              <section class="field">
+                <section class="field-title"><span><span>External Source(s)</span><span class="small floatRight">Separate by comma for multiple sources</span></span>
+                  <section class="clear"></section>
+                  <textarea placeholder="http://.css"></textarea>
                   <section class="clear"></section>
                 </section>
               </section>
             </li>
             <li class="js-properties panel hidden">
               <section class="field">
-                <section class="field-title">Options</section>
-                <section class="field-option"><span class="left-container"><span>Modernizer</span>
+                <section class="field-title"></section>
+                <section class="field-option"><span class="left-container"><span>Preprocessor</span></span><span class="right-container"> 
+                    <select id="properties-lib-select" class="input">
+                      <option>None</option>
+                      <option>CoffeeScript</option>
+                      <option>LiveScript</option>
+                    </select></span>
+                  <section class="clear"></section>
+                </section>
+              </section>
+              <section class="field">
+                <section class="field-title"></section>
+                <section class="field-option"><span class="left-container"><span>Framework</span></span><span class="right-container"> 
+                    <select id="properties-lib-select" class="input">
+                      <option>None</option>
+                      <option>jQuery 1.11.1</option>
+                      <option>jQuery 2.1.1</option>
+                      <option>Angular 1.2.25</option>
+                    </select></span>
+                  <section class="clear"></section>
+                </section>
+              </section>
+              <section class="field">
+                <section class="field-title"></section>
+                <section class="field-option"><span class="left-container"><span>Apollo</span></span><span class="right-container"> 
+                    <label class="switch">
+                      <input type="checkbox" class="normalize switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
+                    </label></span><span class="left-container"><span>Modernizer</span>
                     <section class="clear"></section></span><span class="right-container">
                     <label class="switch">
                       <input type="checkbox" checked class="modernizer switch-input"><span data-on="On" data-off="Off" class="switch-label"></span><span class="switch-handle transition"></span>
-                    </label></span><span class="left-container"><span>External JS</span></span><span class="right-container">
-                    <input type="text" placeholder="http://youresites.com/scripts.js" data-validate="url" id="properties-js-input"></span>
+                    </label></span>
+                  <section class="clear"></section>
+                </section>
+              </section>
+              <section class="field">
+                <section class="field-title"><span><span>External Source(s)</span><span class="small floatRight">Separate by comma for multiple sources</span></span>
+                  <section class="clear"></section>
+                  <textarea placeholder="http://.js"></textarea>
                   <section class="clear"></section>
                 </section>
               </section>
