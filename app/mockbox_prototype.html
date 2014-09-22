@@ -7,13 +7,35 @@
   <body></body>
   <script>
     window.addEventListener('message', function(event) {
-      document.body.innerHTML = event.data.html;
-      document.getElementById('mockbox-prototype-styles').innerHTML = event.data.css;
       
-      var script = document.createElement("script");
-      script.type = "text/javascript";
-      script.innerHTML = event.data.js;
-      document.body.appendChild(script);
+      if(event.data.html || event.data.js){
+        
+        //- Create a new body to clear any bound events to the body
+        var body = document.createElement("body");
+        //- Set the contents of the body
+        body.innerHTML = event.data.html;
+        //- Reset the current body to the new one
+        document.body = body;
+    
+        //- Create a new script to contain the latest code
+        var script = document.createElement("script");
+        //- Set the type
+        script.type = "text/javascript";
+        //- Set the code to the script element
+        script.innerHTML = event.data.js;
+        //- Append script element to new body
+        document.body.appendChild(script);
+    
+      }
+    
+      if(event.data.css){
+         document.getElementById('mockbox-prototype-styles').innerHTML = event.data.css;
+      }
+    
+      if(event.data.properties){
+        // TODO
+      }
+    
     });
   </script>
 </html>

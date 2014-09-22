@@ -39,10 +39,10 @@ block content
               span.left-container
                 span Preprocessor
               span.right-container 
-                select.input#properties-lib-select
-                  option None
-                  option Haml
-                  option Jade
+                select.input#properties-html-preprocessor
+                  option(value="none") None
+                  option(value="haml") Haml
+                  option(value="jade") Jade
 
               section.clear
 
@@ -50,14 +50,23 @@ block content
             section.field-title
             
               span
+                span Custom &lt;HTML&gt;
+                span.small.floatRight Leave empty for regular &lt;HTML&gt;
+              section.clear
+              input(type="text" placeholder='<html lang="eng" class="yourClass">' style="width:100%; margin-bottom:10px;")#properties-html-customHtml
+
+              section.clear
+
+              span
                 span Head includes
               section.clear
-              textarea(placeholder='<meta name="viewport" content="initial-scale=1, minimal-ui">')
+              textarea(placeholder='<meta name="viewport" content="initial-scale=1, minimal-ui">')#properties-html-headIncludes
 
               section.clear
 
         //- CSS PANEL
         li.css-properties.panel
+
           section.field
             section.field-title
             section.field-option
@@ -65,11 +74,11 @@ block content
               span.left-container
                 span Preprocessor
               span.right-container 
-                select.input#properties-lib-select
-                  option None
-                  option SCSS
-                  option Less
-                  option Stylus
+                select.input#properties-css-preprocessor
+                  option(value="none") None
+                  option(value="scss") SCSS
+                  option(value="less") Less
+                  option(value="stylus") Stylus
 
               section.clear
 
@@ -82,7 +91,7 @@ block content
                 section.clear              
               span.right-container
                 label.switch
-                  input(type="checkbox").normalize-css.switch-input
+                  input(type="checkbox" checked)#properties-css-normalize.switch-input
                   span(data-on="On" data-off="Off").switch-label
                   span.switch-handle.transition
               section.clear
@@ -92,7 +101,7 @@ block content
                 section.clear              
               span.right-container
                 label.switch
-                  input(type="checkbox").animate-css.switch-input
+                  input(type="checkbox")#properties-css-animate.switch-input
                   span(data-on="On" data-off="Off").switch-label
                   span.switch-handle.transition
               section.clear
@@ -104,7 +113,7 @@ block content
                 span External Source(s)
                 span.small.floatRight Separate by comma for multiple sources
               section.clear
-              textarea(placeholder="http://.css")
+              textarea(placeholder="http://.css")#properties-css-sources
               section.clear
 
 
@@ -118,10 +127,10 @@ block content
               span.left-container
                 span Preprocessor
               span.right-container 
-                select.input#properties-lib-select
-                  option None
-                  option CoffeeScript
-                  option LiveScript
+                select.input#properties-js-preprocessor
+                  option(value="none") None
+                  option(value="coffeescript") CoffeeScript
+                  option(value="livescript") LiveScript
 
               section.clear
           
@@ -132,11 +141,11 @@ block content
               span.left-container
                 span Framework
               span.right-container 
-                select.input#properties-lib-select
-                  option None
-                  option jQuery 1.11.1
-                  option jQuery 2.1.1
-                  option Angular 1.2.25
+                select.input#properties-js-framework
+                  option(value="none") None
+                  option(value="jquery1") jQuery 1.11.1
+                  option(value="jquery2") jQuery 2.1.1
+                  option(value="angular") AngularJs 1.2.25
 
               section.clear
 
@@ -148,7 +157,7 @@ block content
                 span Apollo
               span.right-container 
                 label.switch
-                  input(type="checkbox").normalize.switch-input
+                  input(type="checkbox")#properties-js-apollo.switch-input
                   span(data-on="On" data-off="Off").switch-label
                   span.switch-handle.transition
 
@@ -157,7 +166,7 @@ block content
                 section.clear
               span.right-container
                 label.switch
-                  input(type="checkbox" checked).modernizer.switch-input
+                  input(type="checkbox" checked)#properties-js-modernizer.switch-input
                   span(data-on="On" data-off="Off").switch-label
                   span.switch-handle.transition
 
@@ -170,7 +179,7 @@ block content
                 span External Source(s)
                 span.small.floatRight Separate by comma for multiple sources
               section.clear
-              textarea(placeholder="http://.js")
+              textarea(placeholder="http://.js")#properties-js-sources
 
               section.clear
           

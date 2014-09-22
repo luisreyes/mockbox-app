@@ -184,7 +184,7 @@ _v.load = (function(){
      chrome.runtime.sendMessage({message:'onLoadItem', gui:gui, isTemplate:isTemplate});
       // Clear Dirty Flag to bypass reset dirty check
       mockbox.isDirty(false);
-      mockbox.reset();
+      mockbox.reset({clearProperties:true});
       mockbox.popout.close('load');
     }
   }

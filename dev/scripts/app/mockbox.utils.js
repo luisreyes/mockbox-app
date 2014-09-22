@@ -24,6 +24,14 @@ _mock.utils = (function(){
       }
   };
 
+  function getObjectLength(obj){
+    var l = 0;
+    for(var prop in obj){
+      l++;
+    }
+    return l;
+  }
+
   function _getFolderNameFromType(type){
     var result;
     switch(type){
@@ -138,6 +146,9 @@ _mock.utils = (function(){
     },
     getFolderForType: function(type){
       return _getFolderNameFromType(type);
+    },
+    getObjectLength: function(obj){
+      return getObjectLength(obj);
     },
     Collect: function(baseObj, updateObj){
       return _collect(baseObj, updateObj);

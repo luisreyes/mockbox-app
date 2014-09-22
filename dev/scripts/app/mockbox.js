@@ -21,6 +21,7 @@ var mockbox;
       domEditors = document.getElementById('app-editors'),
       defaultLayout = '50,50,25',
       _settings = {},
+      currentProperties = {},
       tokens = {},
       sidebarToggleClasses = ['closed', 'open', 'open-half' ],
       currentSidebarToggleClassIndex,
@@ -67,6 +68,15 @@ var mockbox;
               // Loop and close all windows
                 _mock.windows.closeAll();
             });            
+         break;
+
+         case 'setProperties':
+          // Cache the settings to a global var
+          setCurrentProperties(data.properties);
+          // Apply settings         
+            setProperties();
+          // Set Dirty to allow to save the properties
+            //_mock.utils.isDirty(true);
          break;
 
          case 'saveSettings':
@@ -184,13 +194,17 @@ var mockbox;
 
             _mock.database.onReady(function(){
               var templates = _mock.templates.getAll();
+              
               for(var i = 0; i < templates.length; i++){
                 _mock.database.save('templates',templates[i], true);
-              }  
+              }
+              
+              closeSplash();
+              saveSettings();  
+            
             });
 
-            closeSplash();
-            saveSettings();
+            
 
             
 
@@ -247,6 +261,11 @@ var mockbox;
 
     // Change css file
     chrome.app.window.get('main').contentWindow.document.getElementById('mockbox-styles').setAttribute('href', 'styles/mockbox-' + _settings.theme + '.css');
+
+  }
+
+  function setProperties(){
+    updateIframe('properties')
 
   }
 
@@ -336,11 +355,20 @@ var mockbox;
       _mock.utils.isDirty(false);
     }else{
       setGlobalEditorOption('value', '');
-    }
+    }    
   }
 
-  function onEditorChange(){
-    updateIframe();
+  function setCurrentProperties(properties){
+    currentProperties = properties;
+  }
+
+  function onEditorChange(e){
+    var caller = "";
+    if(e){
+      caller = e.display.wrapper.offsetParent.id;
+    }
+    
+    updateIframe(caller);
     _mock.utils.isDirty(true);
     if(areAllEmpty()){
       _mock.clicks.buttons.removeClass('export','inactive');
@@ -365,39 +393,37 @@ var mockbox;
             Math.round(size0.substr(0,size0.length-1)),
             Math.round(size1.substr(0,size1.length-1)),
             Math.round(size2.substr(0,size2.length-1))
-            ]
+            ],
+          properties: views.properties.getAll()
         };
 
   }
 
-  function exportPackage(){
-    var _atHeader = '<!-- Prototype generated with MockBox v0.5.1 -->',
-        zip = new JSZip(),
-        styles = zip.folder("styles"),
-        scripts = zip.folder("scripts");
-    
-    zip.file("index.html", _atHeader+'\n<!DOCTYPE html>\n<html>\n<head>\n<link rel="stylesheet" type="text/css" href="styles/atype.styles.css">\n</head>\n<body>\n'+editors.html.getValue()+'\n<script type="text/javascript" src="scripts/atype.scripts.js"></script>\n</body>\n</html>');
-    styles.file("atype.styles.css", editors.css.getValue());
-    scripts.file("atype.scripts.js", editors.js.getValue());
-    
-    var content = zip.generate({type:"blob"});
-    
-    
-    //Save to system
-    chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName:'mockbox.prototype.zip'}, function(writableFileEntry) {
-      writableFileEntry.createWriter(function(writer) {
-        writer.onerror = errorHandler;
-        writer.onwriteend = function(e) { console.log(e); };
-        writer.write(content, {type: 'application/zip'} );
-      }, errorHandler);
-    });
+  function updateIframe(section){
+    var postData = {};
+    switch(section){
+      case ('html' || 'js'):
+        postData.html = editors.html.getValue();
+        postData.js = editors.js.getValue();
+      break;
+      case 'css':
+        postData.css = editors.css.getValue();
+      break;
+      case 'properties':
+        postData.properties = currentProperties;
+      break;
+      default:
+        postData = {
+          html: editors.html.getValue(),
+          css: editors.css.getValue(),
+          js: editors.js.getValue(),
+          properties: currentProperties
+        }
+    }
 
-  }
+    postData.section = section;
 
-  function errorHandler(e){ console.log(e); }
-
-  function updateIframe(){
-    document.getElementById('compiled-view').contentWindow.postMessage(getSaveData(), '*');
+    document.getElementById('compiled-view').contentWindow.postMessage(postData, '*');
    
   }
 
@@ -407,7 +433,10 @@ var mockbox;
     var l = defaultLayout.split(',');
     sv.setLayout(l[0],l[1],l[2]);
     clearEditors();
+    views.properties.reset();
     _mock.utils.isDirty(false);
+    setCurrentProperties({});
+    
   }
 
   mockbox = this;
@@ -424,6 +453,7 @@ var mockbox;
       return _settings;
     },
     restore: function(data, fromTemplate){
+      setCurrentProperties(data.properties);
       setEditorsData(data, fromTemplate);
     },
     gui: function(){
@@ -449,8 +479,13 @@ var mockbox;
         }
       };
     },
-    export: function(){
-      return exportPackage();
+    getCurrentProperties: function(){
+      if(!_mock.utils.getObjectLength(currentProperties)){
+        var props = views.properties.getDefaults();
+        props.title = header.querySelector('.project-name').innerHTML;
+        setCurrentProperties(props);
+      }
+      return currentProperties;
     },
     save: function(){
       _mock.database.save('prototypes',getSaveData());

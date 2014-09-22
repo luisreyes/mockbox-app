@@ -35,6 +35,9 @@ _mock.database = (function(){
 
       var store2 = db.createObjectStore("templates",{keyPath: "gui"});
       var guiIndex2 = store2.createIndex("by_templateId", "gui");
+
+      var store3 = db.createObjectStore("properties",{keyPath: "gui"});
+      var guiIndex = store3.createIndex("by_prototypeId", "gui");
     };
 
     request.onsuccess = function(e) {
@@ -45,29 +48,55 @@ _mock.database = (function(){
     request.onerror = indexedDb.onerror;
   };
 
-  indexedDb.addEditEntry = function(table, data, suppressNotification) {
+  indexedDb.addEditEntry = function(store, data, suppressNotification) {
     var db = indexedDb.db,
-        trans = db.transaction(table, "readwrite"),
-        store = trans.objectStore(table),
+        trans = db.transaction(store, "readwrite"),
+        store = trans.objectStore(store),
         currentGui = _mock.gui() || _mock.utils.getGUID();
 
-    if(table !== 'templates'){
+    if(store === 'properties'){
+      indexedDb.addEditProperties(currentGui, data, suppressNotification)
+      return;
+    }
+
+    if(store !== 'templates'){
       _mock.gui(currentGui);
     }
     
     // Put Entry
     var entry = store.put({
-      "gui" : (table === 'templates') ? _mock.utils.getGUID() : currentGui,
-      "name": data.name || "No Name",
+      "gui" : (store === 'templates') ? _mock.utils.getGUID() : currentGui,
+      "name": data.name,
       "html": data.html,
       "css": data.css,
       "js": data.js,
       "layout": data.layout,
-      "createdBy" : data.author || 'Someone',
-      "updatedBy" : data.author || 'Someone',
+      "createdBy" : data.author || 'you',
+      "updatedBy" : data.author || 'you',
       "createdOn" : new Date().getTime(),
       "updatedOn" : new Date().getTime()
     });
+
+    entry.onsuccess = function(e) {
+      indexedDb.addEditProperties(currentGui, data.properties, suppressNotification)
+    };
+
+    entry.onerror = function(e) {
+      mockbox.notify({type:'error',message:'Problem Saving: ' + e.toString()});
+    };
+  };
+
+  indexedDb.addEditProperties = function(id, _data, suppressNotification) {
+    var db = indexedDb.db,
+        trans = db.transaction('properties', "readwrite"),
+        store = trans.objectStore('properties'),
+        currentGui = id;
+
+    var data = _data;
+    data.gui = currentGui; 
+
+    // Put Entry
+    var entry = store.put(data);
 
     entry.onsuccess = function(e) {
       // Re-render all the editors
@@ -80,10 +109,10 @@ _mock.database = (function(){
     };
   };
   
-  indexedDb.deleteEntry = function(id, table) {
+  indexedDb.deleteEntry = function(id, store) {
     var db = indexedDb.db;
-    var trans = db.transaction(table, "readwrite");
-    var store = trans.objectStore(table);
+    var trans = db.transaction(store, "readwrite");
+    var store = trans.objectStore(store);
 
     var request = store.delete(id);
 
@@ -95,10 +124,10 @@ _mock.database = (function(){
     };
   };
 
-  indexedDb.getAll = function(table, callback) {
+  indexedDb.getAll = function(store, callback) {
     var db = indexedDb.db;
-    var transaction = db.transaction([table]);
-    var objectStore = transaction.objectStore(table);
+    var transaction = db.transaction([store]);
+    var objectStore = transaction.objectStore(store);
 
     var items = [];
     var cb = callback;
@@ -122,37 +151,61 @@ _mock.database = (function(){
     };
   }; 
 
-  indexedDb.setEditorsFromId = function(id, isTemplate) {
+  _setEditorsFromId = function(id, isTemplate) {
     var db = indexedDb.db;
-    var table = isTemplate ? 'templates' : 'prototypes';
-    var transaction = db.transaction([table]);
-    var objectStore = transaction.objectStore(table);
+    var store = isTemplate ? 'templates' : 'prototypes';
+    var transaction = db.transaction([store]);
+    var objectStore = transaction.objectStore(store);
     var request = objectStore.get(id);
     
     request.onsuccess = function(event) {
       if(request.result){
         // Do something with the request.result!
-        mockbox.notify({type:'info', message:'Loaded ' + request.result.name});
         var gui = isTemplate ? _mock.utils.getGUID() : request.result.gui;
         _mock.gui(gui);
-        _mock.restore(request.result, isTemplate);
+        _setProperties(id, request.result, isTemplate);
       }
     };
     
-    request.onerror = function(event) {};
+    request.onerror = function(event) {
+      mockbox.notify({type:'error', message:'There was a problem loading: ' + data.name});
+    };
+  }; 
+
+  _setProperties = function(id, data, isTemplate) {
+    var db = indexedDb.db;
+    var store = 'properties';
+    var transaction = db.transaction([store]);
+    var objectStore = transaction.objectStore(store);
+    var request = objectStore.get(id);
+    var prototypeData = data;
+    
+    request.onsuccess = function(event) {
+      if(request.result){
+        // Do something with the request.result!
+        prototypeData.properties = request.result;
+        _mock.restore(prototypeData, isTemplate);
+        mockbox.notify({type:'info', message:'Loaded ' + data.name});
+      }
+    };
+    
+    request.onerror = function(event) {
+      mockbox.notify({type:'error', message:'Error loading properties for: ' + data.name});
+    };
   }; 
 
 
   return {
     init:init,
-    save: function(table, data, suppressNotification){
-      indexedDb.addEditEntry(table, data, suppressNotification);
+    save: function(store, data, suppressNotification){
+      indexedDb.addEditEntry(store, data, suppressNotification);
     },
     delete:function(id){
       indexedDb.deleteEntry(id, 'prototypes');
+      indexedDb.deleteEntry(id, 'properties');
     },
     restoreEditorsFromId: function(id, isTemplate){
-      indexedDb.setEditorsFromId(id, isTemplate);
+      _setEditorsFromId(id, isTemplate);
     },
     onReady: function(callback){
       if(indexedDb.db){
@@ -161,8 +214,8 @@ _mock.database = (function(){
         _onReadyCallback = callback;
       }
     },
-    getAll:function(table, callback){
-      indexedDb.getAll(table, callback);
+    getAll:function(store, callback){
+      indexedDb.getAll(store, callback);
     }
 
   };

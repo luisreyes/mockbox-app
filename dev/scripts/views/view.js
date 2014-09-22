@@ -9,8 +9,13 @@ var views;
 
   function init(){}
 
+  views = this;
+
   return {
-    init: init
+   init: function(){
+      init();
+
+    }
   };
 
 }());

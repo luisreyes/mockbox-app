@@ -17,6 +17,9 @@
       _mock.notification.send(o);
       //_mock.notify.send(o);
     },
+    getCurrentProperties:function(){
+      return _mock.getCurrentProperties();
+    },
     getTokens: function(){
       return _mock.tokens();
     },

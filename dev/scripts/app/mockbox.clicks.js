@@ -119,12 +119,9 @@ _mock.clicks = (function(){
     // Project Name Accept
     buttons.projectProperties.addEventListener( 'click', function(){
       _mock.popout.open('properties', function(){
-        var data = {
-          title: header.querySelector('.project-name').innerHTML
-        }
         // init the views js file
         views.properties.init(function(){
-          views.properties.restoreFields(data);
+          views.properties.restore(_mock.getCurrentProperties());
         });
       });
     });

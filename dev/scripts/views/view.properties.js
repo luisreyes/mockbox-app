@@ -8,7 +8,27 @@ _v.properties = (function(){
       panels,
       selectedClass,
       selectedPanel,
-      buttons = {};
+      buttons = {},
+      defaults = {
+        html:{
+          preprocessor: "none",
+          html: "",
+          head: ""
+        },
+        css:{
+          preprocessor: "none",
+          normalize: false,
+          animate: false,
+          sources: []
+        },
+        js:{
+          preprocessor: "none",
+          framework: "none",
+          apollo: false,
+          modernizer: false,
+          sources: []
+        }
+      };
 
   function _init(callback){
     doc = chrome.app.window.get('properties').contentWindow.document;
@@ -45,13 +65,33 @@ _v.properties = (function(){
 
   }
 
+  function _getAll(){
+    return {
+      html:{
+          preprocessor: doc.getElementById('properties-html-preprocessor').value,
+          html: doc.getElementById('properties-html-customHtml').value,
+          head: doc.getElementById('properties-html-headIncludes').value
+        },
+        css:{
+          preprocessor: doc.getElementById('properties-css-preprocessor').value,
+          normalize: doc.getElementById('properties-css-normalize').checked,
+          animate: doc.getElementById('properties-css-animate').checked,
+          sources: doc.getElementById('properties-css-sources').value.split(',')
+        },
+        js:{
+          preprocessor: doc.getElementById('properties-js-preprocessor').value,
+          framework: doc.getElementById('properties-js-framework').value,
+          apollo: doc.getElementById('properties-js-apollo').checked,
+          modernizer: doc.getElementById('properties-js-modernizer').checked,
+          sources: doc.getElementById('properties-js-sources').value.split(',')
+        }
+      };
+  }
+
   function onOkClick(e){
     var data = {
-      message:'saveSettings', 
-      properties:{
-        theme: doc.getElementById('properties-theme-select').value,
-        autoload:doc.getElementById('properties-open-check').checked
-      }
+      message:'setProperties', 
+      properties: _getAll()
     };
 
     chrome.runtime.sendMessage(data);
@@ -96,10 +136,29 @@ _v.properties = (function(){
     }
   }
 
-  function _restoreFieldsFromSettings(properties){
+  function _restore(properties){
     // Set Window Title
     var title = properties.title || 'Prototype';
     doc.querySelector('.popout-title').innerHTML = title + ' Properties';
+
+    // HTML Fields
+    doc.getElementById('properties-html-preprocessor').value = properties.html.preprocessor,
+    doc.getElementById('properties-html-customHtml').value = properties.html.html,
+    doc.getElementById('properties-html-headIncludes').value = properties.html.head
+    
+    // CSS Fields
+    doc.getElementById('properties-css-preprocessor').value = properties.css.preprocessor,
+    doc.getElementById('properties-css-normalize').checked = properties.css.normalize,
+    doc.getElementById('properties-css-animate').checked = properties.css.animate,
+    doc.getElementById('properties-css-sources').value = properties.css.sources
+    
+    // JavaScript Fields
+    doc.getElementById('properties-js-preprocessor').value = properties.js.preprocessor,
+    doc.getElementById('properties-js-framework').value = properties.js.framework,
+    doc.getElementById('properties-js-apollo').checked = properties.js.apollo,
+    doc.getElementById('properties-js-modernizer').checked = properties.js.modernizer,
+    doc.getElementById('properties-js-sources').value = properties.js.sources
+
   }
 
   
@@ -111,8 +170,23 @@ _v.properties = (function(){
         callback();
       };
     },
-    restoreFields: function(properties){
-      _restoreFieldsFromSettings(properties);
+    restore: function(properties){
+        _restore(properties);
+    },
+    getAll: function(){
+      if(doc)
+        return _getAll();
+      else
+        return defaults;
+    },
+    reset: function(){
+      if(doc){
+        _restore(defaults);  
+        setPanel({target:buttons.sidebar.html});
+      }
+    },
+    getDefaults: function(){
+      return defaults;
     }
   };
 
