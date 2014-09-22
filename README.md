@@ -1,5 +1,15 @@
-MockBox v0.9.8.50
+MockBox v0.9.8.55
 
+---------------------------------------
+**v0.9.8.55 - 09/22/14 - 1:32am**
+
+
+```
+- Refactored iframe compile for efficiency
+- Saving properties is complete
+- Working on implementing the saved properties to the iframe
+
+```
 ---------------------------------------
 **v0.9.8.50 - 09/19/14 - 12:46am**
 
