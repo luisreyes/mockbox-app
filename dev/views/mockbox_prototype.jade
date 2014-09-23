@@ -9,33 +9,74 @@ html
 
   script.
     window.addEventListener('message', function(event) {
+      var frameworkScript;
+      //- Create a new body to clear any bound events to the body
+      var body = document.createElement("body");
+      //- Set the contents of the body
+      body.innerHTML = event.data.html;
+      //- Reset the current body to the new one
+      document.body = body;
+
+      //- Create a new script to contain the latest code
+      var script = document.createElement("script");
+      //- Set the type
+      script.type = "text/javascript";
+      //- Set the code to the script element
+      script.innerHTML = event.data.js;
+      //- Append script element to new body
+      document.body.appendChild(script);
+
+      //- Create a new script to contain the latest code
+      frameworkScript = document.createElement("script");
+      //- Set Id for reference
+      frameworkScript.id = "mockbox-prototype-framework";
+      //- Set the type
+      frameworkScript.type = "text/javascript";
+      //- Append script element to new body
+      document.body.appendChild(frameworkScript);
+
+      document.getElementById('mockbox-prototype-styles').innerHTML = event.data.css;
       
-      if(event.data.html || event.data.js){
-        
-        //- Create a new body to clear any bound events to the body
-        var body = document.createElement("body");
-        //- Set the contents of the body
-        body.innerHTML = event.data.html;
-        //- Reset the current body to the new one
-        document.body = body;
+      var props = event.data.properties;
+      // TODO
+      if(props.css.normalize){
+        var link = document.createElement("link");
+        link.href = "custom_includes/normalize.css";
+        link.type = "text/css";
+        link.rel = "stylesheet";
+        document.getElementsByTagName("head")[0].appendChild(link);
+      }
 
+      if(props.css.sources){
+        debugger;
+        props.css.sources.forEach(function(src){
+          var link = document.createElement("link");
+          link.href = src;
+          link.type = "text/css";
+          link.rel = "stylesheet";
+          document.getElementsByTagName("head")[0].appendChild(link);
+        });
+      }
+
+      if(props.js.apollo){
         //- Create a new script to contain the latest code
-        var script = document.createElement("script");
+        var scriptApollo = document.createElement("script");
         //- Set the type
-        script.type = "text/javascript";
-        //- Set the code to the script element
-        script.innerHTML = event.data.js;
+        scriptApollo.src = "custom_includes/apollo.min.js";
+        //- Set the type
+        scriptApollo.type = "text/javascript";
         //- Append script element to new body
-        document.body.appendChild(script);
-
+        document.body.appendChild(scriptApollo);
       }
 
-      if(event.data.css){
-         document.getElementById('mockbox-prototype-styles').innerHTML = event.data.css;
-      }
 
-      if(event.data.properties){
-        // TODO
+      switch(props.js.framework){
+        case 'jquery1':
+          frameworkScript.src = "custom_includes/jquery-1.11.1.min.js";
+          break;
+        case 'jquery2':
+          frameworkScript.src = "custom_includes/jquery-2.1.1.min.js";
+          break;
       }
 
     });

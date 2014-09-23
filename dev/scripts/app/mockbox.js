@@ -265,7 +265,7 @@ var mockbox;
   }
 
   function setProperties(){
-    updateIframe('properties')
+    updateIframe();
 
   }
 
@@ -363,12 +363,7 @@ var mockbox;
   }
 
   function onEditorChange(e){
-    var caller = "";
-    if(e){
-      caller = e.display.wrapper.offsetParent.id;
-    }
-    
-    updateIframe(caller);
+    updateIframe();
     _mock.utils.isDirty(true);
     if(areAllEmpty()){
       _mock.clicks.buttons.removeClass('export','inactive');
@@ -399,32 +394,24 @@ var mockbox;
 
   }
 
-  function updateIframe(section){
-    var postData = {};
-    switch(section){
-      case ('html' || 'js'):
-        postData.html = editors.html.getValue();
-        postData.js = editors.js.getValue();
-      break;
-      case 'css':
-        postData.css = editors.css.getValue();
-      break;
-      case 'properties':
-        postData.properties = currentProperties;
-      break;
-      default:
-        postData = {
-          html: editors.html.getValue(),
-          css: editors.css.getValue(),
-          js: editors.js.getValue(),
-          properties: currentProperties
-        }
+  function updateIframe(){
+    
+    var postData = {
+      html: editors.html.getValue(),
+      css: editors.css.getValue(),
+      js: editors.js.getValue(),
+      properties: _mock.getCurrentProperties()
     }
-
-    postData.section = section;
-
-    document.getElementById('compiled-view').contentWindow.postMessage(postData, '*');
-   
+    
+    document.getElementById('compiled-view').remove();
+    var iframe = document.createElement('iframe');
+    iframe.id = 'compiled-view';
+    iframe.src = 'mockbox_prototype.html';
+    document.getElementById('iframe-container').appendChild(iframe);
+    
+    setTimeout(function(){
+      document.getElementById('compiled-view').contentWindow.postMessage(postData, '*');
+    },50);
   }
 
   function _reset(){
@@ -435,7 +422,7 @@ var mockbox;
     clearEditors();
     views.properties.reset();
     _mock.utils.isDirty(false);
-    setCurrentProperties({});
+    setCurrentProperties(_mock.getCurrentProperties());
     
   }
 

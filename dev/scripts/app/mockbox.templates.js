@@ -24,21 +24,16 @@ _mock.templates = (function(){
       "author": "@luisreyesdev",
       "properties":{
         "html":{
-          "preprocessor": "haml",
           "html": "",
           "head": ""
         },
         "css":{
-          "preprocessor": "none",
           "normalize": true,
-          "animate": true,
           "sources": []
         },
         "js":{
-          "preprocessor": "none",
           "framework": "none",
           "apollo": true,
-          "modernizer": true,
           "sources": []
         }
       }

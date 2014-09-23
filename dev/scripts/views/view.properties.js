@@ -11,21 +11,16 @@ _v.properties = (function(){
       buttons = {},
       defaults = {
         html:{
-          preprocessor: "none",
           html: "",
           head: ""
         },
         css:{
-          preprocessor: "none",
-          normalize: false,
-          animate: false,
+          normalize: true,
           sources: []
         },
         js:{
-          preprocessor: "none",
           framework: "none",
           apollo: false,
-          modernizer: false,
           sources: []
         }
       };
@@ -68,21 +63,16 @@ _v.properties = (function(){
   function _getAll(){
     return {
       html:{
-          preprocessor: doc.getElementById('properties-html-preprocessor').value,
           html: doc.getElementById('properties-html-customHtml').value,
           head: doc.getElementById('properties-html-headIncludes').value
         },
         css:{
-          preprocessor: doc.getElementById('properties-css-preprocessor').value,
           normalize: doc.getElementById('properties-css-normalize').checked,
-          animate: doc.getElementById('properties-css-animate').checked,
           sources: doc.getElementById('properties-css-sources').value.split(',')
         },
         js:{
-          preprocessor: doc.getElementById('properties-js-preprocessor').value,
           framework: doc.getElementById('properties-js-framework').value,
           apollo: doc.getElementById('properties-js-apollo').checked,
-          modernizer: doc.getElementById('properties-js-modernizer').checked,
           sources: doc.getElementById('properties-js-sources').value.split(',')
         }
       };
@@ -142,21 +132,16 @@ _v.properties = (function(){
     doc.querySelector('.popout-title').innerHTML = title + ' Properties';
 
     // HTML Fields
-    doc.getElementById('properties-html-preprocessor').value = properties.html.preprocessor,
     doc.getElementById('properties-html-customHtml').value = properties.html.html,
     doc.getElementById('properties-html-headIncludes').value = properties.html.head
     
     // CSS Fields
-    doc.getElementById('properties-css-preprocessor').value = properties.css.preprocessor,
     doc.getElementById('properties-css-normalize').checked = properties.css.normalize,
-    doc.getElementById('properties-css-animate').checked = properties.css.animate,
     doc.getElementById('properties-css-sources').value = properties.css.sources
     
     // JavaScript Fields
-    doc.getElementById('properties-js-preprocessor').value = properties.js.preprocessor,
     doc.getElementById('properties-js-framework').value = properties.js.framework,
     doc.getElementById('properties-js-apollo').checked = properties.js.apollo,
-    doc.getElementById('properties-js-modernizer').checked = properties.js.modernizer,
     doc.getElementById('properties-js-sources').value = properties.js.sources
 
   }
