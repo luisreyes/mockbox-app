@@ -68,12 +68,12 @@ _v.properties = (function(){
         },
         css:{
           normalize: doc.getElementById('properties-css-normalize').checked,
-          sources: doc.getElementById('properties-css-sources').value.split(',')
+          sources: doc.getElementById('properties-css-sources').value.split(';')
         },
         js:{
           framework: doc.getElementById('properties-js-framework').value,
           apollo: doc.getElementById('properties-js-apollo').checked,
-          sources: doc.getElementById('properties-js-sources').value.split(',')
+          sources: doc.getElementById('properties-js-sources').value.split(';')
         }
       };
   }

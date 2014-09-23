@@ -16,15 +16,6 @@
       document.body = body;
     
       //- Create a new script to contain the latest code
-      var script = document.createElement("script");
-      //- Set the type
-      script.type = "text/javascript";
-      //- Set the code to the script element
-      script.innerHTML = event.data.js;
-      //- Append script element to new body
-      document.body.appendChild(script);
-    
-      //- Create a new script to contain the latest code
       frameworkScript = document.createElement("script");
       //- Set Id for reference
       frameworkScript.id = "mockbox-prototype-framework";
@@ -46,8 +37,7 @@
       }
     
       if(props.css.sources){
-        debugger;
-        props.css.sources.forEach(function(src){
+       props.css.sources.forEach(function(src){
           var link = document.createElement("link");
           link.href = src;
           link.type = "text/css";
@@ -67,7 +57,6 @@
         document.body.appendChild(scriptApollo);
       }
     
-    
       switch(props.js.framework){
         case 'jquery1':
           frameworkScript.src = "custom_includes/jquery-1.11.1.min.js";
@@ -76,6 +65,18 @@
           frameworkScript.src = "custom_includes/jquery-2.1.1.min.js";
           break;
       }
+    
+      setTimeout(function(){
+        //- Create a new script to contain the latest code
+        var script = document.createElement("script");
+        //- Set the type
+        script.type = "text/javascript";
+        //- Set the code to the script element
+        script.innerHTML = '$( document ).ready(function() {'+event.data.js + '});';
+        //- Append script element to new body
+        document.body.appendChild(script);
+      },50);
+      
     
     });
   </script>
