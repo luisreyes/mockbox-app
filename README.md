@@ -1,5 +1,14 @@
-MockBox v0.9.8.6
+MockBox v0.9.8.7
 
+---------------------------------------
+**v0.9.8.7 - 09/29/14 - 1:31am**
+
+
+```
+- Grounds Set for Mocha Unit Testing
+- Exporting Compiled HTML from iFrame
+
+```
 ---------------------------------------
 **v0.9.8.6 - 09/22/14 - 1:32am**
 

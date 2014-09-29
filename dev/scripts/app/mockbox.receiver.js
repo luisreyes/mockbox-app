@@ -83,7 +83,7 @@ _mock.receiver = (function(){
 
         var exportData = {
           projectName: document.getElementById('app-header').querySelector('.project-name').innerHTML,
-          editors: _mock.getEditorsModel(),
+          editors: _mock.getEditorsModel(true),
           projectFolderName: 'MockBox_' + document.getElementById('app-header').querySelector('.project-name').innerHTML.replace(/\s/g, '_')
         },
         type,

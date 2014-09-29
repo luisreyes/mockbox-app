@@ -114,4 +114,7 @@ html
         },50);
       }
 
+      setTimeout(function(){
+        window.top.postMessage({ html: document.getElementsByTagName('html')[0].outerHTML }, "*");
+      },100);
     });

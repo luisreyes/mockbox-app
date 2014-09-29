@@ -8,6 +8,7 @@ concat = require( 'gulp-concat' ),
 jade = require( 'gulp-jade' ),
 jshint = require( 'gulp-jshint' ),
 stylish = require('jshint-stylish'),
+mocha = require('gulp-mocha'),
 header = require( 'gulp-header' ),
 order = require( 'gulp-order' ),
 locals = require( './locals.json' );
@@ -114,6 +115,12 @@ gulp.task('lint_dev', function(){
   gulp.src(['dev/scripts/**/*.js','!dev/scripts/lib/**/*.*'])
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
+});
+
+
+gulp.task('test', function () {
+    return gulp.src('dev/test/test.js', {read: false})
+        .pipe(mocha({reporter: 'nyan'}));
 });
 
 /******************************************************************

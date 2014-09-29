@@ -26,6 +26,7 @@ var mockbox;
       sidebarToggleClasses = ['closed', 'open', 'open-half' ],
       currentSidebarToggleClassIndex,
       refreshTimeout,
+      compiledHTML,
       sv;
 
   function init(){
@@ -220,6 +221,10 @@ var mockbox;
     
     // Init Clicks
     _mock.clicks.init();
+
+    window.addEventListener('message', function(message) {
+      compiledHTML = message.data.html;
+    });
   }
 
   function setSidebarState(stateIndex){
@@ -453,10 +458,10 @@ var mockbox;
         return currentGui;
       }
     },
-    getEditorsModel: function(){
+    getEditorsModel: function(isExport){
       return { 
         html:{
-          value:editors.html.getValue(),
+          value:isExport ? compiledHTML : editors.html.getValue(),
           title:'main'
         }, 
         css:{
