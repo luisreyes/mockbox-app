@@ -46,6 +46,8 @@ _mock.clicks = (function(){
     // Header Bar
     projectProperties     :header.querySelector('.icon_adjust-horiz'),
     
+    reload   :document.getElementById('view').querySelector('.icon_refresh'),
+
     // Application Chrome Controls
     appMin    :windowControls.querySelector('.window-min'),
     appMax    :windowControls.querySelector('.window-max'),
@@ -112,8 +114,12 @@ _mock.clicks = (function(){
       // Set the current window var to the current window
       // This method is used to brin attention to a window in case it falls behind the main window
       var curWindow = chrome.app.window.get(_mock.popout.getCurrentId());
-      curWindow.focus();
-      curWindow.drawAttention();
+      if(curWindow){
+        curWindow.focus();
+        curWindow.drawAttention();
+      }else{
+        apollo.removeClass(this, 'visible');
+      }
     });
     
     // Project Name Accept
@@ -192,6 +198,9 @@ _mock.clicks = (function(){
       }
     });
 
+    buttons.reload.addEventListener('click', function(){
+      _mock.refresh();
+    });
 
     buttons.export.addEventListener( 'click', function(e){
       

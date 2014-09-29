@@ -11,7 +11,7 @@ _v.properties = (function(){
       buttons = {},
       defaults = {
         html:{
-          html: "",
+          html: [],
           head: ""
         },
         css:{
@@ -63,7 +63,7 @@ _v.properties = (function(){
   function _getAll(){
     return {
       html:{
-          html: doc.getElementById('properties-html-customHtml').value,
+          html: doc.getElementById('properties-html-htmlAttributes').value ? doc.getElementById('properties-html-htmlAttributes').value.split(';') : null,
           head: doc.getElementById('properties-html-headIncludes').value
         },
         css:{
@@ -130,19 +130,19 @@ _v.properties = (function(){
     // Set Window Title
     var title = properties.title || 'Prototype';
     doc.querySelector('.popout-title').innerHTML = title + ' Properties';
-
+    
     // HTML Fields
-    doc.getElementById('properties-html-customHtml').value = properties.html.html,
-    doc.getElementById('properties-html-headIncludes').value = properties.html.head
+    if(properties.html.html){ doc.getElementById('properties-html-htmlAttributes').value = properties.html.html.toString().replace(',',';'); }
+    doc.getElementById('properties-html-headIncludes').value = properties.html.head;
     
     // CSS Fields
-    doc.getElementById('properties-css-normalize').checked = properties.css.normalize,
-    doc.getElementById('properties-css-sources').value = properties.css.sources
+    doc.getElementById('properties-css-normalize').checked = properties.css.normalize;
+    doc.getElementById('properties-css-sources').value = properties.css.sources;
     
     // JavaScript Fields
-    doc.getElementById('properties-js-framework').value = properties.js.framework,
-    doc.getElementById('properties-js-apollo').checked = properties.js.apollo,
-    doc.getElementById('properties-js-sources').value = properties.js.sources
+    doc.getElementById('properties-js-framework').value = properties.js.framework;
+    doc.getElementById('properties-js-apollo').checked = properties.js.apollo;
+    doc.getElementById('properties-js-sources').value = properties.js.sources;
 
   }
 

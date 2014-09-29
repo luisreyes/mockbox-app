@@ -25,6 +25,7 @@ var mockbox;
       tokens = {},
       sidebarToggleClasses = ['closed', 'open', 'open-half' ],
       currentSidebarToggleClassIndex,
+      refreshTimeout,
       sv;
 
   function init(){
@@ -193,6 +194,7 @@ var mockbox;
             _settings.isInited = true;
 
             _mock.database.onReady(function(){
+
               var templates = _mock.templates.getAll();
               
               for(var i = 0; i < templates.length; i++){
@@ -394,7 +396,7 @@ var mockbox;
 
   }
 
-  function updateIframe(){
+  function updateIframe(timeout){
     
     var postData = {
       html: editors.html.getValue(),
@@ -409,9 +411,10 @@ var mockbox;
     iframe.src = 'mockbox_prototype.html';
     document.getElementById('iframe-container').appendChild(iframe);
     
-    setTimeout(function(){
+    if(refreshTimeout){clearTimeout(refreshTimeout);}
+    refreshTimeout = setTimeout(function(){
       document.getElementById('compiled-view').contentWindow.postMessage(postData, '*');
-    },50);
+    },100);
   }
 
   function _reset(){
@@ -422,7 +425,7 @@ var mockbox;
     clearEditors();
     views.properties.reset();
     _mock.utils.isDirty(false);
-    setCurrentProperties(_mock.getCurrentProperties());
+    setCurrentProperties(views.properties.getDefaults());
     
   }
 
@@ -476,6 +479,9 @@ var mockbox;
     },
     save: function(){
       _mock.database.save('prototypes',getSaveData());
+    },
+    refresh:function(){
+      updateIframe();
     },
     reset:function(){
       if(mockbox.isDirty()){

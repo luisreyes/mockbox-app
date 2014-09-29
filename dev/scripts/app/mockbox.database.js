@@ -60,7 +60,7 @@ _mock.database = (function(){
     }
 
     if(store !== 'templates'){
-      _mock.gui(currentGui);
+      _mock.gui(_mock.utils.getGUID());
     }
     
     // Put Entry
