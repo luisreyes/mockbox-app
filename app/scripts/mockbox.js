@@ -2105,8 +2105,14 @@ _mock.receiver = (function(){
         files = {},
         gui = data.model.versioned ? '_'+_mock.utils.getGUID() : '';
 
-        exportData.editors.html.value = html_beautify(_mock.templates.getBodyHeader({title: exportData.projectName})) + exportData.editors.html.value + _mock.templates.getBodyFooter('foot');
+        var parseHtml;
         
+        // Replace Style with Link if needed
+        var replaceVal = exportData.editors.css.value ? '<link rel="stylesheet" href="styles/styles.css">' : '';
+        
+        parseHtml = exportData.editors.html.value.replace(/<style id="mockbox-prototype-styles">([\s\S]*?)<\/style>/g, replaceVal);
+        exportData.editors.html.value = html_beautify(parseHtml);
+
         if(data.model.type === 'drive'){
           
           _mock.notification.send({type:'info', message:'Exporting to Google Drive', persist:true});
@@ -2170,6 +2176,7 @@ _mock.receiver = (function(){
         }else
 
         if(data.model.type === 'ftp'){
+          debugger;
           // Display Notification
           _mock.notification.send({type:'info', message:'Exporting to: '+data.model.host, persist:true});
           

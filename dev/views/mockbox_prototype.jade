@@ -1,7 +1,6 @@
 doctype html
 html
   head
-    link(rel="stylesheet" type="text/css" href="styles/iframe.css")
   
   style#mockbox-prototype-styles
   
@@ -25,10 +24,6 @@ html
       
       //- Create a new body to clear any bound events to the body
       var htmlTag = document.getElementsByTagName("html");
-      //- Set the contents of the body
-      //body.innerHTML = event.data.html;
-      //- Reset the current body to the new one
-      //document.body = body;
 
       if(props.html.html){
         props.html.html.forEach(function(attr){
@@ -46,7 +41,7 @@ html
       // TODO
       if(props.css.normalize){
         var link = document.createElement("link");
-        link.href = "custom_includes/normalize.css";
+        link.href = "includes/normalize.css";
         link.type = "text/css";
         link.rel = "stylesheet";
         document.getElementsByTagName("head")[0].appendChild(link);
@@ -66,7 +61,7 @@ html
         //- Create a new script to contain the latest code
         var scriptApollo = document.createElement("script");
         //- Set the type
-        scriptApollo.src = "custom_includes/apollo.min.js";
+        scriptApollo.src = "includes/apollo.min.js";
         //- Set the type
         scriptApollo.type = "text/javascript";
         //- Append script element to new body
@@ -85,17 +80,16 @@ html
       
         switch(props.js.framework){
           case 'jquery1':
-            frameworkScript.src = "custom_includes/jquery-1.11.1.min.js";
             scriptWrapper = ['$( document ).ready(function() {','});'];
+            frameworkScript.src = "includes/jquery-1.11.1.min.js";
             break;
           case 'jquery2':
-            frameworkScript.src = "custom_includes/jquery-2.1.1.min.js";
             scriptWrapper = ['$( document ).ready(function() {','});'];
+            frameworkScript.src = "includes/jquery-2.1.1.min.js";
             break;
           case 'angular':
             htmlTag[0].setAttribute('ng-app','');
-            frameworkScript.src = "custom_includes/angular.min.js";
-            //scriptWrapper = ['$( document ).ready(function() {','});'];
+            frameworkScript.src = "includes/angular.min.js";
             break;
         }
 
@@ -107,6 +101,7 @@ html
           var script = document.createElement("script");
           //- Set the type
           script.type = "text/javascript";
+          script.id="this script";
           //- Set the code to the script element
           script.innerHTML = scriptWrapper[0] + event.data.js + scriptWrapper[1];
           //- Append script element to new body
