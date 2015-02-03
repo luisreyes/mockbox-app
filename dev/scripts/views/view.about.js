@@ -5,7 +5,7 @@ _v.about = (function(){
       buttons = {},
       links = {
         twitter:'https://twitter.com/mockboxio',
-        email:'mailto:support@mockbox.io?subject=Hello MockBox'
+        email:'mailto:mockbox@luisreyes.com?subject=Hello MockBox'
       };
 
   function init(){

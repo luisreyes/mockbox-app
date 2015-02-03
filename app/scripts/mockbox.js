@@ -2305,9 +2305,9 @@ _mock.templates = (function(){
   function getTemplates(){
     return [
     {
-      "name": "MockBox Template",
-      "html": "<!-- MockBox HTML -->",
-      "css" : "/* MockBox CSS */",
+      "name": "MockBox Color Shift",
+      "html": "<main>MockBox</main>",
+      "css" : "body{background:#50a1ed;color:#fff;-webkit-animation-name:colorShift;-webkit-animation-duration:5s;-webkit-animation-timing-function:ease-in-out;-webkit-animation-delay:0;-webkit-animation-iteration-count:infinite;-webkit-animation-direction:alternate;-webkit-animation-play-state:running}@-webkit-keyframes colorShift{0%{background:#50a1ed;color:#fff}100%{background:#333;color:#50a1ed}}main{width:100%;position:absolute;top:50%;text-align:center;font-size:60px;line-height:0}",
       "js"  : "// JavaScript Here",
       "layout": [50,50,50],
       "author": "@luisreyesdev",

@@ -1,5 +1,14 @@
-MockBox v0.9.8.55
+MockBox v0.9.9
 
+---------------------------------------
+**v0.9.9 - 02/3/15 - 4:28pm**
+
+
+```
+- Turned off "Prototype Properties" for release 1
+- Package for release 1
+
+```
 ---------------------------------------
 **v0.9.8.55 - 09/22/14 - 1:32am**
 
