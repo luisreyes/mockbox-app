@@ -427,6 +427,10 @@ var mockbox;
    
   }
 
+  function _getSKU(sku){
+    return false;
+  }
+
   function _reset(){
     currentGui = null;
     document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New Prototype';
@@ -448,6 +452,9 @@ var mockbox;
     },
     tokens: function(){
       return tokens;
+    },
+    hasSKU: function(sku){ 
+      return _getSKU(sku);
     },
     getSettings: function(){ 
       return _settings;

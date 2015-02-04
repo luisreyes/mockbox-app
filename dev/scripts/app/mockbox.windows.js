@@ -83,6 +83,21 @@ _mock.windows = (function(){
       }
     },
 
+    purchase :{
+      file:'popout_purchase.html',
+      created: false,
+      options:{
+        id:'purchase',
+        frame: globals.frame,
+        hidden: globals.hidden,
+        resizable:false,
+        bounds: {
+          width: 400,
+          height: 200
+        }
+      }
+    },
+
     about :{
       file:'popout_about.html',
       created: false,

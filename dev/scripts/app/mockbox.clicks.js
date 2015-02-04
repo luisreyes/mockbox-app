@@ -114,6 +114,9 @@ _mock.clicks = (function(){
       var curWindow = chrome.app.window.get(_mock.popout.getCurrentId());
       curWindow.focus();
       curWindow.drawAttention();
+      setTimeout( function(){
+        curWindow.clearAttention();
+      },3000)
     });
     
     // Project Name Accept
@@ -195,12 +198,19 @@ _mock.clicks = (function(){
 
     buttons.export.addEventListener( 'click', function(e){
       
+
       // Verify the click happens opn the LI in the sidebar navigation
       var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        chrome.runtime.sendMessage({message:'onOpenPopout', popout:'export'});
+        
+        // Check if this package has been purchased
+        _mock.popout.open('purchase', function(){
+          // init the views js file
+          views.purchase.init();
+        });
+  
       }
     });
 

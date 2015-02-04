@@ -84,8 +84,15 @@ footer{
   .cancel{float:left;}
   
   .ok, 
-  .continue{ 
+  .continue,
+  .buy{ 
     float:right;
+  }
+
+  .buy{
+    width: 170px;
+    cursor: pointer;
+    img{ width: 100%; }
   }
   
 }

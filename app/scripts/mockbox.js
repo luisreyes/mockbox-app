@@ -427,6 +427,10 @@ var mockbox;
    
   }
 
+  function _getSKU(sku){
+    return false;
+  }
+
   function _reset(){
     currentGui = null;
     document.getElementById('app-header').querySelector('.project-name').innerHTML = 'New Prototype';
@@ -448,6 +452,9 @@ var mockbox;
     },
     tokens: function(){
       return tokens;
+    },
+    hasSKU: function(sku){ 
+      return _getSKU(sku);
     },
     getSettings: function(){ 
       return _settings;
@@ -619,6 +626,9 @@ _mock.clicks = (function(){
       var curWindow = chrome.app.window.get(_mock.popout.getCurrentId());
       curWindow.focus();
       curWindow.drawAttention();
+      setTimeout( function(){
+        curWindow.clearAttention();
+      },3000)
     });
     
     // Project Name Accept
@@ -700,12 +710,19 @@ _mock.clicks = (function(){
 
     buttons.export.addEventListener( 'click', function(e){
       
+
       // Verify the click happens opn the LI in the sidebar navigation
       var element = (e.target.localName === 'li') ? e.target : e.target.parentElement;
       
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
-        chrome.runtime.sendMessage({message:'onOpenPopout', popout:'export'});
+        
+        // Check if this package has been purchased
+        _mock.popout.open('purchase', function(){
+          // init the views js file
+          views.purchase.init();
+        });
+  
       }
     });
 
@@ -2054,7 +2071,7 @@ _mock.receiver = (function(){
               // init the views js file
               views.export.init(mockbox.getSettings());
             });
-            break;  
+            break;
         }
         
       break;
@@ -2082,6 +2099,12 @@ _mock.receiver = (function(){
         }else{
           _mock.clicks.buttons.addClass('save','inactive');
         }
+        break;
+
+      case 'onPurchased':
+        //Cache purchase data
+        _mock.popout.close('purchase');
+        chrome.runtime.sendMessage({message:'onOpenPopout', popout:'export'});  
         break;
       
       case 'onExport':
@@ -2584,6 +2607,21 @@ _mock.windows = (function(){
         bounds: {
           width: 500,
           height: 460
+        }
+      }
+    },
+
+    purchase :{
+      file:'popout_purchase.html',
+      created: false,
+      options:{
+        id:'purchase',
+        frame: globals.frame,
+        hidden: globals.hidden,
+        resizable:false,
+        bounds: {
+          width: 400,
+          height: 200
         }
       }
     },

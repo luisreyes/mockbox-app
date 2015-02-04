@@ -48,7 +48,7 @@ _mock.receiver = (function(){
               // init the views js file
               views.export.init(mockbox.getSettings());
             });
-            break;  
+            break;
         }
         
       break;
@@ -76,6 +76,12 @@ _mock.receiver = (function(){
         }else{
           _mock.clicks.buttons.addClass('save','inactive');
         }
+        break;
+
+      case 'onPurchased':
+        //Cache purchase data
+        _mock.popout.close('purchase');
+        chrome.runtime.sendMessage({message:'onOpenPopout', popout:'export'});  
         break;
       
       case 'onExport':

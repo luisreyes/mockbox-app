@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "MockBox",
-  "version": "0.9.9",
-  "description": "Prorotype and Deploy",
+  "version": "0.9.91",
+  "description": "Develop and export quick prototypes.",
   "sandbox": {
     "pages": ["mockbox_prototype.html"]
   },
@@ -19,7 +19,7 @@
     }
   },
   "update_url": "https://clients2.google.com/service/update2/crx",
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlgV1yA1tt/g1QefsgF2O9xm4YyLWbwwifA6mLbZBV/ArNgb2CeGH4vSqTBflYY3ynd3lFBB9P9o5vLqgmzD3zpormNHQo/XCRjlP8P8Hqbuhu2lY3SJLO+U/a4l2MNwrGLINsB1Ct7owC6EC7E3gZM5JbX/2AVhOynGFls14rUVS2v1vYtTOr0oBKkZkyY7jQP2vBNF1cURwG9w8QkgTc8zvDcESiI50FyGvcRyorCAksIUYQBPhQaM8a8U7JA3/3ltGETFzUDWQ2aatyodWXiQh3njqgQDpczjJBiiQ9L1jqHvl02Edgh/vqM1DLfenx6JHVVsvNHNRm5JR4sXi3wIDAQAB",
+  
   "permissions": [
     {"socket": ["tcp-connect:*:*"]},
     "identity",
