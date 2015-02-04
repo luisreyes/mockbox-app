@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "MockBox",
-  "version": "0.9.91",
+  "version": "0.9.93",
   "description": "Develop and export quick prototypes.",
   "sandbox": {
     "pages": ["mockbox_prototype.html"]
