@@ -160,9 +160,13 @@ footer {
 
 }
 
-.a{
+.a, a{
   cursor: default;/*pointer;*/
-  &:hover{ text-decoration: underline; }
+  
+  &:link, &:visited{ color: #994343; text-decoration: none;}
+  
+  &:hover, &:active{ color: #AA4B4B; text-decoration: underline; }
+  
   &.small{ 
     color:$app-popout-link-color;
     font-size:smaller;

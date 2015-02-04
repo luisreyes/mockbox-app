@@ -8,8 +8,7 @@
   "scripts":[ 
     "scripts/lib.js",
     "scripts/views.js",
-    "scripts/mockbox.js",
-    "https://sandbox.google.com/checkout/inapp/lib/buy.js"
+    "scripts/mockbox.js"
   ],
 
   "popout":{

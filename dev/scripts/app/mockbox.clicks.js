@@ -28,6 +28,8 @@ _mock.clicks = (function(){
 
   // Collection of buttons
   buttons = {
+    // Logo
+    logo: header.querySelector('.app-logo'),
 
     // Navigation
     profileLink:sidebar.querySelector('.profile-name'),
@@ -36,6 +38,7 @@ _mock.clicks = (function(){
     save      :sidebar.querySelector('.save'),
     load      :sidebar.querySelector('.load'),
     export    :sidebar.querySelector('.export'),
+    donate    :sidebar.querySelector('.donate'),
     about     :sidebar.querySelector('.about'),
     profile   :sidebar.querySelector('.profile-settings'),
 
@@ -134,6 +137,14 @@ _mock.clicks = (function(){
     // Additional Clicks
     // ---------------------------------------------- //    
 
+    // Logo
+    buttons.logo.addEventListener( 'click', function(){
+      _mock.popout.open('about', function(){
+          // init the views js file
+          views.about.init();
+        });
+    });
+
     // Sidebar Buttons Action
 
     // New Button
@@ -156,6 +167,12 @@ _mock.clicks = (function(){
       if(!apollo.hasClass(element, 'inactive')){
         _mock.save();
       }
+    });
+
+    // Donate
+    buttons.donate.addEventListener( 'click', function(){
+      // Open external page
+      window.open('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CZAK3N73FB3R8', '_blank');
     });
 
     // About

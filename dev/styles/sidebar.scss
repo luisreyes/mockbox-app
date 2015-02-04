@@ -41,6 +41,15 @@
         }
       }
 
+      &.special{
+        background-color: $special-nav-item-color;
+        color:$accent-color-font-hover;
+        cursor:pointer;
+        &:hover{
+          padding-left:12px;
+        }
+      }
+
       &:hover{
         color:$accent-color-font-hover;
         padding-left:12px;
