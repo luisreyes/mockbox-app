@@ -205,11 +205,14 @@ _mock.clicks = (function(){
       // If it has a class 'inactive' ignore the click
       if(!apollo.hasClass(element, 'inactive')){
         
-        // Check if this package has been purchased
-        _mock.popout.open('purchase', function(){
-          // init the views js file
-          views.purchase.init();
-        });
+        chrome.runtime.sendMessage({message:'onOpenPopout', popout:'export'});
+
+        // REMOVE PURCHASE FOR NOW 2/4/2015
+        // // Check if this package has been purchased
+        // _mock.popout.open('purchase', function(){
+        //   // init the views js file
+        //   views.purchase.init();
+        // });
   
       }
     });

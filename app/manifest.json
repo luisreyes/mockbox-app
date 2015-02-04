@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "MockBox",
-  "version": "0.9.93",
+  "version": "1.0.0",
   "description": "Develop and export quick prototypes.",
   "sandbox": {
     "pages": ["mockbox_prototype.html"]
@@ -19,7 +19,7 @@
     }
   },
   "update_url": "https://clients2.google.com/service/update2/crx",
-  
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAojKvZ1dd7kEmgxq3v9WYxZZTQFCo0nxfnlX0fdvZWooCNk4I4z2ZQn81ppf+lgbPVVN5CKC4EHquBLws3J8amRLoBZqOPoRQW/yT2XmyydgTJ/nRzqami7THGiEvxW556oC5tyshfHJr2NQKJzmV4d+ld3Izsg7bv9tBXoJGpifr9Cxe0/A/Xa4VjF/cfeoaWx+OkojBpPhXoftpI2GJb3CX/mKjVh4ZzEsiYt+xpkNsA0fpcsJ5FO+cxlcVk14L+OqEeiw0U9QbA4+MzkzILkIcf7RxrP96mr4qo3yBeLFJGs2YJ/tVP1WbB8geSYrhj6Cm0WSFECLDZQXOfYVw1wIDAQAB",
   "permissions": [
     {"socket": ["tcp-connect:*:*"]},
     "identity",
@@ -30,7 +30,7 @@
     "https://www.googleapis.com/"
   ],
   "oauth2": {
-    "client_id": "599622858138-0pnf0pheaoe3ltssbjor765l7cb95eam.apps.googleusercontent.com",
+    "client_id": "599622858138-cb99mgg6eqs4t8gd49aq2e73bmo9u9dg.apps.googleusercontent.com",
     "scopes": [
       "https://www.googleapis.com/auth/drive.file",
       "https://www.googleapis.com/auth/chromewebstore.readonly"

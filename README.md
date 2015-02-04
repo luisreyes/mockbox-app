@@ -1,4 +1,14 @@
-MockBox v0.9.9
+MockBox v1.0.0
+
+---------------------------------------
+**v1.0.0 - 02/4/15 - 11:39am**
+
+
+```
+- Turned off "Purchases" for release 1
+- Release to Chrome Web Store <a target="_blank" href="https://chrome.google.com/webstore/detail/mockbox/pgggcnphpclajipbdnnimhelglfjpgmn"> View App </a>
+
+```
 
 ---------------------------------------
 **v0.9.9 - 02/3/15 - 4:28pm**

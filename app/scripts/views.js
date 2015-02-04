@@ -28,7 +28,7 @@ _v.about = (function(){
       buttons = {},
       links = {
         twitter:'https://twitter.com/mockboxio',
-        email:'mailto:mockbox@luisreyes.com?subject=Hello MockBox'
+        email:'mailto:mockbox@luisreyes.com?subject=Hello MockBox Support'
       };
 
   function init(){
@@ -53,37 +53,13 @@ _v.about = (function(){
 
     buttons.email.addEventListener( 'click', function(){
       // Open external page
-      //openLink('email');
-      testGooglePayments();
+      openLink('email');
     });
   }
 
   function openLink(loc){
     // Open external page
     window.open(links[loc], '_blank');
-  }
-
-  function testGooglePayments(){
-    google.payments.inapp.getPurchases({
-        'success': function(){
-          console.log('Purch Success');
-        },
-        'failure': function(){
-          console.log('Purch fail');   
-        }
-      });
-
-      google.payments.inapp.getSkuDetails({
-          'parameters': {'env': 'prod'},
-          'success': function(){
-            console.log('SKU Success');
-            console.log(arguments);
-          },
-          'failure': function(){
-            console.log('SKU fail');
-            console.log(arguments);   
-          }
-        });
   }
 
   function checkUpdate(){
